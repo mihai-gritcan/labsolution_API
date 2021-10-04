@@ -14,7 +14,6 @@ namespace LabSolution.Controllers
     [ApiController]
     public class AvailabilityController : ControllerBase
     {
-
         private readonly IOrderService _orderService;
 
         public AvailabilityController(IOrderService orderService)
