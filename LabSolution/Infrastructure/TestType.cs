@@ -1,6 +1,6 @@
 ﻿namespace LabSolution.Infrastructure
 {
-    public enum TestTypes
+    public enum TestType
     {
         Quick = 1,
         PCR = 2

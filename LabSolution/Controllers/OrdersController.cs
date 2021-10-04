@@ -38,8 +38,8 @@ namespace LabSolution.Controllers
                 ParentId = x.ParentId,
                 Placed = x.Placed,
                 Scheduled = x.Scheduled,
-                PrefferedLanguage = (TestLanguages)x.PrefferedLanguage,
-                TestType = (TestTypes)x.TestType
+                PrefferedLanguage = (TestLanguage)x.PrefferedLanguage,
+                TestType = (TestType)x.TestType
             });
 
             return Ok(response);
