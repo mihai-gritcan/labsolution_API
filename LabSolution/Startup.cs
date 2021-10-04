@@ -29,6 +29,8 @@ namespace LabSolution
             services.AddScoped<IOrderService, OrderService>();
 
             services.AddDbContext<LabSolutionContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+            
+            services.AddHealthChecks();
 
             services.AddSwaggerGen(c =>
             {
@@ -49,6 +51,8 @@ namespace LabSolution
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseHealthChecks("/status/health");
 
             app.UseMiddleware<ExceptionMiddleware>();
 

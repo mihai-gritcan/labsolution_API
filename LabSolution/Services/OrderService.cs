@@ -64,7 +64,7 @@ namespace LabSolution.Services
                 {
                     CustomerId = customerId,
                     Placed = DateTime.Now,
-                    Scheduled = createOrder.ScheduledTime,
+                    Scheduled = createOrder.ScheduledDateTime,
                     TestType = (int)TestTypes.Quick,
                     PrefferedLanguage = (int)TestLanguages.Romanian,
                     ParentId = shouldSetParentId ? rootCustomer.Id : null
