@@ -15,7 +15,7 @@ namespace LabSolution.Services
         Task<List<CustomerOrder>> SaveOrders(CreateOrderRequest createOrder, IEnumerable<Customer> customersEntities);
         Task<List<DateTime>> GetOccupiedTimeSlots(DateTime date);
         Task<List<CreatedOrdersResponse>> GetOrders(DateTime date);
-        Task<DateTime> GetOrderScheduledDateTime(int createdOrderId);
+        Task<CustomerOrder> GetOrderDetails(int createdOrderId);
     }
 
     public class OrderService : IOrderService
@@ -50,9 +50,9 @@ namespace LabSolution.Services
                 .ToListAsync();
         }
 
-        public Task<DateTime> GetOrderScheduledDateTime(int createdOrderId)
+        public Task<CustomerOrder> GetOrderDetails(int createdOrderId)
         {
-            return _context.CustomerOrders.Where(x => x.Id == createdOrderId).Select(x => x.Scheduled).SingleOrDefaultAsync();
+            return _context.CustomerOrders.SingleOrDefaultAsync(x => x.Id == createdOrderId);
         }
 
         public async Task<List<CustomerOrder>> SaveOrders(CreateOrderRequest createOrder, IEnumerable<Customer> customersEntities)
