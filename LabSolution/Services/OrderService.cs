@@ -44,8 +44,8 @@ namespace LabSolution.Services
                     ParentId = x.ParentId,
                     Placed = x.Placed,
                     Scheduled = x.Scheduled,
-                    PrefferedLanguage = (TestLanguages)x.PrefferedLanguage,
-                    TestType = (TestTypes)x.TestType
+                    PrefferedLanguage = (TestLanguage)x.PrefferedLanguage,
+                    TestType = (TestType)x.TestType
                 })
                 .ToListAsync();
         }
@@ -71,8 +71,8 @@ namespace LabSolution.Services
                     CustomerId = customerId,
                     Placed = DateTime.Now,
                     Scheduled = createOrder.ScheduledDateTime,
-                    TestType = (int)TestTypes.Quick,
-                    PrefferedLanguage = (int)TestLanguages.Romanian,
+                    TestType = (int)TestType.Quick,
+                    PrefferedLanguage = (int)TestLanguage.Romanian,
                     ParentId = shouldSetParentId ? rootCustomer.Id : null
                 };
 

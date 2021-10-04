@@ -25,7 +25,7 @@ namespace LabSolution.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAvailableTimeSlots([FromQuery] DailySlotsAvailabilityRequest dailySlotsAvailabilityRequest)
         {
-            if (!LabDailyAvailabilityProvider.IsWhenOfficeIsOpen(dailySlotsAvailabilityRequest.Date))
+            if (!LabDailyAvailabilityProvider.IsWorkingDay(dailySlotsAvailabilityRequest.Date))
                 return Ok(new DailyAvailableTimeSlotsResponse(dailySlotsAvailabilityRequest.Date));
 
             var placedOrders = await _orderService.GetOccupiedTimeSlots(dailySlotsAvailabilityRequest.Date);

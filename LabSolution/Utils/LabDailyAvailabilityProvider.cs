@@ -16,7 +16,12 @@ namespace LabSolution.Utils
 
         public static bool IsWhenOfficeIsOpen(DateTime date)
         {
-            return date.DayOfWeek != DayOfWeek.Sunday && date >= StartOfDay(date) && date < EndOfDay(date);
+            return IsWorkingDay(date) && date >= StartOfDay(date) && date < EndOfDay(date);
+        }
+
+        public static bool IsWorkingDay(DateTime date)
+        {
+            return date.DayOfWeek != DayOfWeek.Sunday;
         }
     }
 }
