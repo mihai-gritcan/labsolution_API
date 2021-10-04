@@ -1,5 +1,6 @@
 ﻿using LabSolution.HttpModels;
 using LabSolution.Services;
+using LabSolution.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,9 +14,6 @@ namespace LabSolution.Controllers
     [ApiController]
     public class AvailabilityController : ControllerBase
     {
-        private const int _defaultStartHour = 8;
-        private const int _defaultEndHour = 18;
-        private const int _defaultPlacesPer10Minutes = 5;
 
         private readonly IOrderService _orderService;
 
@@ -24,16 +22,11 @@ namespace LabSolution.Controllers
             _orderService = orderService;
         }
 
-        // Default configuration is from 8:00 to 18:00 -> 5 places at each 10 minutes
-
-        private DateTime StartOfDay(DateTime date) => new DateTime(date.Year, date.Month, date.Day, _defaultStartHour, 0, 0);
-        private DateTime EndOfDay(DateTime date) => new DateTime(date.Year, date.Month, date.Day, _defaultEndHour, 0, 0);
-
         [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult> GetAvailableTimeSlots([FromQuery] DailySlotsAvailabilityRequest dailySlotsAvailabilityRequest)
         {
-            if (dailySlotsAvailabilityRequest.Date.DayOfWeek == DayOfWeek.Sunday)
+            if (!LabDailyAvailabilityProvider.IsWhenOfficeIsOpen(dailySlotsAvailabilityRequest.Date))
                 return Ok(new DailyAvailableTimeSlotsResponse(dailySlotsAvailabilityRequest.Date));
 
             var placedOrders = await _orderService.GetOccupiedTimeSlots(dailySlotsAvailabilityRequest.Date);
@@ -41,13 +34,13 @@ namespace LabSolution.Controllers
             return Ok(BuildDailyStructure(dailySlotsAvailabilityRequest.Date, placedOrders));
         }
 
-        private DailyAvailableTimeSlotsResponse BuildDailyStructure(DateTime date, List<DateTime> occupiedSlots)
+        private static DailyAvailableTimeSlotsResponse BuildDailyStructure(DateTime date, List<DateTime> occupiedSlots)
         {
             var structure = new DailyAvailableTimeSlotsResponse(date);
 
-            var iterator = StartOfDay(date);
+            var iterator = LabDailyAvailabilityProvider.StartOfDay(date);
 
-            while (iterator < EndOfDay(date))
+            while (iterator < LabDailyAvailabilityProvider.EndOfDay(date))
             {
                 var nextIntervalStart = iterator.AddMinutes(10);
                 structure.AvailableSlots.Add(new DailyAvailableTimeSlotsResponse.TimeSlot(iterator, GetNumberOfAvaliableSlotsPerInterval(iterator, nextIntervalStart, occupiedSlots)));
@@ -60,7 +53,7 @@ namespace LabSolution.Controllers
         private static int GetNumberOfAvaliableSlotsPerInterval(DateTime intervalStart, DateTime intervalEnd, List<DateTime> dailyOccupiedSlots)
         {
             var placedOrdersCount = dailyOccupiedSlots.Count(x => x >= intervalStart && x < intervalEnd);
-            return _defaultPlacesPer10Minutes - placedOrdersCount;
+            return LabDailyAvailabilityProvider.DefaultPlacesPer10Minutes - placedOrdersCount;
         }
     }
 }

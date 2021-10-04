@@ -43,7 +43,6 @@ namespace LabSolution.Dtos
         [EmailAddress]
         public string Email { get; set; }
 
-        [JsonIgnore]
         public bool IsRootCustomer { get; set; }
 
         public static CustomerDto CreateDtoFromEntity(Customer entity)
