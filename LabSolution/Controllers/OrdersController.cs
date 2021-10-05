@@ -25,7 +25,7 @@ namespace LabSolution.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest createOrder)
+        public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest createOrder) //SAVE IsRootCustomer
         {
             var allSavedCustomers = await _customerService.SaveCustomers(createOrder.Customers);
 
@@ -34,12 +34,12 @@ namespace LabSolution.Controllers
             var response = addedOrders.Select(x => new CreatedOrdersResponse {
                 Id = x.Id,
                 CustomerId = x.CustomerId,
-                Customer = CustomerDto.CreateDtoFromEntity(allSavedCustomers.Find(c => c.Id == x.CustomerId)),
+                Customer = CustomerDto.CreateDtoFromEntity(allSavedCustomers.Find(c => c.Id == x.CustomerId), isRootCustomer: x.ParentId == null),
                 ParentId = x.ParentId,
                 Placed = x.Placed,
                 Scheduled = x.Scheduled,
                 PrefferedLanguage = (TestLanguage)x.PrefferedLanguage,
-                TestType = (TestType)x.TestType
+                TestType = (TestType)x.TestType,
             });
 
             return Ok(response);
@@ -49,6 +49,12 @@ namespace LabSolution.Controllers
         public async Task<ActionResult> GetOrdersByDate([FromQuery] DateTime date)
         {
             return Ok(await _orderService.GetOrders(date));
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> SetTicketWasEmitted()
+        {
+            throw new NotImplementedException();
         }
     }
 }

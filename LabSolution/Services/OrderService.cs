@@ -40,7 +40,7 @@ namespace LabSolution.Services
                 {
                     Id = x.Id,
                     CustomerId = x.CustomerId,
-                    Customer = CustomerDto.CreateDtoFromEntity(x.Customer),
+                    Customer = CustomerDto.CreateDtoFromEntity(x.Customer, x.ParentId == null),
                     ParentId = x.ParentId,
                     Placed = x.Placed,
                     Scheduled = x.Scheduled,
@@ -59,12 +59,13 @@ namespace LabSolution.Services
         {
             var ordersToAdd = new List<CustomerOrder>();
 
-            var shouldSetParentId = createOrder.Customers.Count > 1;
+            
             var rootCustomer = customersEntities.Single(x => x.PersonalNumber == createOrder.Customers.First(c => c.IsRootCustomer).PersonalNumber);
 
             foreach (var customer in createOrder.Customers)
             {
                 var customerId = customersEntities.Single(x => x.PersonalNumber == customer.PersonalNumber).Id;
+                var shouldSetParentId = !customer.IsRootCustomer && createOrder.Customers.Count > 1;
 
                 var customerOrder = new CustomerOrder
                 {

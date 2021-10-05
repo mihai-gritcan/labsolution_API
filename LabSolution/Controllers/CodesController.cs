@@ -2,7 +2,6 @@
 using LabSolution.Services;
 using LabSolution.Utils;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
