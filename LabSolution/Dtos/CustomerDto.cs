@@ -45,7 +45,7 @@ namespace LabSolution.Dtos
 
         public bool IsRootCustomer { get; set; }
 
-        public static CustomerDto CreateDtoFromEntity(Customer entity)
+        public static CustomerDto CreateDtoFromEntity(Customer entity, bool isRootCustomer)
         {
             return new CustomerDto
             {
@@ -58,7 +58,8 @@ namespace LabSolution.Dtos
                 Passport = entity.Passport,
                 PersonalNumber = entity.PersonalNumber,
                 Phone = entity.Phone,
-                Email = entity.Email
+                Email = entity.Email,
+                IsRootCustomer = isRootCustomer
             };
         }
     }
