@@ -34,5 +34,17 @@ namespace LabSolution.Controllers
 
             return Ok(File(barcode, "image/jpeg"));
         }
+        
+        [HttpGet("qrcode")]
+        public async Task<ActionResult> GetQRCode([FromQuery] int orderId)
+        {
+            var orderDetails = await _orderService.GetOrderDetails(orderId);
+            if (orderDetails is null) return NotFound();
+
+            var numericCode = BarcodeProvider.GenerateNumericCode(orderDetails.Scheduled, orderId);
+            var qrCode = QRCodeProvider.GeneratQRCode(numericCode);
+
+            return Ok(File(qrCode, "image/jpeg"));
+        }
     }
 }
