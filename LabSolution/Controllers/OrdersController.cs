@@ -51,6 +51,7 @@ namespace LabSolution.Controllers
             return Ok(await _orderService.GetOrders(date));
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPut]
         public async Task<ActionResult> SetTicketWasEmitted()
         {

@@ -1,9 +1,22 @@
-﻿using System;
+﻿using BarcodeLib;
+using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 
 namespace LabSolution.Utils
 {
-    public static class NumericCodeProvider
+    public static class BarcodeProvider
     {
+        public static byte[] GenerateBarcode(DateTime date, int customerOrderNumber)
+        {
+            var numericCode = GenerateNumericCode(date, customerOrderNumber);
+
+            var barcode = new Barcode();
+            var img = barcode.Encode(TYPE.CODE39, numericCode.ToString(), Color.Black, Color.White, 250, 100);
+            return ConvertImageToBytes(img);
+        }
+
         // 2021-10-12 1:30 -> 110121130 + 5 digits from customerOrderNumber => 11012113000015
         public static long GenerateNumericCode(DateTime date, int customerOrderNumber)
         {
@@ -22,6 +35,13 @@ namespace LabSolution.Utils
                 throw new ArgumentException($"Can't generat numeric code based on the input parameters: '{date}', '{customerOrderNumber}'");
 
             return numericCode;
+        }
+
+        private static byte[] ConvertImageToBytes(Image image)
+        {
+            using var ms = new MemoryStream();
+            image.Save(ms, ImageFormat.Png);
+            return ms.ToArray();
         }
     }
 }
