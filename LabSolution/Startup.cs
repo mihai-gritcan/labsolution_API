@@ -47,6 +47,14 @@ namespace LabSolution
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "LabSolution v1"));
             }
+            else
+            {
+                if (string.Equals(Configuration.GetSection("UseSwaggerInProd").Value, "true", System.StringComparison.InvariantCultureIgnoreCase))
+                {
+                    app.UseSwagger();
+                    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "LabSolution v1"));
+                }
+            }
 
             app.UseHttpsRedirection();
 
