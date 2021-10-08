@@ -31,6 +31,8 @@ namespace LabSolution
             services.AddDbContext<LabSolutionContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
             
             services.AddHealthChecks();
+            
+            //services.AddCors();
 
             services.AddSwaggerGen(c =>
             {
@@ -55,6 +57,10 @@ namespace LabSolution
                     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "LabSolution v1"));
                 }
             }
+
+            //app.UseCors(x => x.AllowAnyMethod()
+            //                  .AllowAnyHeader()
+            //                  .WithOrigins("http://localhost:4200"));
 
             app.UseHttpsRedirection();
 
