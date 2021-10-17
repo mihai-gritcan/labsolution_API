@@ -27,6 +27,7 @@ namespace LabSolution
 
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<ITokenService, TokenService>();
 
             services.AddDbContext<LabSolutionContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
             
