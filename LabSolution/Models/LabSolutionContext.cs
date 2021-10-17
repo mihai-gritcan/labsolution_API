@@ -13,6 +13,7 @@ namespace LabSolution.Models
         {
         }
 
+        public virtual DbSet<AppUser> AppUsers { get; set; }
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<CustomerOrder> CustomerOrders { get; set; }
 
