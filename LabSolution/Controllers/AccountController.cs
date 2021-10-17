@@ -1,6 +1,7 @@
 ﻿using LabSolution.HttpModels;
 using LabSolution.Models;
 using LabSolution.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
@@ -22,6 +23,7 @@ namespace LabSolution.Controllers
 			_tokenService = tokenService;
         }
 
+		[AllowAnonymous]
 		[HttpPost("login")]
 		public async Task<ActionResult<UserLoggedInResponse>> Login(UserLoginRequest userLoginRequest)
 		{
@@ -45,6 +47,7 @@ namespace LabSolution.Controllers
 			};
 		}
 
+		[AllowAnonymous]
 		[HttpPost("register")]
 		public async Task<ActionResult<AppUser>> Register(UserRegisterRequest userRegisterRequest)
 		{

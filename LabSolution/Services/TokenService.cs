@@ -34,8 +34,10 @@ namespace LabSolution.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(7),
-                SigningCredentials = creds
+                Expires = DateTime.Now.AddDays(1),
+                SigningCredentials = creds, 
+                Audience = "https://localhost:44314",
+                Issuer = "https://localhost:44314"
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
