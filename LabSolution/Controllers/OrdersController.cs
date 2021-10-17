@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace LabSolution.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OrdersController : ControllerBase
@@ -25,7 +26,7 @@ namespace LabSolution.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest createOrder) //SAVE IsRootCustomer
+        public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest createOrder)
         {
             var allSavedCustomers = await _customerService.SaveCustomers(createOrder.Customers);
 
@@ -51,7 +52,7 @@ namespace LabSolution.Controllers
             return Ok(await _orderService.GetOrders(date));
         }
 
-        //[ApiExplorerSettings(IgnoreApi = true)]
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPut]
         public async Task<ActionResult> SetTicketWasEmitted()
         {

@@ -1,13 +1,17 @@
 using LabSolution.Infrastructure;
 using LabSolution.Models;
 using LabSolution.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 namespace LabSolution
 {
@@ -30,14 +34,39 @@ namespace LabSolution
             services.AddScoped<ITokenService, TokenService>();
 
             services.AddDbContext<LabSolutionContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
-            
+
             services.AddHealthChecks();
-            
-            //services.AddCors();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("EnableCORS", builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                });
+            });
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "LabSolution", Version = "v1" });
+            });
+
+            services.AddAuthentication(opts =>
+            {
+                opts.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opts.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options => {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = "https://localhost:44314",
+                    ValidAudience = "https://localhost:44314",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"]))
+                };
             });
         }
 
@@ -59,11 +88,8 @@ namespace LabSolution
                 }
             }
 
-            //app.UseCors(x => x.AllowAnyMethod()
-            //                  .AllowAnyHeader()
-            //                  .WithOrigins("http://localhost:4200"));
-
             app.UseHttpsRedirection();
+            app.UseCors("EnableCORS");
 
             app.UseRouting();
 
@@ -71,6 +97,7 @@ namespace LabSolution
 
             app.UseMiddleware<ExceptionMiddleware>();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
