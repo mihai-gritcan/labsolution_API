@@ -12,7 +12,7 @@ namespace LabSolution.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AvailabilityController : ControllerBase
+    public class AvailabilityController : BaseApiController
     {
         private readonly IOrderService _orderService;
 

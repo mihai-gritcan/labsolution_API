@@ -16,6 +16,7 @@ namespace LabSolution.Services
         Task<List<DateTime>> GetOccupiedTimeSlots(DateTime date);
         Task<List<CreatedOrdersResponse>> GetOrders(DateTime date);
         Task<CustomerOrder> GetOrderDetails(int createdOrderId);
+        Task UpdateOrder(UpdateOrderRequest updateOrderRequest);
     }
 
     public class OrderService : IOrderService
@@ -84,6 +85,21 @@ namespace LabSolution.Services
             await _context.SaveChangesAsync();
 
             return ordersToAdd;
+        }
+
+        public async Task UpdateOrder(UpdateOrderRequest updateOrderRequest)
+        {
+            var orderEntity = await _context.CustomerOrders.FindAsync(updateOrderRequest.Id);
+            if (orderEntity is null)
+                throw new ResourceNotFoundException();
+
+            orderEntity.PrefferedLanguage = (short)updateOrderRequest.TestLanguage;
+            orderEntity.TestType = (short)updateOrderRequest.TestType;
+            orderEntity.Scheduled = updateOrderRequest.ScheduledDateTime;
+
+            _context.CustomerOrders.Update(orderEntity);
+
+            await _context.SaveChangesAsync();
         }
     }
 }

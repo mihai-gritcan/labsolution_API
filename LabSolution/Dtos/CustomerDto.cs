@@ -2,7 +2,6 @@
 using LabSolution.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace LabSolution.Dtos
 {
@@ -60,6 +59,24 @@ namespace LabSolution.Dtos
                 Phone = entity.Phone,
                 Email = entity.Email,
                 IsRootCustomer = isRootCustomer
+            };
+        }
+
+
+        public static Customer CreateEntityFromDto(CustomerDto entity)
+        {
+            return new Customer
+            {
+                Id = entity.Id,
+                FirstName = entity.FirstName,
+                LastName = entity.LastName,
+                Gender = (int)entity.Gender,
+                DateOfBirth = entity.DateOfBirth,
+                Address = entity.Address,
+                Passport = entity.Passport,
+                PersonalNumber = entity.PersonalNumber,
+                Phone = entity.Phone,
+                Email = entity.Email
             };
         }
     }
