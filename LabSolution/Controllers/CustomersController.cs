@@ -29,9 +29,21 @@ namespace LabSolution.Controllers
                 return BadRequest();
             }
 
-            var entity = CustomerDto.CreateEntityFromDto(customer);
+            var customerEntity = await _context.Customers.FindAsync(customer.Id);
+            if (customerEntity is null)
+                return NotFound();
 
-            _context.Entry(entity).State = EntityState.Modified;
+            customerEntity.FirstName = customer.FirstName;
+            customerEntity.LastName = customer.LastName;
+            customerEntity.Gender = (int)customer.Gender;
+            customerEntity.DateOfBirth = customer.DateOfBirth;
+            customerEntity.Address = customer.Address;
+            customerEntity.Passport = customer.Passport;
+            customerEntity.PersonalNumber = customer.PersonalNumber;
+            customerEntity.Phone = customer.Phone;
+            customerEntity.Email = customer.Email;
+
+            _context.Customers.Update(customerEntity);
 
             try
             {
