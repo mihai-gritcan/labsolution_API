@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LabSolution.Models;
+using LabSolution.Dtos;
 
 namespace LabSolution.Controllers
 {
-    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomersController : ControllerBase
+    public class CustomersController : BaseApiController
     {
         private readonly LabSolutionContext _context;
 
@@ -21,38 +21,29 @@ namespace LabSolution.Controllers
             _context = context;
         }
 
-        // GET: api/Customers
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
-        {
-            return await _context.Customers.ToListAsync();
-        }
-
-        // GET: api/Customers/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomer(int id)
-        {
-            var customer = await _context.Customers.FindAsync(id);
-
-            if (customer == null)
-            {
-                return NotFound();
-            }
-
-            return customer;
-        }
-
-        // PUT: api/Customers/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCustomer(int id, Customer customer)
+        public async Task<IActionResult> PutCustomer(int id, CustomerDto customer)
         {
             if (id != customer.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(customer).State = EntityState.Modified;
+            var customerEntity = await _context.Customers.FindAsync(customer.Id);
+            if (customerEntity is null)
+                return NotFound();
+
+            customerEntity.FirstName = customer.FirstName;
+            customerEntity.LastName = customer.LastName;
+            customerEntity.Gender = (int)customer.Gender;
+            customerEntity.DateOfBirth = customer.DateOfBirth;
+            customerEntity.Address = customer.Address;
+            customerEntity.Passport = customer.Passport;
+            customerEntity.PersonalNumber = customer.PersonalNumber;
+            customerEntity.Phone = customer.Phone;
+            customerEntity.Email = customer.Email;
+
+            _context.Customers.Update(customerEntity);
 
             try
             {
@@ -73,8 +64,35 @@ namespace LabSolution.Controllers
             return NoContent();
         }
 
-        // POST: api/Customers
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        private bool CustomerExists(int id)
+        {
+            return _context.Customers.Any(e => e.Id == id);
+        }
+
+        #region Unnecessary methods
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+        {
+            return await _context.Customers.ToListAsync();
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Customer>> GetCustomer(int id)
+        {
+            var customer = await _context.Customers.FindAsync(id);
+
+            if (customer == null)
+            {
+                return NotFound();
+            }
+
+            return customer;
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
         {
@@ -84,7 +102,7 @@ namespace LabSolution.Controllers
             return CreatedAtAction(nameof(GetCustomer), new { id = customer.Id }, customer);
         }
 
-        // DELETE: api/Customers/5
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
@@ -100,9 +118,6 @@ namespace LabSolution.Controllers
             return NoContent();
         }
 
-        private bool CustomerExists(int id)
-        {
-            return _context.Customers.Any(e => e.Id == id);
-        }
+        #endregion Unnecessary methods
     }
 }

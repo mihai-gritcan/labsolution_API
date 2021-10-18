@@ -13,7 +13,7 @@ namespace LabSolution.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class OrdersController : ControllerBase
+    public class OrdersController : BaseApiController
     {
         private readonly ICustomerService _customerService;
         private readonly IOrderService _orderService;
@@ -52,11 +52,24 @@ namespace LabSolution.Controllers
             return Ok(await _orderService.GetOrders(date));
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpPut]
-        public async Task<ActionResult> SetTicketWasEmitted()
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutOrder(int id, UpdateOrderRequest updateOrderRequest)
         {
-            throw new NotImplementedException();
+            if (id != updateOrderRequest.Id)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                await _orderService.UpdateOrder(updateOrderRequest);
+            }
+            catch (ResourceNotFoundException)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
         }
     }
 }

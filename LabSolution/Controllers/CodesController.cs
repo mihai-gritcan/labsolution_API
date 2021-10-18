@@ -1,15 +1,13 @@
 ﻿using LabSolution.Services;
 using LabSolution.Utils;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace LabSolution.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class CodesController : ControllerBase
+    public class CodesController : BaseApiController
     {
         private readonly IOrderService _orderService;
         public CodesController(IOrderService orderService)
@@ -36,7 +34,7 @@ namespace LabSolution.Controllers
 
             return Ok(File(barcode, "image/jpeg"));
         }
-
+        
         [HttpGet("qrcode")]
         public async Task<ActionResult> GetQRCode([FromQuery] int orderId)
         {
