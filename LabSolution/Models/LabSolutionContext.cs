@@ -16,6 +16,7 @@ namespace LabSolution.Models
         public virtual DbSet<AppUser> AppUsers { get; set; }
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<CustomerOrder> CustomerOrders { get; set; }
+        public virtual DbSet<ProcessedOrder> ProcessedOrders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

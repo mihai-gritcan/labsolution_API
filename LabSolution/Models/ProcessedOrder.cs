@@ -23,5 +23,6 @@ namespace LabSolution.Models
         [ForeignKey(nameof(CustomerOrderId))]
         [InverseProperty("ProcessedOrder")]
         public virtual CustomerOrder CustomerOrder { get; set; }
+        public long NumericCode { get; internal set; }
     }
 }

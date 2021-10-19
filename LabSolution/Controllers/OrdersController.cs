@@ -1,7 +1,9 @@
 ﻿using LabSolution.Dtos;
 using LabSolution.HttpModels;
 using LabSolution.Infrastructure;
+using LabSolution.Models;
 using LabSolution.Services;
+using LabSolution.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -71,5 +73,37 @@ namespace LabSolution.Controllers
 
             return NoContent();
         }
+
+        [HttpPatch("{orderId}/processing")]
+        public async Task<ActionResult<ProcessedOrderResponse>> ProcessCustomerOrder(int orderId)
+        {
+            var orderDetails = await _orderService.GetOrderDetails(orderId);
+            if (orderDetails is null)
+                return NotFound();
+
+            var numericCode = BarcodeProvider.GenerateNumericCode(orderDetails.Scheduled, orderId);
+            var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(numericCode);
+
+            var savedProcessedOrder = await _orderService.SaveProcessedOrder(orderId, numericCode, barcode);
+
+            // TODO: we should return a PDF here
+            return Ok(new ProcessedOrderResponse
+            {
+                Id = savedProcessedOrder.Id,
+                CustomerOrderId = savedProcessedOrder.CustomerOrderId,
+                NumericCode = savedProcessedOrder.NumericCode,
+                Barcode = savedProcessedOrder.Barcode,
+                ProcessedAt = savedProcessedOrder.ProcessedAt
+            });
+        }
+    }
+
+    public class ProcessedOrderResponse
+    {
+        public int Id { get; set; }
+        public int CustomerOrderId { get; set; }
+        public long NumericCode { get; set; }
+        public byte[] Barcode { get; set; }
+        public DateTime ProcessedAt { get; set; }
     }
 }
