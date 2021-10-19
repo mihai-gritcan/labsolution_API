@@ -30,11 +30,23 @@ namespace LabSolution.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest createOrder)
         {
+            return await SaveOrder(createOrder);
+        }
+
+        [HttpPost("elevated")]
+        public async Task<ActionResult> CreateElevatedOrder([FromBody] CreateOrderRequest createOrder)
+        {
+            return await SaveOrder(createOrder);
+        }
+
+        private async Task<ActionResult> SaveOrder(CreateOrderRequest createOrder)
+        {
             var allSavedCustomers = await _customerService.SaveCustomers(createOrder.Customers);
 
             var addedOrders = await _orderService.SaveOrders(createOrder, allSavedCustomers);
 
-            var response = addedOrders.Select(x => new CreatedOrdersResponse {
+            var response = addedOrders.Select(x => new CreatedOrdersResponse
+            {
                 Id = x.Id,
                 CustomerId = x.CustomerId,
                 Customer = CustomerDto.CreateDtoFromEntity(allSavedCustomers.Find(c => c.Id == x.CustomerId), isRootCustomer: x.ParentId == null),
