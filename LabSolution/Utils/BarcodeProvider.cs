@@ -15,15 +15,6 @@ namespace LabSolution.Utils
             return ConvertImageToBytes(img);
         }
 
-        public static byte[] GenerateBarcode(DateTime date, int customerOrderNumber)
-        {
-            var numericCode = GenerateNumericCode(date, customerOrderNumber);
-
-            var barcode = new Barcode();
-            var img = barcode.Encode(TYPE.CODE39, numericCode.ToString(), Color.Black, Color.White, 250, 100);
-            return ConvertImageToBytes(img);
-        }
-
         // 2021-10-12 1:30 -> 110121130 + 5 digits from customerOrderNumber => 11012113000015
         public static long GenerateNumericCode(DateTime date, int customerOrderNumber)
         {
