@@ -14,7 +14,7 @@ namespace LabSolution.Models
         public int CustomerOrderId { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime ProcessedAt { get; set; }
-        public bool? Result { get; set; }
+        public int? TestResult { get; set; }
 
         public byte[] Barcode { get; set; }
 

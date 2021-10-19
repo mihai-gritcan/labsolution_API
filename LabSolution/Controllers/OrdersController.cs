@@ -58,9 +58,7 @@ namespace LabSolution.Controllers
         public async Task<IActionResult> PutOrder(int id, UpdateOrderRequest updateOrderRequest)
         {
             if (id != updateOrderRequest.Id)
-            {
                 return BadRequest();
-            }
 
             try
             {
@@ -95,6 +93,17 @@ namespace LabSolution.Controllers
                 Barcode = savedProcessedOrder.Barcode,
                 ProcessedAt = savedProcessedOrder.ProcessedAt
             });
+        }
+
+        [HttpPatch("{id}/settestresult")]
+        public async Task<IActionResult> SetTestResult(int id, SetTestResultRequest setTestResultRequest)
+        {
+            if (id != setTestResultRequest.OrderId)
+                return BadRequest();
+
+            await _orderService.SetTestResult(setTestResultRequest.OrderId, setTestResultRequest.NumericCode, setTestResultRequest.TestResult);
+
+            return NoContent();
         }
     }
 }
