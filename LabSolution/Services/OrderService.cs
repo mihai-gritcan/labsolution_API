@@ -18,6 +18,7 @@ namespace LabSolution.Services
         Task<CustomerOrder> GetOrderDetails(int createdOrderId);
         Task UpdateOrder(UpdateOrderRequest updateOrderRequest);
         Task<ProcessedOrder> SaveProcessedOrder(int orderId, long numericCode, byte[] barcode);
+        Task SetTestResult(int orderId, long numericCode, TestResult testResult);
     }
 
     public class OrderService : IOrderService
@@ -116,6 +117,17 @@ namespace LabSolution.Services
             await _context.SaveChangesAsync();
 
             return processedOrder;
+        }
+
+        public async Task SetTestResult(int orderId, long numericCode, TestResult testResult)
+        {
+            var processedOrder = await _context.ProcessedOrders.SingleAsync(x => x.CustomerOrderId == orderId && x.NumericCode == numericCode);
+
+            processedOrder.TestResult = (int)testResult;
+
+            _context.ProcessedOrders.Update(processedOrder);
+
+            await _context.SaveChangesAsync();
         }
     }
 }
