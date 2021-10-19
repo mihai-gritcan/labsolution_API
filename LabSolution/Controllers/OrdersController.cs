@@ -74,17 +74,17 @@ namespace LabSolution.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{orderId}/processing")]
-        public async Task<ActionResult<ProcessedOrderResponse>> ProcessCustomerOrder(int orderId)
+        [HttpPatch("{id}/processing")]
+        public async Task<ActionResult<ProcessedOrderResponse>> ProcessCustomerOrder(int id)
         {
-            var orderDetails = await _orderService.GetOrderDetails(orderId);
+            var orderDetails = await _orderService.GetOrderDetails(id);
             if (orderDetails is null)
                 return NotFound();
 
-            var numericCode = BarcodeProvider.GenerateNumericCode(orderDetails.Scheduled, orderId);
+            var numericCode = BarcodeProvider.GenerateNumericCode(orderDetails.Scheduled, id);
             var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(numericCode);
 
-            var savedProcessedOrder = await _orderService.SaveProcessedOrder(orderId, numericCode, barcode);
+            var savedProcessedOrder = await _orderService.SaveProcessedOrder(id, numericCode, barcode);
 
             // TODO: we should return a PDF here
             return Ok(new ProcessedOrderResponse
