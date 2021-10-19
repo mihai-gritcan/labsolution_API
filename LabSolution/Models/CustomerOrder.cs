@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LabSolution.Models
 {
     [Table(nameof(CustomerOrder))]
+    [Index(nameof(CustomerId), Name = "IX_CustomerOrder_CustomerId")]
     public partial class CustomerOrder
     {
         [Key]
@@ -19,5 +21,8 @@ namespace LabSolution.Models
         [ForeignKey(nameof(CustomerId))]
         [InverseProperty("CustomerOrders")]
         public virtual Customer Customer { get; set; }
+
+        [InverseProperty("CustomerOrder")]
+        public virtual ProcessedOrder ProcessedOrder { get; set; }
     }
 }

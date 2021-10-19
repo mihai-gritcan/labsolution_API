@@ -30,6 +30,15 @@ namespace LabSolution.Models
                     .HasConstraintName("FK_CustomerOrder_Customer");
             });
 
+            modelBuilder.Entity<ProcessedOrder>(entity =>
+            {
+                entity.HasOne(d => d.CustomerOrder)
+                    .WithOne(p => p.ProcessedOrder)
+                    .HasForeignKey<ProcessedOrder>(d => d.CustomerOrderId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProcessedOrder_CustomerOrder");
+            });
+
             OnModelCreatingPartial(modelBuilder);
         }
 
