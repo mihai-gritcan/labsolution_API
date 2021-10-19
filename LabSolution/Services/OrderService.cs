@@ -17,6 +17,7 @@ namespace LabSolution.Services
         Task<List<CreatedOrdersResponse>> GetOrders(DateTime date);
         Task<CustomerOrder> GetOrderDetails(int createdOrderId);
         Task UpdateOrder(UpdateOrderRequest updateOrderRequest);
+        Task<ProcessedOrder> SaveProcessedOrder(int orderId, long numericCode, byte[] barcode);
     }
 
     public class OrderService : IOrderService
@@ -60,7 +61,6 @@ namespace LabSolution.Services
         {
             var ordersToAdd = new List<CustomerOrder>();
 
-            
             var rootCustomer = customersEntities.Single(x => x.PersonalNumber == createOrder.Customers.First(c => c.IsRootCustomer).PersonalNumber);
 
             foreach (var customer in createOrder.Customers)
@@ -100,6 +100,22 @@ namespace LabSolution.Services
             _context.CustomerOrders.Update(orderEntity);
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<ProcessedOrder> SaveProcessedOrder(int orderId, long numericCode, byte[] barcode)
+        {
+            var processedOrder = new ProcessedOrder
+            {
+                CustomerOrderId = orderId,
+                ProcessedAt = DateTime.Now,
+                Barcode = barcode,
+                NumericCode = numericCode
+            };
+
+            await _context.ProcessedOrders.AddAsync(processedOrder);
+            await _context.SaveChangesAsync();
+
+            return processedOrder;
         }
     }
 }

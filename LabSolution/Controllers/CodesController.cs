@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace LabSolution.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
     public class CodesController : BaseApiController

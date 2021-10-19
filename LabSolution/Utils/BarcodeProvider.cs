@@ -8,6 +8,13 @@ namespace LabSolution.Utils
 {
     public static class BarcodeProvider
     {
+        public static byte[] GenerateBarcodeFromNumericCode(long numericCode)
+        {
+            var barcode = new Barcode();
+            var img = barcode.Encode(TYPE.CODE39, numericCode.ToString(), Color.Black, Color.White, 250, 100);
+            return ConvertImageToBytes(img);
+        }
+
         public static byte[] GenerateBarcode(DateTime date, int customerOrderNumber)
         {
             var numericCode = GenerateNumericCode(date, customerOrderNumber);

@@ -16,6 +16,7 @@ namespace LabSolution.Models
         public virtual DbSet<AppUser> AppUsers { get; set; }
         public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<CustomerOrder> CustomerOrders { get; set; }
+        public virtual DbSet<ProcessedOrder> ProcessedOrders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,6 +29,15 @@ namespace LabSolution.Models
                     .HasForeignKey(d => d.CustomerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_CustomerOrder_Customer");
+            });
+
+            modelBuilder.Entity<ProcessedOrder>(entity =>
+            {
+                entity.HasOne(d => d.CustomerOrder)
+                    .WithOne(p => p.ProcessedOrder)
+                    .HasForeignKey<ProcessedOrder>(d => d.CustomerOrderId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProcessedOrder_CustomerOrder");
             });
 
             OnModelCreatingPartial(modelBuilder);
