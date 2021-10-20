@@ -4,14 +4,16 @@ using LabSolution.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LabSolution.Migrations
 {
     [DbContext(typeof(LabSolutionContext))]
-    partial class LabSolutionContextModelSnapshot : ModelSnapshot
+    [Migration("20211020174443_PersonalNumber_To_String")]
+    partial class PersonalNumber_To_String
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
