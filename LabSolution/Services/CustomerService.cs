@@ -23,20 +23,20 @@ namespace LabSolution.Services
 
         public async Task<List<Customer>> SaveCustomers(List<CustomerDto> customers)
         {
-            var customersPersonalNumbers = customers.Select(x => x.PersonalNumber);
+            var customersPersonalNumbers = customers.Select(x => x.PersonalNumber.ToString());
 
             var existingCustomers = await _context.Customers.Where(x => customersPersonalNumbers.Contains(x.PersonalNumber)).ToListAsync();
             var customersToAdd = new List<Customer>();
 
             foreach (var customer in customers)
             {
-                var customerEntity = existingCustomers.SingleOrDefault(x => x.PersonalNumber == customer.PersonalNumber);
+                var customerEntity = existingCustomers.SingleOrDefault(x => x.PersonalNumber == customer.PersonalNumber.ToString());
                 if (customerEntity is not null)
                     continue;
 
                 customerEntity = new Customer
                 {
-                    PersonalNumber = customer.PersonalNumber,
+                    PersonalNumber = customer.PersonalNumber.ToString(),
                     Passport = customer.Passport,
                     FirstName = customer.FirstName,
                     LastName = customer.LastName,

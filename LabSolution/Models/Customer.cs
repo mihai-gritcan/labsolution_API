@@ -28,7 +28,8 @@ namespace LabSolution.Models
         public string Address { get; set; }
         [StringLength(50)]
         public string Passport { get; set; }
-        public long PersonalNumber { get; set; }
+        [StringLength(13)]
+        public string PersonalNumber { get; set; }
         [StringLength(50)]
         public string Phone { get; set; }
         [StringLength(80)]
