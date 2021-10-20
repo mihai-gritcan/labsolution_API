@@ -39,7 +39,7 @@ namespace LabSolution.Controllers
             customerEntity.DateOfBirth = customer.DateOfBirth;
             customerEntity.Address = customer.Address;
             customerEntity.Passport = customer.Passport;
-            customerEntity.PersonalNumber = customer.PersonalNumber;
+            customerEntity.PersonalNumber = customer.PersonalNumber.ToString();
             customerEntity.Phone = customer.Phone;
             customerEntity.Email = customer.Email;
 

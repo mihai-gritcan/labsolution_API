@@ -38,7 +38,8 @@ namespace LabSolution.Services
 
         public Task<List<CreatedOrdersResponse>> GetCreatedOrders(DateTime date, long? idnp)
         {
-            var queryableOrders = _context.CustomerOrders.Where(x => x.Scheduled.Date == date.Date && x.ProcessedOrder == null)
+            return _context.CustomerOrders.Where(x => x.Scheduled.Date == date.Date && x.ProcessedOrder == null 
+                                                    && (idnp == null || x.Customer.PersonalNumber.Contains(idnp.Value.ToString())))
                 .Include(x => x.Customer)
                 .Select(x => new CreatedOrdersResponse
                 {
@@ -50,12 +51,7 @@ namespace LabSolution.Services
                     Scheduled = x.Scheduled,
                     PrefferedLanguage = (TestLanguage)x.PrefferedLanguage,
                     TestType = (TestType)x.TestType
-                });
-
-            if (idnp is not null)
-                queryableOrders = queryableOrders.Where(x => x.Customer.PersonalNumber.ToString().Contains(idnp.Value.ToString()));
-
-            return queryableOrders.ToListAsync();
+                }).ToListAsync();
         }
 
         public Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date)
@@ -80,11 +76,11 @@ namespace LabSolution.Services
         {
             var ordersToAdd = new List<CustomerOrder>();
 
-            var rootCustomer = customersEntities.Single(x => x.PersonalNumber == createOrder.Customers.First(c => c.IsRootCustomer).PersonalNumber);
+            var rootCustomer = customersEntities.Single(x => x.PersonalNumber == createOrder.Customers.First(c => c.IsRootCustomer).PersonalNumber.ToString());
 
             foreach (var customer in createOrder.Customers)
             {
-                var customerId = customersEntities.Single(x => x.PersonalNumber == customer.PersonalNumber).Id;
+                var customerId = customersEntities.Single(x => x.PersonalNumber == customer.PersonalNumber.ToString()).Id;
                 var shouldSetParentId = !customer.IsRootCustomer && createOrder.Customers.Count > 1;
 
                 var customerOrder = new CustomerOrder

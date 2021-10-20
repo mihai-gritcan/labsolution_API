@@ -26,9 +26,10 @@ namespace LabSolution.Models
         public DateTime DateOfBirth { get; set; }
         [StringLength(250)]
         public string Address { get; set; }
-        [StringLength(50)]
+        [StringLength(10)]
         public string Passport { get; set; }
-        public long PersonalNumber { get; set; }
+        [StringLength(13)]
+        public string PersonalNumber { get; set; }
         [StringLength(50)]
         public string Phone { get; set; }
         [StringLength(80)]

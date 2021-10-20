@@ -55,7 +55,7 @@ namespace LabSolution.Dtos
                 Gender = (Gender)entity.Gender,
                 Address = entity.Address,
                 Passport = entity.Passport,
-                PersonalNumber = entity.PersonalNumber,
+                PersonalNumber = long.Parse(entity.PersonalNumber),
                 Phone = entity.Phone,
                 Email = entity.Email,
                 IsRootCustomer = isRootCustomer
