@@ -66,9 +66,9 @@ namespace LabSolution.Controllers
         }
 
         [HttpGet("{date}/finished")]
-        public async Task<ActionResult<object>> GetFinishedOrders(DateTime date)
+        public async Task<ActionResult<object>> GetFinishedOrders(DateTime date, [FromQuery] long? idnp)
         {
-            return Ok(await _orderService.GetFinishedOrders(date));
+            return Ok(await _orderService.GetFinishedOrders(date, idnp));
         }
 
         [HttpPut("{id}")]

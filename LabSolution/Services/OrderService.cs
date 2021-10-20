@@ -19,7 +19,7 @@ namespace LabSolution.Services
         Task UpdateOrder(UpdateOrderRequest updateOrderRequest);
         Task<ProcessedOrder> SaveProcessedOrder(int orderId, long numericCode, byte[] barcode);
         Task SetTestResult(int orderId, long numericCode, TestResult testResult);
-        Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date);
+        Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date, long? idnp);
     }
 
     public class OrderService : IOrderService
@@ -54,10 +54,11 @@ namespace LabSolution.Services
                 }).ToListAsync();
         }
 
-        public Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date)
+        public Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date, long? idnp)
         {
-            return _context.ProcessedOrders.Where(x => x.TestResult != null && x.ProcessedAt.Date == date.Date)
-                .Include(x => x.CustomerOrder)
+            return _context.ProcessedOrders.Where(x => x.TestResult != null && x.ProcessedAt.Date == date.Date 
+                                                    && (idnp == null || x.CustomerOrder.Customer.PersonalNumber.Contains(idnp.Value.ToString())))
+                .Include(x => x.CustomerOrder).ThenInclude(x => x.Customer)
                 .Select(x => new FinishedOrderResponse
                 {
                     Id = x.Id,
