@@ -7,6 +7,7 @@ using LabSolution.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,22 +31,22 @@ namespace LabSolution.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest createOrder)
         {
-            return await SaveOrder(createOrder);
+            return Ok(await SaveOrder(createOrder));
         }
 
         [HttpPost("elevated")]
         public async Task<ActionResult> CreateElevatedOrder([FromBody] CreateOrderRequest createOrder)
         {
-            return await SaveOrder(createOrder);
+            return Ok(await SaveOrder(createOrder));
         }
 
-        private async Task<ActionResult> SaveOrder(CreateOrderRequest createOrder)
+        private async Task<IEnumerable<CreatedOrdersResponse>> SaveOrder(CreateOrderRequest createOrder)
         {
             var allSavedCustomers = await _customerService.SaveCustomers(createOrder.Customers);
 
             var addedOrders = await _orderService.SaveOrders(createOrder, allSavedCustomers);
 
-            var response = addedOrders.Select(x => new CreatedOrdersResponse
+            return addedOrders.Select(x => new CreatedOrdersResponse
             {
                 Id = x.Id,
                 CustomerId = x.CustomerId,
@@ -56,14 +57,18 @@ namespace LabSolution.Controllers
                 PrefferedLanguage = (TestLanguage)x.PrefferedLanguage,
                 TestType = (TestType)x.TestType,
             });
-
-            return Ok(response);
         }
 
-        [HttpGet]
-        public async Task<ActionResult> GetOrdersByDate([FromQuery] DateTime date)
+        [HttpGet("{date}/created")]
+        public async Task<ActionResult> GetCreatedOrders(DateTime date, [FromQuery] long? idnp)
         {
-            return Ok(await _orderService.GetOrders(date));
+            return Ok(await _orderService.GetCreatedOrders(date, idnp));
+        }
+
+        [HttpGet("{date}/finished")]
+        public async Task<ActionResult<object>> GetFinishedOrders(DateTime date)
+        {
+            return Ok(await _orderService.GetFinishedOrders(date));
         }
 
         [HttpPut("{id}")]

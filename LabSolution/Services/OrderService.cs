@@ -14,11 +14,12 @@ namespace LabSolution.Services
     {
         Task<List<CustomerOrder>> SaveOrders(CreateOrderRequest createOrder, IEnumerable<Customer> customersEntities);
         Task<List<DateTime>> GetOccupiedTimeSlots(DateTime date);
-        Task<List<CreatedOrdersResponse>> GetOrders(DateTime date);
+        Task<List<CreatedOrdersResponse>> GetCreatedOrders(DateTime date, long? idnp);
         Task<CustomerOrder> GetOrderDetails(int createdOrderId);
         Task UpdateOrder(UpdateOrderRequest updateOrderRequest);
         Task<ProcessedOrder> SaveProcessedOrder(int orderId, long numericCode, byte[] barcode);
         Task SetTestResult(int orderId, long numericCode, TestResult testResult);
+        Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date);
     }
 
     public class OrderService : IOrderService
@@ -35,9 +36,10 @@ namespace LabSolution.Services
             return _context.CustomerOrders.Where(x => x.Scheduled.Date == date.Date).Select(x => x.Scheduled).ToListAsync();
         }
 
-        public Task<List<CreatedOrdersResponse>> GetOrders(DateTime date)
+        public Task<List<CreatedOrdersResponse>> GetCreatedOrders(DateTime date, long? idnp)
         {
-            return _context.CustomerOrders.Where(x => x.Scheduled.Date == date.Date)
+            var queryableOrders =_context.CustomerOrders.Where(x => x.Scheduled.Date == date.Date
+                                                                && !_context.ProcessedOrders.Select(po => po.CustomerOrderId).Contains(x.Id))
                 .Include(x => x.Customer)
                 .Select(x => new CreatedOrdersResponse
                 {
@@ -49,8 +51,25 @@ namespace LabSolution.Services
                     Scheduled = x.Scheduled,
                     PrefferedLanguage = (TestLanguage)x.PrefferedLanguage,
                     TestType = (TestType)x.TestType
-                })
-                .ToListAsync();
+                });
+
+            if (idnp is not null)
+                queryableOrders = queryableOrders.Where(x => x.Customer.PersonalNumber.ToString().Contains(idnp.Value.ToString()));
+
+            return queryableOrders.ToListAsync();
+        }
+
+        public Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date)
+        {
+            return _context.ProcessedOrders.Where(x => x.TestResult != null && x.ProcessedAt.Date == date.Date)
+                .Include(x => x.CustomerOrder)
+                .Select(x => new FinishedOrderResponse
+                {
+                    Id = x.Id,
+                    TestResult = (TestResult)x.TestResult,
+                    NumericCode = x.NumericCode,
+                    OrderDate = x.CustomerOrder.Scheduled
+                }).ToListAsync();
         }
 
         public Task<CustomerOrder> GetOrderDetails(int createdOrderId)
