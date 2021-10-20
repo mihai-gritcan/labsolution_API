@@ -38,8 +38,7 @@ namespace LabSolution.Services
 
         public Task<List<CreatedOrdersResponse>> GetCreatedOrders(DateTime date, long? idnp)
         {
-            var queryableOrders =_context.CustomerOrders.Where(x => x.Scheduled.Date == date.Date
-                                                                && !_context.ProcessedOrders.Select(po => po.CustomerOrderId).Contains(x.Id))
+            var queryableOrders = _context.CustomerOrders.Where(x => x.Scheduled.Date == date.Date && x.ProcessedOrder == null)
                 .Include(x => x.Customer)
                 .Select(x => new CreatedOrdersResponse
                 {
