@@ -1,6 +1,7 @@
 ﻿using LabSolution.Services;
 using LabSolution.Utils;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace LabSolution.Controllers
@@ -19,33 +20,38 @@ namespace LabSolution.Controllers
         [HttpGet("numericCode")]
         public async Task<ActionResult> GetNumericCode([FromQuery] int orderId)
         {
-            var orderDetails = await _orderService.GetOrderDetails(orderId);
-            if (orderDetails is null) return NotFound();
+            throw new NotImplementedException();
 
-            return Ok(BarcodeProvider.GenerateNumericCode(orderDetails.Scheduled, orderId));
+            //var orderDetails = await _orderService.GetOrderDetails(orderId);
+            //if (orderDetails is null) return NotFound();
+
+            //return Ok(BarcodeProvider.GenerateNumericCode(orderDetails.Scheduled, orderId));
         }
 
         [HttpGet("barcode")]
         public async Task<ActionResult> GetBarCode([FromQuery] int orderId)
         {
-            var orderDetails = await _orderService.GetOrderDetails(orderId);
-            if (orderDetails is null) return NotFound();
+            throw new NotImplementedException();
 
-            var barcode = BarcodeProvider.GenerateBarcode(orderDetails.Scheduled, orderId);
+            //var orderDetails = await _orderService.GetOrderDetails(orderId);
+            //if (orderDetails is null) return NotFound();
 
-            return Ok(File(barcode, "image/jpeg"));
+            //var barcode = BarcodeProvider.GenerateBarcode(orderDetails.Scheduled, orderId);
+
+            //return Ok(File(barcode, "image/jpeg"));
         }
-        
+
         [HttpGet("qrcode")]
         public async Task<ActionResult> GetQRCode([FromQuery] int orderId)
         {
-            var orderDetails = await _orderService.GetOrderDetails(orderId);
-            if (orderDetails is null) return NotFound();
+            throw new NotImplementedException();
+            //var orderDetails = await _orderService.GetOrderDetails(orderId);
+            //if (orderDetails is null) return NotFound();
 
-            var numericCode = BarcodeProvider.GenerateNumericCode(orderDetails.Scheduled, orderId);
-            var qrCode = QRCodeProvider.GeneratQRCode(numericCode);
+            //var numericCode = BarcodeProvider.GenerateNumericCode(orderDetails.Scheduled, orderId);
+            //var qrCode = QRCodeProvider.GeneratQRCode(numericCode);
 
-            return Ok(File(qrCode, "image/jpeg"));
+            //return Ok(File(qrCode, "image/jpeg"));
         }
     }
 }

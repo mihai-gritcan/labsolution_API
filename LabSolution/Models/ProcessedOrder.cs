@@ -16,10 +16,6 @@ namespace LabSolution.Models
         public DateTime ProcessedAt { get; set; }
         public int? TestResult { get; set; }
 
-        public byte[] Barcode { get; set; }
-
-        public byte[] QRCode { get; set; }
-
         [ForeignKey(nameof(CustomerOrderId))]
         [InverseProperty("ProcessedOrder")]
         public virtual CustomerOrder CustomerOrder { get; set; }

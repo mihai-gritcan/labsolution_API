@@ -8,10 +8,10 @@ namespace LabSolution.Utils
 {
     public static class BarcodeProvider
     {
-        public static byte[] GenerateBarcodeFromNumericCode(long numericCode)
+        public static byte[] GenerateBarcodeFromNumericCode(string numericCode)
         {
             var barcode = new Barcode();
-            var img = barcode.Encode(TYPE.CODE39, numericCode.ToString(), Color.Black, Color.White, 250, 100);
+            var img = barcode.Encode(TYPE.CODE39, numericCode, Color.Black, Color.White, 250, 100);
             return ConvertImageToBytes(img);
         }
 
@@ -24,8 +24,9 @@ namespace LabSolution.Utils
             return ConvertImageToBytes(img);
         }
 
+        [Obsolete("This method is not allowed to be used because of verbosity")]
         // 2021-10-12 1:30 -> 110121130 + 5 digits from customerOrderNumber => 11012113000015
-        public static long GenerateNumericCode(DateTime date, int customerOrderNumber)
+        private static long GenerateNumericCode(DateTime date, int customerOrderNumber)
         {
             var year4Digits = date.Year.ToString();
             var month2Digits = date.Month.ToString("D2");

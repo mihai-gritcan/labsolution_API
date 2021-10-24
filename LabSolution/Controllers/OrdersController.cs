@@ -1,7 +1,6 @@
 ﻿using LabSolution.Dtos;
 using LabSolution.HttpModels;
 using LabSolution.Infrastructure;
-using LabSolution.Models;
 using LabSolution.Services;
 using LabSolution.Utils;
 using Microsoft.AspNetCore.Authorization;
@@ -96,18 +95,16 @@ namespace LabSolution.Controllers
             if (orderDetails is null)
                 return NotFound();
 
-            var numericCode = BarcodeProvider.GenerateNumericCode(orderDetails.Scheduled, id);
-            var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(numericCode);
+            var savedProcessedOrder = await _orderService.SaveProcessedOrder(id);
+            var numericCode7Digicts = savedProcessedOrder.Id.ToString("D7");
+            var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(numericCode7Digicts);
 
-            var savedProcessedOrder = await _orderService.SaveProcessedOrder(id, numericCode, barcode);
-
-            // TODO: we should return a PDF here
             return Ok(new ProcessedOrderResponse
             {
                 Id = savedProcessedOrder.Id,
                 CustomerOrderId = savedProcessedOrder.CustomerOrderId,
-                NumericCode = savedProcessedOrder.NumericCode,
-                Barcode = savedProcessedOrder.Barcode,
+                NumericCode = numericCode7Digicts,
+                Barcode = barcode,
                 ProcessedAt = savedProcessedOrder.ProcessedAt
             });
         }
