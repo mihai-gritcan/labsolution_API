@@ -17,7 +17,7 @@ namespace LabSolution.Services
         Task<List<CreatedOrdersResponse>> GetCreatedOrders(DateTime date, long? idnp);
         Task<CustomerOrder> GetOrderDetails(int createdOrderId);
         Task UpdateOrder(UpdateOrderRequest updateOrderRequest);
-        Task<ProcessedOrder> SaveProcessedOrder(int orderId, long numericCode, byte[] barcode);
+        Task<ProcessedOrder> SaveProcessedOrder(int orderId);
         Task SetTestResult(int orderId, long numericCode, TestResult testResult);
         Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date, long? idnp);
     }
@@ -118,15 +118,16 @@ namespace LabSolution.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<ProcessedOrder> SaveProcessedOrder(int orderId, long numericCode, byte[] barcode)
+        public async Task<ProcessedOrder> SaveProcessedOrder(int orderId)
         {
             var processedOrder = new ProcessedOrder
             {
                 CustomerOrderId = orderId,
-                ProcessedAt = DateTime.Now,
-                Barcode = barcode,
-                NumericCode = numericCode
+                ProcessedAt = DateTime.Now
             };
+
+            if (await _context.ProcessedOrders.AnyAsync(x => x.CustomerOrderId == orderId))
+                throw new CustomExceptions($"Order {orderId} is already processed");
 
             await _context.ProcessedOrders.AddAsync(processedOrder);
             await _context.SaveChangesAsync();
