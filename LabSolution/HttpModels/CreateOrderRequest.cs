@@ -1,4 +1,5 @@
 ﻿using LabSolution.Dtos;
+using LabSolution.Infrastructure;
 using LabSolution.Utils;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,11 @@ namespace LabSolution.HttpModels
         [Required]
         public string ScheduledTime { get; set; }
 
-        public int TestLanguage { get; set; } = (int)Infrastructure.TestLanguage.Romanian;
+        [Required]
+        public TestLanguage TestLanguage { get; set; }
 
-        public int TestType { get; set; } = (int)Infrastructure.TestType.Quick;
+        [Required]
+        public TestType TestType { get; set; }
 
         public List<CustomerDto> Customers { get; set; }
 

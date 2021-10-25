@@ -9,9 +9,9 @@ namespace LabSolution.HttpModels
         public int Id { get; set; }
         public int CustomerId { get; set; }
         public DateTime Scheduled { get; set; }
-        public DateTime Placed { get; set; }
+        public DateTime PlacedAt { get; set; }
         public TestType TestType { get; set; }
-        public TestLanguage PrefferedLanguage { get; set; }
+        public TestLanguage TestLanguage { get; set; }
         public int? ParentId { get; set; }
 
         public CustomerDto Customer { get; set; }

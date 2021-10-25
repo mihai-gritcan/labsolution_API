@@ -2,7 +2,7 @@
 {
     public enum TestType
     {
-        Quick = 1,
+        Antigen = 1,
         PCR = 2
     }
 }

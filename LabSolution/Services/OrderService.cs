@@ -17,9 +17,10 @@ namespace LabSolution.Services
         Task<List<CreatedOrdersResponse>> GetCreatedOrders(DateTime date, long? idnp);
         Task<CustomerOrder> GetOrderDetails(int createdOrderId);
         Task UpdateOrder(UpdateOrderRequest updateOrderRequest);
-        Task<ProcessedOrder> SaveProcessedOrder(int orderId);
-        Task SetTestResult(int orderId, long numericCode, TestResult testResult);
+        Task<ProcessedOrder> CreateOrUpdateProcessedOrder(int orderId);
+        Task SetTestResult(int processedOrderId, TestResult testResult, string executorName, string verifierName, string validatorName);
         Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date, long? idnp);
+        Task<FinishedOrderResponse> GetFinishedOrderForPdf(int processedOrderId);
     }
 
     public class OrderService : IOrderService
@@ -47,30 +48,50 @@ namespace LabSolution.Services
                     CustomerId = x.CustomerId,
                     Customer = CustomerDto.CreateDtoFromEntity(x.Customer, x.ParentId == null),
                     ParentId = x.ParentId,
-                    Placed = x.Placed,
+                    PlacedAt = x.PlacedAt,
                     Scheduled = x.Scheduled,
-                    PrefferedLanguage = (TestLanguage)x.PrefferedLanguage,
+                    TestLanguage = (TestLanguage)x.TestLanguage,
                     TestType = (TestType)x.TestType
-                }).ToListAsync();
+                })
+                .OrderBy(x => x.Scheduled)
+                .ToListAsync();
         }
 
         public Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date, long? idnp)
         {
-            return _context.ProcessedOrders.Where(x => x.TestResult != null && x.ProcessedAt.Date == date.Date 
+            return _context.ProcessedOrders.Where(x => x.TestResult != null && x.ProcessedAt.Date == date.Date
                                                     && (idnp == null || x.CustomerOrder.Customer.PersonalNumber.Contains(idnp.Value.ToString())))
                 .Include(x => x.CustomerOrder).ThenInclude(x => x.Customer)
                 .Select(x => new FinishedOrderResponse
                 {
                     Id = x.Id,
                     TestResult = (TestResult)x.TestResult,
-                    NumericCode = x.NumericCode,
-                    OrderDate = x.CustomerOrder.Scheduled
-                }).ToListAsync();
+                    OrderDate = x.CustomerOrder.Scheduled,
+                    TestType = (TestType)x.CustomerOrder.TestType,
+                    TestLanguage = (TestLanguage)x.CustomerOrder.TestLanguage,
+                    Customer = CustomerDto.CreateDtoFromEntity(x.CustomerOrder.Customer, x.CustomerOrder.ParentId == null)
+                }).OrderBy(x => x.NumericCode).ToListAsync();
+        }
+
+        public Task<FinishedOrderResponse> GetFinishedOrderForPdf(int processedOrderId)
+        {
+            return _context.ProcessedOrders
+                .Include(x => x.CustomerOrder).ThenInclude(x => x.Customer)
+                .Where(x => x.Id == processedOrderId)
+                .Select(x => new FinishedOrderResponse
+                {
+                    Id = x.Id,
+                    TestResult = (TestResult)x.TestResult,
+                    OrderDate = x.CustomerOrder.Scheduled,
+                    TestType = (TestType)x.CustomerOrder.TestType,
+                    TestLanguage = (TestLanguage)x.CustomerOrder.TestLanguage,
+                    Customer = CustomerDto.CreateDtoFromEntity(x.CustomerOrder.Customer, x.CustomerOrder.ParentId == null)
+                }).SingleAsync();
         }
 
         public Task<CustomerOrder> GetOrderDetails(int createdOrderId)
         {
-            return _context.CustomerOrders.SingleOrDefaultAsync(x => x.Id == createdOrderId);
+            return _context.CustomerOrders.Include(x => x.Customer).SingleOrDefaultAsync(x => x.Id == createdOrderId);
         }
 
         public async Task<List<CustomerOrder>> SaveOrders(CreateOrderRequest createOrder, IEnumerable<Customer> customersEntities)
@@ -87,10 +108,10 @@ namespace LabSolution.Services
                 var customerOrder = new CustomerOrder
                 {
                     CustomerId = customerId,
-                    Placed = DateTime.Now,
+                    PlacedAt = DateTime.Now,
                     Scheduled = createOrder.ScheduledDateTime,
-                    TestType = (int)TestType.Quick,
-                    PrefferedLanguage = (int)TestLanguage.Romanian,
+                    TestType = (int)TestType.Antigen,
+                    TestLanguage = (int)TestLanguage.Romanian,
                     ParentId = shouldSetParentId ? rootCustomer.Id : null
                 };
 
@@ -109,7 +130,7 @@ namespace LabSolution.Services
             if (orderEntity is null)
                 throw new ResourceNotFoundException();
 
-            orderEntity.PrefferedLanguage = (short)updateOrderRequest.TestLanguage;
+            orderEntity.TestLanguage = (short)updateOrderRequest.TestLanguage;
             orderEntity.TestType = (short)updateOrderRequest.TestType;
             orderEntity.Scheduled = updateOrderRequest.ScheduledDateTime;
 
@@ -118,28 +139,38 @@ namespace LabSolution.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<ProcessedOrder> SaveProcessedOrder(int orderId)
+        public async Task<ProcessedOrder> CreateOrUpdateProcessedOrder(int orderId)
         {
-            var processedOrder = new ProcessedOrder
+            var processedOrder = await _context.ProcessedOrders.FindAsync(orderId) ?? new ProcessedOrder
             {
                 CustomerOrderId = orderId,
-                ProcessedAt = DateTime.Now
+                ProcessedAt = DateTime.Now,
+                PrintCount = 1
             };
 
-            if (await _context.ProcessedOrders.AnyAsync(x => x.CustomerOrderId == orderId))
-                throw new CustomExceptions($"Order {orderId} is already processed");
+            if(processedOrder.Id > 0)
+            {
+                processedOrder.ProcessedAt = DateTime.Now;
+                processedOrder.PrintCount++;
+            }
+            else
+            {
+                await _context.ProcessedOrders.AddAsync(processedOrder);
+            }
 
-            await _context.ProcessedOrders.AddAsync(processedOrder);
             await _context.SaveChangesAsync();
 
             return processedOrder;
         }
 
-        public async Task SetTestResult(int orderId, long numericCode, TestResult testResult)
+        public async Task SetTestResult(int processedOrderId, TestResult testResult, string executorName, string verifierName, string validatorName)
         {
-            var processedOrder = await _context.ProcessedOrders.SingleAsync(x => x.CustomerOrderId == orderId && x.NumericCode == numericCode);
+            var processedOrder = await _context.ProcessedOrders.SingleAsync(x => x.Id == processedOrderId);
 
             processedOrder.TestResult = (int)testResult;
+            processedOrder.ExecutorName = executorName;
+            processedOrder.VerifierName = verifierName;
+            processedOrder.ValidatorName = validatorName;
 
             _context.ProcessedOrders.Update(processedOrder);
 

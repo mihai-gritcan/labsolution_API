@@ -4,8 +4,10 @@ namespace LabSolution.HttpModels
 {
     public class SetTestResultRequest
     {
-        public int OrderId { get; set; }
-        public long NumericCode { get; set; }
+        public int ProcesedOrderId { get; set; }
         public TestResult TestResult { get; set; }
+        public string ExecutorName { get; set; }
+        public string VerifierName { get; set; }
+        public string ValidatorName { get; set; }
     }
 }

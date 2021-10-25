@@ -21,6 +21,7 @@ namespace LabSolution.Controllers
             _context = context;
         }
 
+        // reception update Customer details
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCustomer(int id, CustomerDto customer)
         {
@@ -70,13 +71,6 @@ namespace LabSolution.Controllers
         }
 
         #region Unnecessary methods
-
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
-        {
-            return await _context.Customers.ToListAsync();
-        }
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("{id}")]

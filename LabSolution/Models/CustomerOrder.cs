@@ -13,9 +13,9 @@ namespace LabSolution.Models
         public int Id { get; set; }
         public int CustomerId { get; set; }
         public DateTime Scheduled { get; set; }
-        public DateTime Placed { get; set; }
+        public DateTime PlacedAt { get; set; }
         public short TestType { get; set; }
-        public short PrefferedLanguage { get; set; }
+        public short TestLanguage { get; set; }
         public int? ParentId { get; set; }
 
         [ForeignKey(nameof(CustomerId))]
