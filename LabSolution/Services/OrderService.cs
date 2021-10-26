@@ -141,7 +141,7 @@ namespace LabSolution.Services
 
         public async Task<ProcessedOrder> CreateOrUpdateProcessedOrder(int orderId)
         {
-            var processedOrder = await _context.ProcessedOrders.FindAsync(orderId) ?? new ProcessedOrder
+            var processedOrder = await _context.ProcessedOrders.Where(x => x.CustomerOrderId == orderId).SingleOrDefaultAsync() ?? new ProcessedOrder
             {
                 CustomerOrderId = orderId,
                 ProcessedAt = DateTime.Now,
