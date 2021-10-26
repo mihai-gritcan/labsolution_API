@@ -341,3 +341,5 @@ secrets.*.tfvars
 
 # Logs #
 **/logs/*
+
+GeneratedReports/

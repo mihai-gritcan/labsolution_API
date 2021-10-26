@@ -20,8 +20,8 @@ namespace LabSolution.Models
         [InverseProperty("ProcessedOrder")]
         public virtual CustomerOrder CustomerOrder { get; set; }
         public int PrintCount { get; set; }
-        public string ExecutorName { get; internal set; }
-        public string VerifierName { get; internal set; }
-        public string ValidatorName { get; internal set; }
+        public string ProcessedBy { get; internal set; }
+        public string CheckedBy { get; internal set; }
+        public string ValidatedBy { get; internal set; }
     }
 }

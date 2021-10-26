@@ -136,12 +136,14 @@ namespace LabSolution.Controllers
             return NoContent();
         }
 
+        [AllowAnonymous]
         // reception getPdfResult by processedOrderId
         [HttpGet("{id}/pdfresult")]
         public async Task<IActionResult> GetPdfResuly(int id)
         {
-            var res = await _orderService.GetFinishedOrderForPdf(id);
+            var finishedOrder = await _orderService.GetFinishedOrderForPdf(id);
 
+            var fileName = $"antigenRo-{new Guid()}";
             var globalSettings = new GlobalSettings
             {
                 ColorMode = ColorMode.Color,
@@ -149,12 +151,13 @@ namespace LabSolution.Controllers
                 PaperSize = PaperKind.A4,
                 Margins = new MarginSettings { Top = 10 },
                 DocumentTitle = "PDF Report",
-                Out = Path.Combine(Directory.GetCurrentDirectory(), "AvtoGenerated", $"Employee_Report{res.Id}.pdf")
+                Out = Path.Combine(Directory.GetCurrentDirectory(), "GeneratedReports", $"{fileName}.pdf")
             };
             var objectSettings = new ObjectSettings
             {
                 PagesCount = true,
-                HtmlContent = TemplateGenerator.GetHTMLString(),
+                //HtmlContent = TemplateGenerator.GetHTMLString(),
+                HtmlContent = GetDefaultTemplateHtml(),
                 WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
                 HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
                 FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer" }
@@ -167,7 +170,20 @@ namespace LabSolution.Controllers
             _converter.Convert(pdf);
             return Ok("Successfully created PDF document.");
         }
+
+        private string GetDefaultTemplateHtml()
+        {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", "testAntigenRo.html");
+            string readContents;
+            using (StreamReader streamReader = new StreamReader(path, Encoding.UTF8))
+            {
+                readContents = streamReader.ReadToEnd();
+            }
+
+            return readContents;
+        }
     }
+
 
     public class Employee
     {
