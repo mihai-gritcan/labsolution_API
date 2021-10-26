@@ -81,10 +81,10 @@ namespace LabSolution.Controllers
         }
 
         // reception updateOrder 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrder(int id, UpdateOrderRequest updateOrderRequest)
+        [HttpPut("{orderId}")]
+        public async Task<IActionResult> PutOrder(int orderId, UpdateOrderRequest updateOrderRequest)
         {
-            if (id != updateOrderRequest.Id)
+            if (orderId != updateOrderRequest.Id)
                 return BadRequest();
 
             try
@@ -100,14 +100,14 @@ namespace LabSolution.Controllers
         }
 
         // reception start printing the command confirmation
-        [HttpPatch("{id}/processing-ticket")]
-        public async Task<ActionResult<ProcessedOrderResponse>> GetProcessingTicket(int id)
+        [HttpPatch("{orderId}/processing-ticket")]
+        public async Task<ActionResult<ProcessedOrderResponse>> GetProcessingTicket(int orderId)
         {
-            var orderDetails = await _orderService.GetOrderDetails(id);
+            var orderDetails = await _orderService.GetOrderDetails(orderId);
             if (orderDetails is null)
                 return NotFound();
 
-            var savedProcessedOrder = await _orderService.CreateOrUpdateProcessedOrder(id);
+            var savedProcessedOrder = await _orderService.CreateOrUpdateProcessedOrder(orderId);
             var numericCode7Digicts = savedProcessedOrder.Id.ToString("D7");
             var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(numericCode7Digicts);
 
@@ -139,11 +139,11 @@ namespace LabSolution.Controllers
         [AllowAnonymous]
         // reception getPdfResult by processedOrderId
         [HttpGet("{id}/pdfresult")]
-        public async Task<IActionResult> GetPdfResuly(int id)
+        public async Task<IActionResult> GetPdfResult(int id)
         {
             var finishedOrder = await _orderService.GetFinishedOrderForPdf(id);
 
-            var fileName = $"antigenRo-{new Guid()}";
+            var fileName = $"antigenRo-{Guid.NewGuid()}";
             var globalSettings = new GlobalSettings
             {
                 ColorMode = ColorMode.Color,
@@ -151,16 +151,17 @@ namespace LabSolution.Controllers
                 PaperSize = PaperKind.A4,
                 Margins = new MarginSettings { Top = 10 },
                 DocumentTitle = "PDF Report",
-                Out = Path.Combine(Directory.GetCurrentDirectory(), "GeneratedReports", $"{fileName}.pdf")
+                Out = Path.Combine(Directory.GetCurrentDirectory(), "GeneratedReports", $"{fileName}.pdf"),
+                DPI = 300
             };
             var objectSettings = new ObjectSettings
             {
                 PagesCount = true,
                 //HtmlContent = TemplateGenerator.GetHTMLString(),
                 HtmlContent = GetDefaultTemplateHtml(),
-                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
-                HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
-                FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer" }
+                WebSettings = { DefaultEncoding = "utf-8"/*, UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css")*/ },
+                //HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
+                //FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer" }
             };
             var pdf = new HtmlToPdfDocument()
             {
@@ -174,70 +175,8 @@ namespace LabSolution.Controllers
         private string GetDefaultTemplateHtml()
         {
             string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", "testAntigenRo.html");
-            string readContents;
-            using (StreamReader streamReader = new StreamReader(path, Encoding.UTF8))
-            {
-                readContents = streamReader.ReadToEnd();
-            }
-
-            return readContents;
-        }
-    }
-
-
-    public class Employee
-    {
-        public string Name { get; set; }
-        public string LastName { get; set; }
-        public int Age { get; set; }
-        public string Gender { get; set; }
-    }
-    public static class DataStorage
-    {
-        public static List<Employee> GetAllEmployees() =>
-            new List<Employee>
-            {
-                new Employee { Name="Mike", LastName="Turner", Age=35, Gender="Male"},
-                new Employee { Name="Sonja", LastName="Markus", Age=22, Gender="Female"},
-                new Employee { Name="Luck", LastName="Martins", Age=40, Gender="Male"},
-                new Employee { Name="Sofia", LastName="Packner", Age=30, Gender="Female"},
-                new Employee { Name="John", LastName="Doe", Age=45, Gender="Male"}
-            };
-    }
-
-    public static class TemplateGenerator
-    {
-        public static string GetHTMLString()
-        {
-            var employees = DataStorage.GetAllEmployees();
-            var sb = new StringBuilder();
-            sb.Append(@"
-                        <html>
-                            <head>
-                            </head>
-                            <body>
-                                <div class='header'><h1>This is the generated PDF report!!!</h1></div>
-                                <table align='center'>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>LastName</th>
-                                        <th>Age</th>
-                                        <th>Gender</th>
-                                    </tr>");
-            foreach (var emp in employees)
-            {
-                sb.AppendFormat(@"<tr>
-                                    <td>{0}</td>
-                                    <td>{1}</td>
-                                    <td>{2}</td>
-                                    <td>{3}</td>
-                                  </tr>", emp.Name, emp.LastName, emp.Age, emp.Gender);
-            }
-            sb.Append(@"
-                                </table>
-                            </body>
-                        </html>");
-            return sb.ToString();
+            using var streamReader = new StreamReader(path, Encoding.UTF8);
+            return streamReader.ReadToEnd();
         }
     }
 }
