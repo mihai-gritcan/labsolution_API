@@ -168,9 +168,9 @@ namespace LabSolution.Services
             var processedOrder = await _context.ProcessedOrders.SingleAsync(x => x.Id == processedOrderId);
 
             processedOrder.TestResult = (int)testResult;
-            processedOrder.ExecutorName = executorName;
-            processedOrder.VerifierName = verifierName;
-            processedOrder.ValidatorName = validatorName;
+            processedOrder.ProcessedBy = executorName;
+            processedOrder.CheckedBy = verifierName;
+            processedOrder.ValidatedBy = validatorName;
 
             _context.ProcessedOrders.Update(processedOrder);
 
