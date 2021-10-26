@@ -4,14 +4,16 @@ using LabSolution.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LabSolution.Migrations
 {
     [DbContext(typeof(LabSolutionContext))]
-    partial class LabSolutionContextModelSnapshot : ModelSnapshot
+    [Migration("20211025203337_PrintCountColumn")]
+    partial class PrintCountColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -135,9 +137,6 @@ namespace LabSolution.Migrations
                     b.Property<int>("CustomerOrderId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ExecutorName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("PrintCount")
                         .HasColumnType("int");
 
@@ -146,12 +145,6 @@ namespace LabSolution.Migrations
 
                     b.Property<int?>("TestResult")
                         .HasColumnType("int");
-
-                    b.Property<string>("ValidatorName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VerifierName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

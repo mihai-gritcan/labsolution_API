@@ -15,7 +15,7 @@ namespace LabSolution.HttpModels
 
         public string ScheduledTime { get; set; }
 
-        public int TestType { get; set; } = (int)Infrastructure.TestType.Quick;
+        public int TestType { get; set; } = (int)Infrastructure.TestType.Antigen;
 
         public int TestLanguage { get; set; } = (int)Infrastructure.TestLanguage.Romanian;
 
