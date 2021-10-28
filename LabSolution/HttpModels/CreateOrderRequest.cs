@@ -54,6 +54,9 @@ namespace LabSolution.HttpModels
             if(Customers.Count > 1 && Customers.Count(x => x.IsRootCustomer) != 1)
                 validationErrors.Add(new ValidationResult("Please set one single customer as Root customer", new List<string> { nameof(Customers) }));
 
+            if (Customers.GroupBy(x => x.PersonalNumber).Count() != Customers.Count)
+                validationErrors.Add(new ValidationResult("There are customers with duplicated Personal numbers. Ensure ach Customer has it's own personal number set.", new List<string> { nameof(Customers) }));
+
             return validationErrors;
         }
     }

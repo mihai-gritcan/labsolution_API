@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
 
@@ -49,21 +50,30 @@ namespace LabSolution.Controllers
 
         private async Task<IEnumerable<CreatedOrdersResponse>> SaveOrder(CreateOrderRequest createOrder)
         {
-            var allSavedCustomers = await _customerService.SaveCustomers(createOrder.Customers);
+            var savedOrders = new List<CreatedOrdersResponse>();
 
-            var addedOrders = await _orderService.SaveOrders(createOrder, allSavedCustomers);
-
-            return addedOrders.Select(x => new CreatedOrdersResponse
+            using(var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                Id = x.Id,
-                CustomerId = x.CustomerId,
-                Customer = CustomerDto.CreateDtoFromEntity(allSavedCustomers.Find(c => c.Id == x.CustomerId), isRootCustomer: x.ParentId == null),
-                ParentId = x.ParentId,
-                PlacedAt = x.PlacedAt,
-                Scheduled = x.Scheduled,
-                TestLanguage = (TestLanguage)x.TestLanguage,
-                TestType = (TestType)x.TestType,
-            });
+                var allSavedCustomers = await _customerService.SaveCustomers(createOrder.Customers);
+
+                var addedOrders = await _orderService.SaveOrders(createOrder, allSavedCustomers);
+
+                savedOrders.AddRange(addedOrders.Select(x => new CreatedOrdersResponse
+                {
+                    Id = x.Id,
+                    CustomerId = x.CustomerId,
+                    Customer = CustomerDto.CreateDtoFromEntity(allSavedCustomers.Find(c => c.Id == x.CustomerId), isRootCustomer: x.ParentId == null),
+                    ParentId = x.ParentId,
+                    PlacedAt = x.PlacedAt,
+                    Scheduled = x.Scheduled,
+                    TestLanguage = (TestLanguage)x.TestLanguage,
+                    TestType = (TestType)x.TestType,
+                }));
+
+                scope.Complete();
+            }
+
+            return savedOrders;
         }
 
         [Obsolete("Use '~api/orders/{date}?idnp=1234' instead")]
