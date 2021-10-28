@@ -137,8 +137,8 @@ namespace LabSolution.Services
                     CustomerId = customerId,
                     PlacedAt = DateTime.Now,
                     Scheduled = createOrder.ScheduledDateTime,
-                    TestType = (int)TestType.Antigen,
-                    TestLanguage = (int)TestLanguage.Romanian,
+                    TestType = (short)createOrder.TestType,
+                    TestLanguage = (short)createOrder.TestLanguage,
                     ParentId = shouldSetParentId ? rootCustomer.Id : null
                 };
 
