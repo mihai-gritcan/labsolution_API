@@ -67,7 +67,7 @@ namespace LabSolution.Controllers
                     PlacedAt = x.PlacedAt,
                     Scheduled = x.Scheduled,
                     TestLanguage = (TestLanguage)x.TestLanguage,
-                    TestType = (TestType)x.TestType,
+                    TestType = (TestType)x.TestType
                 }));
 
                 scope.Complete();

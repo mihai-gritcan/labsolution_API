@@ -57,7 +57,8 @@ namespace LabSolution.Services
                     ParentId = x.ParentId,
                     OrderDate = x.Scheduled,
                     Status = x.ProcessedOrder == null ? OrderStatus.Created : OrderStatus.Processed,
-                    TestResult = x.ProcessedOrder == null ? null : (TestResult)x.ProcessedOrder.TestResult
+                    TestResult = x.ProcessedOrder == null ? null : (TestResult)x.ProcessedOrder.TestResult,
+                    NumericCode = x.ProcessedOrder == null ? null : x.ProcessedOrder.Id.ToString("D7")
                 })
                 .OrderBy(x => x.Status).ThenBy(x => x.Id)
                 .ToListAsync();

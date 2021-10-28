@@ -21,7 +21,7 @@ namespace LabSolution.HttpModels
     {
         public int Id { get; set; }
         public TestResult TestResult { get; set; }
-        public string NumericCode => Id.ToString("D7");
+        public string NumericCode { get; set; }
         public DateTime OrderDate { get; set; }
         public CustomerDto Customer { get; set; }
         public TestLanguage TestLanguage { get; set; }
@@ -31,7 +31,7 @@ namespace LabSolution.HttpModels
     public class OrderWithStatusResponse
     {
         public int Id { get; set; }
-        public string NumericCode => Id.ToString("D7");
+        public string NumericCode { get; set; }
 
         public CustomerDto Customer { get; set; }
         public TestLanguage TestLanguage { get; set; }
