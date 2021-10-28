@@ -60,6 +60,8 @@ namespace LabSolution.Controllers
 			var user = new AppUser
 			{
 				Username = userRegisterRequest.Username.ToLower(),
+				Firstname = userRegisterRequest.Firstname,
+				Lastname = userRegisterRequest.Lastname,
 				PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userRegisterRequest.Password)),
 				PasswordSalt = hmac.Key
 			};

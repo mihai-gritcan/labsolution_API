@@ -37,8 +37,8 @@ table {
 
 .customer .barcode img {
     float: right;
-    width: 140px;
-    height: 35px;
+    width: 200px;
+    height: 50px;
 }
 
 .notes {
@@ -46,8 +46,8 @@ table {
 
 .qr-code img {
     float: right;
-    width: 85px;
-    height: 85px;
+    width: 100px;
+    height: 100px;
 }
 
 .parameters table {
