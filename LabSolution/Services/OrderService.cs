@@ -14,13 +14,19 @@ namespace LabSolution.Services
     {
         Task<List<CustomerOrder>> SaveOrders(CreateOrderRequest createOrder, IEnumerable<Customer> customersEntities);
         Task<List<DateTime>> GetOccupiedTimeSlots(DateTime date);
-        Task<List<CreatedOrdersResponse>> GetCreatedOrders(DateTime date, long? idnp);
         Task<CustomerOrder> GetOrderDetails(int createdOrderId);
         Task UpdateOrder(UpdateOrderRequest updateOrderRequest);
         Task<ProcessedOrder> CreateOrUpdateProcessedOrder(int orderId);
         Task SetTestResult(int processedOrderId, TestResult testResult, string executorName, string verifierName, string validatorName);
-        Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date, long? idnp);
+
         Task<FinishedOrderResponse> GetFinishedOrderForPdf(int processedOrderId);
+
+        [Obsolete("Use OrderWithStatusResponse instead")]
+        Task<List<CreatedOrdersResponse>> GetCreatedOrders(DateTime date, long? idnp);
+        [Obsolete("Use OrderWithStatusResponse instead")]
+        Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date, long? idnp);
+
+        Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, long? idnp);
     }
 
     public class OrderService : IOrderService
@@ -35,6 +41,26 @@ namespace LabSolution.Services
         public Task<List<DateTime>> GetOccupiedTimeSlots(DateTime date)
         {
             return _context.CustomerOrders.Where(x => x.Scheduled.Date == date.Date).Select(x => x.Scheduled).ToListAsync();
+        }
+
+        public Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, long? idnp)
+        {
+            return _context.CustomerOrders.Where(x => x.Scheduled.Date == date && (idnp == null || x.Customer.PersonalNumber.Contains(idnp.Value.ToString())))
+                .Include(x => x.Customer)
+                .Include(x => x.ProcessedOrder)
+                .Select(x => new OrderWithStatusResponse
+                {
+                    Id = x.Id,
+                    Customer = CustomerDto.CreateDtoFromEntity(x.Customer, x.ParentId == null),
+                    TestLanguage = (TestLanguage)x.TestLanguage,
+                    TestType = (TestType)x.TestType,
+                    ParentId = x.ParentId,
+                    OrderDate = x.Scheduled,
+                    Status = x.ProcessedOrder == null ? OrderStatus.Created : OrderStatus.Processed,
+                    TestResult = x.ProcessedOrder == null ? null : (TestResult)x.ProcessedOrder.TestResult
+                })
+                .OrderBy(x => x.Status).ThenBy(x => x.Id)
+                .ToListAsync();
         }
 
         public Task<List<CreatedOrdersResponse>> GetCreatedOrders(DateTime date, long? idnp)

@@ -15,5 +15,11 @@ namespace LabSolution.Models
         public byte[] PasswordHash { get; set; }
         [Required]
         public byte[] PasswordSalt { get; set; }
+        [Required]
+        [StringLength(50)]
+        public string Firstname { get; set; }
+        [Required]
+        [StringLength(50)]
+        public string Lastname { get; set; }
     }
 }
