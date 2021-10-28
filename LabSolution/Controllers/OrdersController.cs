@@ -66,6 +66,7 @@ namespace LabSolution.Controllers
             });
         }
 
+        [Obsolete("Use '~api/orders/{date}?idnp=1234' instead")]
         // reception getCreatedOrders ByDate or idnp
         [HttpGet("{date}/created")]
         public async Task<ActionResult> GetCreatedOrders(DateTime date, [FromQuery] long? idnp)
@@ -73,11 +74,19 @@ namespace LabSolution.Controllers
             return Ok(await _orderService.GetCreatedOrders(date, idnp));
         }
 
+        [Obsolete("Use '~api/orders/{date}?idnp=1234' instead")]
         // reception getFinishedOrders ByDate or idnp
         [HttpGet("{date}/finished")]
         public async Task<ActionResult<object>> GetFinishedOrders(DateTime date, [FromQuery] long? idnp)
         {
             return Ok(await _orderService.GetFinishedOrders(date, idnp));
+        }
+
+        // reception getOrders ByDate or idnp
+        [HttpGet("{date}")]
+        public async Task<ActionResult<object>> GetOrders(DateTime date, [FromQuery] long? idnp)
+        {
+            return Ok(await _orderService.GetOrdersWithStatus(date, idnp));
         }
 
         // reception updateOrder 
@@ -152,16 +161,15 @@ namespace LabSolution.Controllers
                 Margins = new MarginSettings { Top = 10 },
                 DocumentTitle = "PDF Report",
                 Out = Path.Combine(Directory.GetCurrentDirectory(), "GeneratedReports", $"{fileName}.pdf"),
-                DPI = 300
+                DPI = 400
             };
             var objectSettings = new ObjectSettings
             {
                 PagesCount = true,
-                //HtmlContent = TemplateGenerator.GetHTMLString(),
                 HtmlContent = GetDefaultTemplateHtml(),
-                WebSettings = { DefaultEncoding = "utf-8"/*, UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css")*/ },
-                //HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
-                //FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Report Footer" }
+                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
+                //HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "[page]/[toPage]", Line = true },
+                FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Right = "[page]/[toPage]" }
             };
             var pdf = new HtmlToPdfDocument()
             {

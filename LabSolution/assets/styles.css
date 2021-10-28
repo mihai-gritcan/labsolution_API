@@ -1,22 +1,82 @@
-﻿.header {
-    text-align: center;
-    color: green;
-    padding-bottom: 35px;
+﻿body {
+    font-family: Arial, 'Times New Roman', sans-serif;
 }
 
 table {
-    width: 80%;
     border-collapse: collapse;
 }
 
-td, th {
-    border: 1px solid gray;
-    padding: 15px;
-    font-size: 22px;
-    text-align: center;
+.main-table > table, tr, td {
+    width: 1240px;
 }
 
-table th {
-    background-color: green;
-    color: white;
+.header-left {
+    width: 50%;
+    text-align: left;
+    border: 1px dashed grey;
+}
+
+    .header-left > p {
+        padding: 0;
+        margin: 3px;
+    }
+
+.header-right {
+    width: 50%;
+    text-align: right;
+    border: 1px dashed grey;
+}
+
+.customer > table tr td {
+    border: 1px solid black;
+}
+
+.customer p {
+    margin: 0;
+}
+
+.customer .barcode img {
+    float: right;
+    width: 140px;
+    height: 35px;
+}
+
+.notes {
+}
+
+.qr-code img {
+    float: right;
+    width: 85px;
+    height: 85px;
+}
+
+.parameters table {
+    width: 100%;
+}
+
+    .parameters table td {
+        border: 1px solid black;
+    }
+
+.other {
+}
+
+.other-details p {
+    margin: 0;
+}
+
+.other-details table {
+    width: 100%;
+}
+
+    .other-details table td {
+        border: 1px solid black;
+    }
+
+.processors p {
+    margin: 0;
+}
+
+.processors table {
+    width: 100%;
 }

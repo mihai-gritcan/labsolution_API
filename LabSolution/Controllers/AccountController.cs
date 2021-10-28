@@ -43,7 +43,9 @@ namespace LabSolution.Controllers
 			return new UserLoggedInResponse
 			{
 				Username = user.Username,
-				Token = _tokenService.CreateToken(user)
+				Token = _tokenService.CreateToken(user),
+				Firstname = user.Firstname,
+				Lastname = user.Lastname
 			};
 		}
 
