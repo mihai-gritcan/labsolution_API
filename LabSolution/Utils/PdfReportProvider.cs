@@ -85,6 +85,8 @@ namespace LabSolution.Utils
         private const string _orderProcessingDateTimeKey = "#ORDER_PROCESSING_DATE_TIME";
         private const string _orderReceivedInLabDateTimeKey = "#ORDER_RECEIVED_IN_LAB_DATE_TIME";
         private const string _dateOfExaminationKey = "#DATE_OF_EXAMINATION_KEY";
+        private const string _orderProcessedByKey = "#ORDER_PROCESSED_BY_KEY";
+
 
         private const string _sampleIdKey = "#SAMPLE_ID_KEY";
         private const string _testResultKey = "#TEST_RESULT_KEY";
@@ -113,9 +115,10 @@ namespace LabSolution.Utils
                 .Replace(_customerAddressKey, processedOrderForPdf.Customer.Address ?? string.Empty)
                 .Replace(_customerEmailKey, processedOrderForPdf.Customer.Email ?? string.Empty)
 
-                .Replace(_orderProcessingDateTimeKey, processedOrderForPdf.OrderDate.ToString("dd/MM/yyyy HH:mm"))
+                .Replace(_orderProcessingDateTimeKey, processedOrderForPdf.ProcessedAt.ToString("dd/MM/yyyy HH:mm"))
                 .Replace(_orderReceivedInLabDateTimeKey, processedOrderForPdf.OrderDate.ToString("dd/MM/yyyy HH:mm"))
                 .Replace(_dateOfExaminationKey, processedOrderForPdf.OrderDate.ToString("dd/MM/yyyy"))
+                .Replace(_orderProcessedByKey, processedOrderForPdf.ProcessedBy)
 
                 .Replace(_sampleIdKey, processedOrderForPdf.Id.ToString())
                 .Replace(_testResultKey, processedOrderForPdf.TestResult.ToString());

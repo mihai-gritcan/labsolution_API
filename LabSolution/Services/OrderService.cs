@@ -69,6 +69,8 @@ namespace LabSolution.Services
                     Id = x.Id,
                     TestResult = (TestResult)x.TestResult,
                     OrderDate = x.CustomerOrder.Scheduled,
+                    ProcessedAt = x.ProcessedAt,
+                    ProcessedBy = x.ProcessedBy,
                     TestType = (TestType)x.CustomerOrder.TestType,
                     TestLanguage = (TestLanguage)x.CustomerOrder.TestLanguage,
                     Customer = CustomerDto.CreateDtoFromEntity(x.CustomerOrder.Customer, x.CustomerOrder.ParentId == null),
