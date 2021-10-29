@@ -16,10 +16,10 @@ table {
     border: 1px dashed grey;
 }
 
-    .header-left > p {
-        padding: 0;
-        margin: 3px;
-    }
+.header-left > p {
+    padding: 0;
+    margin: 3px;
+}
 
 .header-right {
     width: 50%;
