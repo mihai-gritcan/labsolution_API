@@ -76,22 +76,6 @@ namespace LabSolution.Controllers
             return savedOrders;
         }
 
-        [Obsolete("Use '~api/orders/{date}?idnp=1234' instead")]
-        // reception getCreatedOrders ByDate or idnp
-        [HttpGet("{date}/created")]
-        public async Task<ActionResult> GetCreatedOrders(DateTime date, [FromQuery] long? idnp)
-        {
-            return Ok(await _orderService.GetCreatedOrders(date, idnp));
-        }
-
-        [Obsolete("Use '~api/orders/{date}?idnp=1234' instead")]
-        // reception getFinishedOrders ByDate or idnp
-        [HttpGet("{date}/finished")]
-        public async Task<ActionResult<object>> GetFinishedOrders(DateTime date, [FromQuery] long? idnp)
-        {
-            return Ok(await _orderService.GetFinishedOrders(date, idnp));
-        }
-
         // reception getOrders ByDate or idnp
         [HttpGet("{date}")]
         public async Task<ActionResult<object>> GetOrders(DateTime date, [FromQuery] long? idnp)
@@ -101,7 +85,7 @@ namespace LabSolution.Controllers
 
         // reception updateOrder 
         [HttpPut("{orderId}")]
-        public async Task<IActionResult> PutOrder(int orderId, UpdateOrderRequest updateOrderRequest)
+        public async Task<IActionResult> UpdateOrder(int orderId, UpdateOrderRequest updateOrderRequest)
         {
             if (orderId != updateOrderRequest.Id)
                 return BadRequest();
@@ -127,15 +111,14 @@ namespace LabSolution.Controllers
                 return NotFound();
 
             var savedProcessedOrder = await _orderService.CreateOrUpdateProcessedOrder(orderId);
-            var numericCode7Digicts = savedProcessedOrder.Id.ToString("D7");
-            var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(numericCode7Digicts);
+            var numericCode7Digits = savedProcessedOrder.Id.ToString("D7");
+            var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(numericCode7Digits);
 
             return Ok(new ProcessedOrderResponse
             {
                 Id = savedProcessedOrder.Id,
-                CustomerOrderId = savedProcessedOrder.CustomerOrderId,
-                NumericCode = numericCode7Digicts,
-                Barcode = barcode,
+                NumericCode = numericCode7Digits,
+                Barcode = Convert.ToBase64String(barcode),
                 ProcessedAt = savedProcessedOrder.ProcessedAt,
                 TestLanguage = (TestLanguage)orderDetails.TestLanguage,
                 TestType = (TestType)orderDetails.TestType,
@@ -160,7 +143,10 @@ namespace LabSolution.Controllers
         [HttpGet("{id}/pdfresult")]
         public async Task<IActionResult> GetPdfResult(int id)
         {
-            var finishedOrder = await _orderService.GetFinishedOrderForPdf(id);
+            var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(id);
+
+            var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(processedOrderForPdf.NumericCode);
+            var qrCode = QRCodeProvider.GeneratQRCode(processedOrderForPdf.NumericCode);
 
             var fileName = $"antigenRo-{Guid.NewGuid()}";
             var globalSettings = new GlobalSettings
@@ -176,7 +162,7 @@ namespace LabSolution.Controllers
             var objectSettings = new ObjectSettings
             {
                 PagesCount = true,
-                HtmlContent = GetDefaultTemplateHtml(),
+                HtmlContent = TemplateBuilder.GetReportTemplate(processedOrderForPdf, barcode, qrCode),
                 WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
                 //HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "[page]/[toPage]", Line = true },
                 FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Right = "[page]/[toPage]" }
@@ -189,8 +175,32 @@ namespace LabSolution.Controllers
             _converter.Convert(pdf);
             return Ok("Successfully created PDF document.");
         }
+    }
 
-        private string GetDefaultTemplateHtml()
+    public static class TemplateBuilder
+    {
+        private const string _barcodeKey = "#BARCODE_KEY";
+        private const string _qrcodeKey = "#QRCODE_KEY";
+        private const string _customerFirstNameKey = "#CUSTOMER_FIRST_NAME_KEY";
+        private const string _customerLastNameKey = "#CUSTOMER_LAST_NAME_KEY";
+
+
+        public static string GetReportTemplate(ProcessedOrderForPdf processedOrderForPdf, byte[] barcode, byte[] qrcode)
+        {
+            var htmlTemplate = TemplateLoader.GetDefaultTemplateHtml(processedOrderForPdf.TestLanguage, processedOrderForPdf.TestType);
+            var refinedTemplate = htmlTemplate
+                .Replace(_barcodeKey, Convert.ToBase64String(barcode))
+                .Replace(_qrcodeKey, Convert.ToBase64String(qrcode))
+                .Replace(_customerFirstNameKey, processedOrderForPdf.Customer.FirstName)
+                .Replace(_customerLastNameKey, processedOrderForPdf.Customer.LastName);
+
+            return refinedTemplate;
+        }
+    }
+
+    public static class TemplateLoader
+    {
+        public static string GetDefaultTemplateHtml(TestLanguage testLanguage, TestType testType)
         {
             string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", "testAntigenRo.html");
             using var streamReader = new StreamReader(path, Encoding.UTF8);
