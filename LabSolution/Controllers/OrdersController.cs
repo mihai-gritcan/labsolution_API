@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -136,16 +135,19 @@ namespace LabSolution.Controllers
             return NoContent();
         }
 
-        [AllowAnonymous]
         // reception getPdfResult by processedOrderId
-        [HttpGet("{id}/pdfresult")]
-        public async Task<IActionResult> GetPdfResult(int id)
+        [HttpGet("{processedOrderId}/pdfresult")]
+        public async Task<IActionResult> GetPdfResult(int processedOrderId)
         {
-            var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(id);
+            // TODO: update DB set file name for each processedOrder
+
+            var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
             var fileName = $"antigenRo-{Guid.NewGuid()}";
             var fullyQualifiedFilePath = Path.Combine(Directory.GetCurrentDirectory(), "GeneratedReports", $"{fileName}.pdf");
-            var report = _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
-            return Ok("Successfully created PDF document.");
+            var pdfBytes = _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
+
+            MemoryStream ms = new MemoryStream(pdfBytes);
+            return new FileStreamResult(ms, "application/pdf");
         }
-    }    
+    }
 }
