@@ -19,12 +19,7 @@ namespace LabSolution.Services
         Task<ProcessedOrder> CreateOrUpdateProcessedOrder(int orderId);
         Task SetTestResult(int processedOrderId, TestResult testResult, string executorName, string verifierName, string validatorName);
 
-        Task<FinishedOrderResponse> GetFinishedOrderForPdf(int processedOrderId);
-
-        [Obsolete("Use OrderWithStatusResponse instead")]
-        Task<List<CreatedOrdersResponse>> GetCreatedOrders(DateTime date, long? idnp);
-        [Obsolete("Use OrderWithStatusResponse instead")]
-        Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date, long? idnp);
+        Task<ProcessedOrderForPdf> GetProcessedOrderForPdf(int processedOrderId);
 
         Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, long? idnp);
     }
@@ -64,55 +59,20 @@ namespace LabSolution.Services
                 .ToListAsync();
         }
 
-        public Task<List<CreatedOrdersResponse>> GetCreatedOrders(DateTime date, long? idnp)
-        {
-            return _context.CustomerOrders.Where(x => x.Scheduled.Date == date.Date && x.ProcessedOrder == null 
-                                                    && (idnp == null || x.Customer.PersonalNumber.Contains(idnp.Value.ToString())))
-                .Include(x => x.Customer)
-                .Select(x => new CreatedOrdersResponse
-                {
-                    Id = x.Id,
-                    CustomerId = x.CustomerId,
-                    Customer = CustomerDto.CreateDtoFromEntity(x.Customer, x.ParentId == null),
-                    ParentId = x.ParentId,
-                    PlacedAt = x.PlacedAt,
-                    Scheduled = x.Scheduled,
-                    TestLanguage = (TestLanguage)x.TestLanguage,
-                    TestType = (TestType)x.TestType
-                })
-                .OrderBy(x => x.Scheduled)
-                .ToListAsync();
-        }
-
-        public Task<List<FinishedOrderResponse>> GetFinishedOrders(DateTime date, long? idnp)
-        {
-            return _context.ProcessedOrders.Where(x => x.TestResult != null && x.ProcessedAt.Date == date.Date
-                                                    && (idnp == null || x.CustomerOrder.Customer.PersonalNumber.Contains(idnp.Value.ToString())))
-                .Include(x => x.CustomerOrder).ThenInclude(x => x.Customer)
-                .Select(x => new FinishedOrderResponse
-                {
-                    Id = x.Id,
-                    TestResult = (TestResult)x.TestResult,
-                    OrderDate = x.CustomerOrder.Scheduled,
-                    TestType = (TestType)x.CustomerOrder.TestType,
-                    TestLanguage = (TestLanguage)x.CustomerOrder.TestLanguage,
-                    Customer = CustomerDto.CreateDtoFromEntity(x.CustomerOrder.Customer, x.CustomerOrder.ParentId == null)
-                }).OrderBy(x => x.NumericCode).ToListAsync();
-        }
-
-        public Task<FinishedOrderResponse> GetFinishedOrderForPdf(int processedOrderId)
+        public Task<ProcessedOrderForPdf> GetProcessedOrderForPdf(int processedOrderId)
         {
             return _context.ProcessedOrders
                 .Include(x => x.CustomerOrder).ThenInclude(x => x.Customer)
                 .Where(x => x.Id == processedOrderId)
-                .Select(x => new FinishedOrderResponse
+                .Select(x => new ProcessedOrderForPdf
                 {
                     Id = x.Id,
                     TestResult = (TestResult)x.TestResult,
                     OrderDate = x.CustomerOrder.Scheduled,
                     TestType = (TestType)x.CustomerOrder.TestType,
                     TestLanguage = (TestLanguage)x.CustomerOrder.TestLanguage,
-                    Customer = CustomerDto.CreateDtoFromEntity(x.CustomerOrder.Customer, x.CustomerOrder.ParentId == null)
+                    Customer = CustomerDto.CreateDtoFromEntity(x.CustomerOrder.Customer, x.CustomerOrder.ParentId == null),
+                    NumericCode = x.Id.ToString("D7")
                 }).SingleAsync();
         }
 

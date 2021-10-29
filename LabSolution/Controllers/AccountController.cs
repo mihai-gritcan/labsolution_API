@@ -13,68 +13,68 @@ namespace LabSolution.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : BaseApiController
-	{
+    {
         private readonly LabSolutionContext _context;
         private readonly ITokenService _tokenService;
 
-		public AccountController(LabSolutionContext context, ITokenService tokenService)
+        public AccountController(LabSolutionContext context, ITokenService tokenService)
         {
             _context = context;
-			_tokenService = tokenService;
+            _tokenService = tokenService;
         }
 
-		[AllowAnonymous]
-		[HttpPost("login")]
-		public async Task<ActionResult<UserLoggedInResponse>> Login(UserLoginRequest userLoginRequest)
-		{
-			var user = await _context.AppUsers.SingleOrDefaultAsync(x => x.Username == userLoginRequest.Username);
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public async Task<ActionResult<UserLoggedInResponse>> Login(UserLoginRequest userLoginRequest)
+        {
+            var user = await _context.AppUsers.SingleOrDefaultAsync(x => x.Username == userLoginRequest.Username);
 
-			if (user is null) return Unauthorized("Invalid Username");
+            if (user is null) return Unauthorized("Invalid Username");
 
-			using var hmac = new HMACSHA512(user.PasswordSalt);
+            using var hmac = new HMACSHA512(user.PasswordSalt);
 
-			var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userLoginRequest.Password));
+            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userLoginRequest.Password));
 
-			for (var i = 0; i < computedHash.Length; i++)
-			{
-				if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid Password");
-			}
+            for (var i = 0; i < computedHash.Length; i++)
+            {
+                if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid Password");
+            }
 
-			return new UserLoggedInResponse
-			{
-				Username = user.Username,
-				Token = _tokenService.CreateToken(user),
-				Firstname = user.Firstname,
-				Lastname = user.Lastname
-			};
-		}
+            return new UserLoggedInResponse
+            {
+                Username = user.Username,
+                Token = _tokenService.CreateToken(user),
+                Firstname = user.Firstname,
+                Lastname = user.Lastname
+            };
+        }
 
-		[AllowAnonymous]
-		[HttpPost("register")]
-		public async Task<ActionResult<AppUser>> Register(UserRegisterRequest userRegisterRequest)
-		{
-			if (await UserExists(userRegisterRequest.Username))
-				return BadRequest("Username is taken");
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<ActionResult<AppUser>> Register(UserRegisterRequest userRegisterRequest)
+        {
+            if (await UserExists(userRegisterRequest.Username))
+                return BadRequest("Username is taken");
 
-			using var hmac = new HMACSHA512();
-			var user = new AppUser
-			{
-				Username = userRegisterRequest.Username.ToLower(),
-				Firstname = userRegisterRequest.Firstname,
-				Lastname = userRegisterRequest.Lastname,
-				PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userRegisterRequest.Password)),
-				PasswordSalt = hmac.Key
-			};
+            using var hmac = new HMACSHA512();
+            var user = new AppUser
+            {
+                Username = userRegisterRequest.Username.ToLower(),
+                Firstname = userRegisterRequest.Firstname,
+                Lastname = userRegisterRequest.Lastname,
+                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userRegisterRequest.Password)),
+                PasswordSalt = hmac.Key
+            };
 
-			_context.AppUsers.Add(user);
-			await _context.SaveChangesAsync();
+            _context.AppUsers.Add(user);
+            await _context.SaveChangesAsync();
 
-			return user;
-		}
+            return user;
+        }
 
-		private Task<bool> UserExists(string username)
-		{
-			return _context.AppUsers.AnyAsync(x => x.Username == username.ToLower());
-		}
-	}
+        private Task<bool> UserExists(string username)
+        {
+            return _context.AppUsers.AnyAsync(x => x.Username == username.ToLower());
+        }
+    }
 }
