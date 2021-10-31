@@ -146,7 +146,8 @@ namespace LabSolution.Controllers
             var directory = Directory.GetCurrentDirectory();
             var parentDir = Directory.GetParent(directory);
             var rootDir = Directory.GetParent(parentDir.FullName);
-            var pdfReportsDir = Path.Combine(Directory.GetCurrentDirectory(), "PdfResults");
+
+            var pdfReportsDir = Path.Combine(rootDir.FullName, "PdfResults");
 
             var reportsResultDirectory = Path.Combine(Directory.GetCurrentDirectory(), "assets", "GeneratedReports");
 
@@ -160,9 +161,9 @@ namespace LabSolution.Controllers
                 //return new FileStreamResult(stream, "application/pdf");
             }
 
-            var fileName = $"{Guid.NewGuid()}";
-            var fullyQualifiedFilePath = Path.Combine(pdfReportsDir, $"{fileName}.pdf");
-            var pdfBytes = await _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
+            //var fileName = $"{Guid.NewGuid()}";
+            var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"dummyPcrEn.pdf");
+            //var pdfBytes = await _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
 
             //await _orderService.SetPdfName(processedOrderId, fileName);
             //return Ok();
