@@ -143,7 +143,7 @@ namespace LabSolution.Controllers
         {
             var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
 
-            var reportsResultDirectory = Path.Combine(Directory.GetCurrentDirectory(), "GeneratedReports");
+            var reportsResultDirectory = Path.Combine(Directory.GetCurrentDirectory(), "assets", "GeneratedReports");
 
             if (!string.IsNullOrEmpty(processedOrderForPdf.PdfName))
             {
@@ -160,12 +160,12 @@ namespace LabSolution.Controllers
             await _orderService.SetPdfName(processedOrderId, fileName);
 
             // TODO: create a FileStream from bytes 
-            //using (var ms = new MemoryStream(pdfBytes))
-            //{
-            //    return new FileStreamResult(ms, "application/pdf");
-            //}
-            var fs = new FileStream(fullyQualifiedFilePath, FileMode.Open);
-            return new FileStreamResult(fs, "application/pdf");
+            using (var ms = new MemoryStream(pdfBytes))
+            {
+                return new FileStreamResult(ms, "application/pdf");
+            }
+            //var fs = new FileStream(fullyQualifiedFilePath, FileMode.Open);
+            //return new FileStreamResult(fs, "application/pdf");
         }
     }
 }

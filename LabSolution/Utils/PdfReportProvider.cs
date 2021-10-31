@@ -42,7 +42,7 @@ namespace LabSolution.Utils
             {
                 PagesCount = true,
                 HtmlContent = await TemplateBuilder.GetReportTemplate(processedOrderForPdf, barcode, qrCode),
-                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
+                WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "Templates", "styles.css") },
                 //HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "[page]/[toPage]", Line = true },
                 FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Right = "[page]/[toPage]" }
             };
@@ -142,7 +142,7 @@ namespace LabSolution.Utils
             var templateName = testType == TestType.Antigen ? "testAntigen" : "testPcr";
             templateName = testLanguage == TestLanguage.Romanian ? $"{templateName}Ro" : $"{templateName}En";
 
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", $"{templateName}.html");
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", "Templates",$"{templateName}.html");
             using var streamReader = new StreamReader(path, Encoding.UTF8);
             return streamReader.ReadToEndAsync();
         }
