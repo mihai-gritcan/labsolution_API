@@ -4,14 +4,16 @@ using LabSolution.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LabSolution.Migrations
 {
     [DbContext(typeof(LabSolutionContext))]
-    partial class LabSolutionContextModelSnapshot : ModelSnapshot
+    [Migration("20211031164100_Add_Column_To_ProcessedOrderTable_PdfName")]
+    partial class Add_Column_To_ProcessedOrderTable_PdfName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

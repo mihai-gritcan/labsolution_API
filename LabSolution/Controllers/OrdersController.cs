@@ -140,15 +140,15 @@ namespace LabSolution.Controllers
         [HttpGet("{processedOrderId}/pdfresult")]
         public async Task<IActionResult> GetPdfResult(int processedOrderId)
         {
-            // TODO: update DB set file name for each processedOrder
-
             var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
-            var fileName = $"antigenRo-{Guid.NewGuid()}";
+
+            var fileName = $"{Guid.NewGuid()}";
             var fullyQualifiedFilePath = Path.Combine(Directory.GetCurrentDirectory(), "GeneratedReports", $"{fileName}.pdf");
             var pdfBytes = _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
 
-            MemoryStream ms = new MemoryStream(pdfBytes);
-            return new FileStreamResult(ms, "application/pdf");
+            await _orderService.SetPdfName(processedOrderId, fileName);
+
+            return new FileStreamResult(new MemoryStream(pdfBytes), "application/pdf");
         }
     }
 }
