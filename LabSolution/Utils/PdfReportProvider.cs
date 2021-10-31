@@ -93,9 +93,8 @@ namespace LabSolution.Utils
 
         public static string GetReportTemplate(ProcessedOrderForPdf processedOrderForPdf, byte[] barcode, byte[] qrcode)
         {
-           
             var htmlTemplate = TemplateLoader.GetDefaultTemplateHtml(processedOrderForPdf.TestLanguage, processedOrderForPdf.TestType);
-            var refinedTemplate = htmlTemplate
+            return htmlTemplate
                 .Replace(_labNameKey, LAB_NAME)
                 .Replace(_labAddressKey, LAB_ADDRESS)
                 .Replace(_labPhoneKey, LAB_PHONE)
@@ -120,10 +119,8 @@ namespace LabSolution.Utils
                 .Replace(_dateOfExaminationKey, processedOrderForPdf.OrderDate.ToString("dd/MM/yyyy"))
                 .Replace(_orderProcessedByKey, processedOrderForPdf.ProcessedBy)
 
-                .Replace(_sampleIdKey, processedOrderForPdf.Id.ToString())
+                .Replace(_sampleIdKey, processedOrderForPdf.OrderId.ToString())
                 .Replace(_testResultKey, processedOrderForPdf.TestResult.ToString());
-
-            return refinedTemplate;
         }
 
         private static int CalculateCustomerAge(DateTime dateOfBirth)

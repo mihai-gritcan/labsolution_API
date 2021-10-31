@@ -45,7 +45,7 @@ namespace LabSolution.Services
                 .Include(x => x.ProcessedOrder)
                 .Select(x => new OrderWithStatusResponse
                 {
-                    Id = x.Id,
+                    OrderId = x.Id,
                     Customer = CustomerDto.CreateDtoFromEntity(x.Customer, x.ParentId == null),
                     TestLanguage = (TestLanguage)x.TestLanguage,
                     TestType = (TestType)x.TestType,
@@ -53,9 +53,10 @@ namespace LabSolution.Services
                     OrderDate = x.Scheduled,
                     Status = x.ProcessedOrder == null ? OrderStatus.Created : OrderStatus.Processed,
                     TestResult = x.ProcessedOrder == null ? null : (TestResult)x.ProcessedOrder.TestResult,
-                    NumericCode = x.ProcessedOrder == null ? null : x.ProcessedOrder.Id.ToString("D7")
+                    NumericCode = x.ProcessedOrder == null ? null : x.ProcessedOrder.Id.ToString("D7"),
+                    ProcessedOrderId = x.ProcessedOrder == null ? null : x.ProcessedOrder.Id
                 })
-                .OrderBy(x => x.Status).ThenBy(x => x.Id)
+                .OrderBy(x => x.Status).ThenBy(x => x.OrderId)
                 .ToListAsync();
         }
 
@@ -66,7 +67,7 @@ namespace LabSolution.Services
                 .Where(x => x.Id == processedOrderId)
                 .Select(x => new ProcessedOrderForPdf
                 {
-                    Id = x.Id,
+                    OrderId = x.Id,
                     TestResult = (TestResult)x.TestResult,
                     OrderDate = x.CustomerOrder.Scheduled,
                     ProcessedAt = x.ProcessedAt,
