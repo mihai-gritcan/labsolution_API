@@ -164,7 +164,7 @@ namespace LabSolution.Controllers
             //{
             //    return new FileStreamResult(ms, "application/pdf");
             //}
-            var fs = new FileStream( Path.Combine(reportsResultDirectory, $"dummyPcrEn.pdf"), FileMode.Open);
+            var fs = new FileStream( Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf"), FileMode.Open);
             return new FileStreamResult(fs, "application/pdf");
         }
     }
