@@ -22,6 +22,7 @@ namespace LabSolution.Services
         Task<ProcessedOrderForPdf> GetProcessedOrderForPdf(int processedOrderId);
 
         Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, long? idnp);
+        Task SetPdfName(int processedOrderId, string pdfName);
     }
 
     public class OrderService : IOrderService
@@ -161,6 +162,17 @@ namespace LabSolution.Services
             processedOrder.ProcessedBy = executorName;
             processedOrder.CheckedBy = verifierName;
             processedOrder.ValidatedBy = validatorName;
+
+            _context.ProcessedOrders.Update(processedOrder);
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task SetPdfName(int processedOrderId, string pdfName)
+        {
+            var processedOrder = await _context.ProcessedOrders.SingleAsync(x => x.Id == processedOrderId);
+
+            processedOrder.PdfName = pdfName;
 
             _context.ProcessedOrders.Update(processedOrder);
 
