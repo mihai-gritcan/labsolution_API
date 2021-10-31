@@ -3,6 +3,7 @@ using LabSolution.Infrastructure;
 using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
 
@@ -10,7 +11,7 @@ namespace LabSolution.Utils
 {
     public interface IPdfReportProvider
     {
-        byte[] CreatePdfReport(string fullyQualifiedFilePath, ProcessedOrderForPdf processedOrderForPdf);
+        Task<byte[]> CreatePdfReport(string fullyQualifiedFilePath, ProcessedOrderForPdf processedOrderForPdf);
     }
 
     public class PdfReportProvider: IPdfReportProvider
@@ -22,7 +23,7 @@ namespace LabSolution.Utils
             _converter = converter;
         }
 
-        public byte[] CreatePdfReport(string fullyQualifiedFilePath, ProcessedOrderForPdf processedOrderForPdf)
+        public async Task<byte[]> CreatePdfReport(string fullyQualifiedFilePath, ProcessedOrderForPdf processedOrderForPdf)
         {
             var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(processedOrderForPdf.NumericCode);
             var qrCode = QRCodeProvider.GeneratQRCode(processedOrderForPdf.NumericCode);
@@ -40,7 +41,7 @@ namespace LabSolution.Utils
             var objectSettings = new ObjectSettings
             {
                 PagesCount = true,
-                HtmlContent = TemplateBuilder.GetReportTemplate(processedOrderForPdf, barcode, qrCode),
+                HtmlContent = await TemplateBuilder.GetReportTemplate(processedOrderForPdf, barcode, qrCode),
                 WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet = Path.Combine(Directory.GetCurrentDirectory(), "assets", "styles.css") },
                 //HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "[page]/[toPage]", Line = true },
                 FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Right = "[page]/[toPage]" }
@@ -91,9 +92,9 @@ namespace LabSolution.Utils
         private const string _sampleIdKey = "#SAMPLE_ID_KEY";
         private const string _testResultKey = "#TEST_RESULT_KEY";
 
-        public static string GetReportTemplate(ProcessedOrderForPdf processedOrderForPdf, byte[] barcode, byte[] qrcode)
+        public static async Task<string> GetReportTemplate(ProcessedOrderForPdf processedOrderForPdf, byte[] barcode, byte[] qrcode)
         {
-            var htmlTemplate = TemplateLoader.GetDefaultTemplateHtml(processedOrderForPdf.TestLanguage, processedOrderForPdf.TestType);
+            var htmlTemplate = await TemplateLoader.GetDefaultTemplateHtml(processedOrderForPdf.TestLanguage, processedOrderForPdf.TestType);
             return htmlTemplate
                 .Replace(_labNameKey, LAB_NAME)
                 .Replace(_labAddressKey, LAB_ADDRESS)
@@ -136,14 +137,14 @@ namespace LabSolution.Utils
 
     public static class TemplateLoader
     {
-        public static string GetDefaultTemplateHtml(TestLanguage testLanguage, TestType testType)
+        public static Task<string> GetDefaultTemplateHtml(TestLanguage testLanguage, TestType testType)
         {
             var templateName = testType == TestType.Antigen ? "testAntigen" : "testPcr";
             templateName = testLanguage == TestLanguage.Romanian ? $"{templateName}Ro" : $"{templateName}En";
 
             string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", $"{templateName}.html");
             using var streamReader = new StreamReader(path, Encoding.UTF8);
-            return streamReader.ReadToEnd();
+            return streamReader.ReadToEndAsync();
         }
     }
 }

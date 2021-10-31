@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -142,13 +143,29 @@ namespace LabSolution.Controllers
         {
             var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
 
+            var reportsResultDirectory = Path.Combine(Directory.GetCurrentDirectory(), "GeneratedReports");
+
+            if (!string.IsNullOrEmpty(processedOrderForPdf.PdfName))
+            {
+                string path = Path.Combine(reportsResultDirectory, $"{processedOrderForPdf.PdfName}.pdf");
+
+                var stream = new FileStream(path, FileMode.Open);
+                return new FileStreamResult(stream, "application/pdf");
+            }
+
             var fileName = $"{Guid.NewGuid()}";
-            var fullyQualifiedFilePath = Path.Combine(Directory.GetCurrentDirectory(), "GeneratedReports", $"{fileName}.pdf");
-            var pdfBytes = _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
+            var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"{fileName}.pdf");
+            var pdfBytes = await _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
 
             await _orderService.SetPdfName(processedOrderId, fileName);
 
-            return new FileStreamResult(new MemoryStream(pdfBytes), "application/pdf");
+            // TODO: create a FileStream from bytes 
+            //using (var ms = new MemoryStream(pdfBytes))
+            //{
+            //    return new FileStreamResult(ms, "application/pdf");
+            //}
+            var fs = new FileStream(fullyQualifiedFilePath, FileMode.Open);
+            return new FileStreamResult(fs, "application/pdf");
         }
     }
 }

@@ -76,7 +76,8 @@ namespace LabSolution.Services
                     TestType = (TestType)x.CustomerOrder.TestType,
                     TestLanguage = (TestLanguage)x.CustomerOrder.TestLanguage,
                     Customer = CustomerDto.CreateDtoFromEntity(x.CustomerOrder.Customer, x.CustomerOrder.ParentId == null),
-                    NumericCode = x.Id.ToString("D7")
+                    NumericCode = x.Id.ToString("D7"),
+                    PdfName = x.PdfName
                 }).SingleAsync();
         }
 
