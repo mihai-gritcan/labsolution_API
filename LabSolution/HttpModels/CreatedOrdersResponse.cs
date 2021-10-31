@@ -5,7 +5,7 @@ using System;
 namespace LabSolution.HttpModels
 {
     public class BaseOrder {
-        public int Id { get; set; }
+        public int OrderId { get; set; }
         public CustomerDto Customer { get; set; }
         public TestType TestType { get; set; }
         public TestLanguage TestLanguage { get; set; }
@@ -44,6 +44,7 @@ namespace LabSolution.HttpModels
 
         public OrderStatus Status { get; set; }
         public TestResult? TestResult { get; set; }
+        public object ProcessedOrderId { get; internal set; }
     }
 
     public enum OrderStatus

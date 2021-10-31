@@ -57,7 +57,7 @@ namespace LabSolution.Controllers
 
                 savedOrders.AddRange(addedOrders.Select(x => new CreatedOrdersResponse
                 {
-                    Id = x.Id,
+                    OrderId = x.Id,
                     CustomerId = x.CustomerId,
                     Customer = CustomerDto.CreateDtoFromEntity(allSavedCustomers.Find(c => c.Id == x.CustomerId), isRootCustomer: x.ParentId == null),
                     ParentId = x.ParentId,
@@ -113,7 +113,7 @@ namespace LabSolution.Controllers
 
             return Ok(new ProcessedOrderResponse
             {
-                Id = savedProcessedOrder.Id,
+                OrderId = savedProcessedOrder.Id,
                 NumericCode = numericCode7Digits,
                 Barcode = Convert.ToBase64String(barcode),
                 ProcessedAt = savedProcessedOrder.ProcessedAt,
@@ -127,14 +127,15 @@ namespace LabSolution.Controllers
         [HttpPatch("{processedOrderId}/settestresult")]
         public async Task<IActionResult> SetTestResult(int processedOrderId, SetTestResultRequest setResultRequest)
         {
-            if (processedOrderId != setResultRequest.ProcesedOrderId)
+            if (processedOrderId != setResultRequest.ProcessedOrderId)
                 return BadRequest();
 
-            await _orderService.SetTestResult(setResultRequest.ProcesedOrderId, setResultRequest.TestResult, setResultRequest.ExecutorName, setResultRequest.VerifierName, setResultRequest.ValidatorName);
+            await _orderService.SetTestResult(setResultRequest.ProcessedOrderId, setResultRequest.TestResult, setResultRequest.ExecutorName, setResultRequest.VerifierName, setResultRequest.ValidatorName);
 
             return NoContent();
         }
 
+        [AllowAnonymous]
         // reception getPdfResult by processedOrderId
         [HttpGet("{processedOrderId}/pdfresult")]
         public async Task<IActionResult> GetPdfResult(int processedOrderId)
