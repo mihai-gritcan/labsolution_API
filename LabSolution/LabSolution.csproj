@@ -27,13 +27,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="assets\img\barcode.jpg">
+    <None Update="assets\styles.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="assets\img\logo.png">
+    <None Update="assets\testAntigenEn.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="assets\img\qrcode.jpg">
+    <None Update="assets\testAntigenRo.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="assets\testPcrEn.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="assets\testPcrRo.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
