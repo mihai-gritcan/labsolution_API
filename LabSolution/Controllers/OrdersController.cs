@@ -147,18 +147,25 @@ namespace LabSolution.Controllers
 
             if (!string.IsNullOrEmpty(processedOrderForPdf.PdfName))
             {
+
+                var directory = Directory.GetCurrentDirectory();
+                var parentDir = Directory.GetParent(directory);
+                var rootDir = Directory.GetParent(parentDir.FullName);
+
+                //TODO: #2672 file path should be sent from UI
+                var filename = Path.Combine(rootDir.FullName, $"PdfResults", $"{processedOrderForPdf.PdfName}.pdf");
                 //string path = Path.Combine(reportsResultDirectory, $"{processedOrderForPdf.PdfName}.pdf");
 
                 //var stream = new FileStream(path, FileMode.Open);
                 //return new FileStreamResult(stream, "application/pdf");
             }
 
-            var fileName = $"{Guid.NewGuid()}";
-            var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"{fileName}.pdf");
-            var pdfBytes = await _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
+            //var fileName = $"{Guid.NewGuid()}";
+            //var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"{fileName}.pdf");
+            //var pdfBytes = await _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
 
-            await _orderService.SetPdfName(processedOrderId, fileName);
-            return Ok();
+            //await _orderService.SetPdfName(processedOrderId, fileName);
+            //return Ok();
             // TODO: create a FileStream from bytes 
             //using (var ms = new MemoryStream(pdfBytes))
             //{
