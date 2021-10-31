@@ -162,7 +162,7 @@ namespace LabSolution.Controllers
             }
 
             //var fileName = $"{Guid.NewGuid()}";
-            var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"dummyPcrEn.pdf");
+            var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf");
             //var pdfBytes = await _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
 
             //await _orderService.SetPdfName(processedOrderId, fileName);
@@ -174,7 +174,7 @@ namespace LabSolution.Controllers
             //}
 
             var stream = new FileStream(fullyQualifiedFilePath, FileMode.Open);
-            return File(stream, "application/pdf", $"dummyPcrEn.pdf");
+            return File(stream, "application/pdf", $"demoPcrEn.pdf");
 
             //var fs = new FileStream( Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf"), FileMode.Open);
             //return new FileStreamResult(fs, "application/pdf");
