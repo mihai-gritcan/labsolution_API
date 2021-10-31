@@ -138,7 +138,10 @@ namespace LabSolution.Utils
     {
         public static string GetDefaultTemplateHtml(TestLanguage testLanguage, TestType testType)
         {
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", "testAntigenRo.html");
+            var templateName = testType == TestType.Antigen ? "testAntigen" : "testPcr";
+            templateName = testLanguage == TestLanguage.Romanian ? $"{templateName}Ro" : $"{templateName}En";
+
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", $"{templateName}.html");
             using var streamReader = new StreamReader(path, Encoding.UTF8);
             return streamReader.ReadToEnd();
         }
