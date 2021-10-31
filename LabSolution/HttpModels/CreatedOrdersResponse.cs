@@ -33,6 +33,7 @@ namespace LabSolution.HttpModels
         public string NumericCode { get; set; }
         public DateTime ProcessedAt { get; internal set; }
         public string ProcessedBy { get; internal set; }
+        public string PdfName { get; internal set; }
     }
 
     public class OrderWithStatusResponse : BaseOrder
