@@ -143,26 +143,26 @@ namespace LabSolution.Controllers
         {
             var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
 
+            var directory = Directory.GetCurrentDirectory();
+            var parentDir = Directory.GetParent(directory);
+            var rootDir = Directory.GetParent(parentDir.FullName);
+            var pdfReportsDir = Path.Combine(Directory.GetCurrentDirectory(), "PdfResults");
+
             var reportsResultDirectory = Path.Combine(Directory.GetCurrentDirectory(), "assets", "GeneratedReports");
 
             if (!string.IsNullOrEmpty(processedOrderForPdf.PdfName))
             {
-
-                var directory = Directory.GetCurrentDirectory();
-                var parentDir = Directory.GetParent(directory);
-                var rootDir = Directory.GetParent(parentDir.FullName);
-
                 //TODO: #2672 file path should be sent from UI
-                var filename = Path.Combine(rootDir.FullName, $"PdfResults", $"{processedOrderForPdf.PdfName}.pdf");
+                var filename = Path.Combine(pdfReportsDir, $"{processedOrderForPdf.PdfName}.pdf");
                 //string path = Path.Combine(reportsResultDirectory, $"{processedOrderForPdf.PdfName}.pdf");
 
                 //var stream = new FileStream(path, FileMode.Open);
                 //return new FileStreamResult(stream, "application/pdf");
             }
 
-            //var fileName = $"{Guid.NewGuid()}";
-            //var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"{fileName}.pdf");
-            //var pdfBytes = await _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
+            var fileName = $"{Guid.NewGuid()}";
+            var fullyQualifiedFilePath = Path.Combine(pdfReportsDir, $"{fileName}.pdf");
+            var pdfBytes = await _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
 
             //await _orderService.SetPdfName(processedOrderId, fileName);
             //return Ok();
@@ -171,8 +171,12 @@ namespace LabSolution.Controllers
             //{
             //    return new FileStreamResult(ms, "application/pdf");
             //}
-            var fs = new FileStream( Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf"), FileMode.Open);
-            return new FileStreamResult(fs, "application/pdf");
+
+            var stream = new FileStream(fullyQualifiedFilePath, FileMode.Open);
+            return File(stream, "application/pdf", $"dummyPcrEn.pdf");
+
+            //var fs = new FileStream( Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf"), FileMode.Open);
+            //return new FileStreamResult(fs, "application/pdf");
         }
     }
 }
