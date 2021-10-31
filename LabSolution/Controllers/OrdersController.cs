@@ -147,10 +147,10 @@ namespace LabSolution.Controllers
 
             if (!string.IsNullOrEmpty(processedOrderForPdf.PdfName))
             {
-                string path = Path.Combine(reportsResultDirectory, $"{processedOrderForPdf.PdfName}.pdf");
+                //string path = Path.Combine(reportsResultDirectory, $"{processedOrderForPdf.PdfName}.pdf");
 
-                var stream = new FileStream(path, FileMode.Open);
-                return new FileStreamResult(stream, "application/pdf");
+                //var stream = new FileStream(path, FileMode.Open);
+                //return new FileStreamResult(stream, "application/pdf");
             }
 
             var fileName = $"{Guid.NewGuid()}";
@@ -158,14 +158,14 @@ namespace LabSolution.Controllers
             var pdfBytes = await _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
 
             await _orderService.SetPdfName(processedOrderId, fileName);
-
+            return Ok();
             // TODO: create a FileStream from bytes 
-            using (var ms = new MemoryStream(pdfBytes))
-            {
-                return new FileStreamResult(ms, "application/pdf");
-            }
-            //var fs = new FileStream(fullyQualifiedFilePath, FileMode.Open);
-            //return new FileStreamResult(fs, "application/pdf");
+            //using (var ms = new MemoryStream(pdfBytes))
+            //{
+            //    return new FileStreamResult(ms, "application/pdf");
+            //}
+            var fs = new FileStream( Path.Combine(reportsResultDirectory, $"dummyPcrEn.pdf"), FileMode.Open);
+            return new FileStreamResult(fs, "application/pdf");
         }
     }
 }
