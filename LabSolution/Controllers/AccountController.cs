@@ -45,7 +45,8 @@ namespace LabSolution.Controllers
                 Username = user.Username,
                 Token = _tokenService.CreateToken(user),
                 Firstname = user.Firstname,
-                Lastname = user.Lastname
+                Lastname = user.Lastname,
+                IsSuperUser = user.IsSuperUser
             };
         }
 
