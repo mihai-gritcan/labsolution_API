@@ -21,5 +21,7 @@ namespace LabSolution.Models
         [Required]
         [StringLength(50)]
         public string Lastname { get; set; }
+
+        public bool IsSuperUser { get; set; }
     }
 }

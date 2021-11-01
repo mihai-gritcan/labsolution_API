@@ -45,13 +45,14 @@ namespace LabSolution.Controllers
                 Username = user.Username,
                 Token = _tokenService.CreateToken(user),
                 Firstname = user.Firstname,
-                Lastname = user.Lastname
+                Lastname = user.Lastname,
+                IsSuperUser = user.IsSuperUser
             };
         }
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<ActionResult<AppUser>> Register(UserRegisterRequest userRegisterRequest)
+        public async Task<ActionResult<UserLoggedInResponse>> Register(UserRegisterRequest userRegisterRequest)
         {
             if (await UserExists(userRegisterRequest.Username))
                 return BadRequest("Username is taken");
@@ -69,7 +70,14 @@ namespace LabSolution.Controllers
             _context.AppUsers.Add(user);
             await _context.SaveChangesAsync();
 
-            return user;
+            return new UserLoggedInResponse
+            {
+                Username = user.Username,
+                Token = _tokenService.CreateToken(user),
+                Firstname = user.Firstname,
+                Lastname = user.Lastname,
+                IsSuperUser = user.IsSuperUser
+            };
         }
 
         private Task<bool> UserExists(string username)
