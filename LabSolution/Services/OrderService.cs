@@ -193,7 +193,7 @@ namespace LabSolution.Services
                     FirstName = x.CustomerOrder.Customer.FirstName,
                     LastName = x.CustomerOrder.Customer.LastName,
                     DateOfBirth = x.CustomerOrder.Customer.DateOfBirth,
-                }).ToListAsync();
+                }).OrderBy(x => x.ProcessedOrderId).ToListAsync();
         }
     }
 }
