@@ -45,7 +45,17 @@ namespace LabSolution.HttpModels
 
         public OrderStatus Status { get; set; }
         public TestResult? TestResult { get; set; }
-        public object ProcessedOrderId { get; internal set; }
+        public int? ProcessedOrderId { get; internal set; }
+    }
+
+    public class ProcessedOrderToSetResultResponse
+    {
+        public int ProcessedOrderId { get; set; }
+        public DateTime ProcessedAt { get; set; }
+        public string PersonalNumber { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public DateTime DateOfBirth { get; set; }
     }
 
     public enum OrderStatus

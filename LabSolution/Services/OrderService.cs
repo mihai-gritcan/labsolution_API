@@ -23,6 +23,7 @@ namespace LabSolution.Services
 
         Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, long? idnp);
         Task SetPdfName(int processedOrderId, string pdfName);
+        Task<List<ProcessedOrderToSetResultResponse>> GetOrdersToSetResult(DateTime date, string numericCode);
     }
 
     public class OrderService : IOrderService
@@ -178,6 +179,21 @@ namespace LabSolution.Services
             _context.ProcessedOrders.Update(processedOrder);
 
             await _context.SaveChangesAsync();
+        }
+
+        public Task<List<ProcessedOrderToSetResultResponse>> GetOrdersToSetResult(DateTime date, string numericCode)
+        {
+            return _context.ProcessedOrders.Where(x => x.ProcessedAt.Date == date.Date && (string.IsNullOrWhiteSpace(numericCode) || x.Id.ToString().Contains(numericCode)))
+                .Include(x => x.CustomerOrder).ThenInclude(x => x.Customer)
+                .Select(x => new ProcessedOrderToSetResultResponse
+                {
+                    ProcessedOrderId = x.Id,
+                    ProcessedAt = x.ProcessedAt,
+                    PersonalNumber = x.CustomerOrder.Customer.PersonalNumber,
+                    FirstName = x.CustomerOrder.Customer.FirstName,
+                    LastName = x.CustomerOrder.Customer.LastName,
+                    DateOfBirth = x.CustomerOrder.Customer.DateOfBirth,
+                }).ToListAsync();
         }
     }
 }

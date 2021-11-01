@@ -50,7 +50,7 @@ namespace LabSolution.Controllers
         {
             var savedOrders = new List<CreatedOrdersResponse>();
 
-            using(var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 var allSavedCustomers = await _customerService.SaveCustomers(createOrder.Customers);
 
@@ -122,6 +122,12 @@ namespace LabSolution.Controllers
                 TestType = (TestType)orderDetails.TestType,
                 Customer = CustomerDto.CreateDtoFromEntity(orderDetails.Customer, orderDetails.ParentId == null)
             });
+        }
+
+        [HttpGet("{date}/processed")]
+        public async Task<IActionResult> GetOrdersToSetResult(DateTime date, [FromQuery] string numericCode)
+        {
+            return Ok(await _orderService.GetOrdersToSetResult(date, numericCode));
         }
 
         // reception set test result by processedOrderId
