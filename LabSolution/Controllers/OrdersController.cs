@@ -172,12 +172,42 @@ namespace LabSolution.Controllers
             //{
             //    return new FileStreamResult(ms, "application/pdf");
             //}
-
+            /*
             var stream = new FileStream(fullyQualifiedFilePath, FileMode.Open);
             return File(stream, "application/pdf", $"demoPcrEn.pdf");
-
+            */
             //var fs = new FileStream( Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf"), FileMode.Open);
             //return new FileStreamResult(fs, "application/pdf");
+
+            //------------------
+            string physicalPath = fullyQualifiedFilePath;
+            byte[] pdfBytes = System.IO.File.ReadAllBytes(physicalPath);
+            MemoryStream ms = new MemoryStream(pdfBytes);
+            return new FileStreamResult(ms, "application/pdf");
+        }
+
+
+        [AllowAnonymous]
+        [HttpGet("{processedOrderId}/pdfresult/filestream")]
+        public async Task<IActionResult> GetPdfFile(int processedOrderId)
+        {
+            var reportsResultDirectory = Path.Combine(Directory.GetCurrentDirectory(), "assets", "GeneratedReports");
+
+            string physicalPath = Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf");
+            byte[] pdfBytes = System.IO.File.ReadAllBytes(physicalPath);
+            MemoryStream ms = new MemoryStream(pdfBytes);
+            return new FileStreamResult(ms, "application/pdf");
+        }
+
+        [AllowAnonymous]
+        // reception getPdfResult by processedOrderId
+        [HttpGet("{processedOrderId}/pdfresult/file")]
+        public async Task<IActionResult> GetFile(int processedOrderId)
+        {
+            var reportsResultDirectory = Path.Combine(Directory.GetCurrentDirectory(), "assets", "GeneratedReports");
+
+            var stream = new FileStream(Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf"), FileMode.Open);
+            return File(stream, "application/pdf", $"demoPcrEn.pdf");
         }
     }
 }
