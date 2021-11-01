@@ -30,9 +30,6 @@
     <None Update="assets\GeneratedReports\demoPcrEn.pdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="assets\GeneratedReports\dummy.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="assets\styles.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
