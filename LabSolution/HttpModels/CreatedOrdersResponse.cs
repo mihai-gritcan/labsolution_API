@@ -51,6 +51,7 @@ namespace LabSolution.HttpModels
     public class ProcessedOrderToSetResultResponse
     {
         public int ProcessedOrderId { get; set; }
+        public string NumericCode => ProcessedOrderId.ToString("D7");
         public DateTime ProcessedAt { get; set; }
         public string PersonalNumber { get; set; }
         public string FirstName { get; set; }
