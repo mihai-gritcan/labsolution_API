@@ -5,6 +5,7 @@ using LabSolution.Services;
 using LabSolution.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,11 +24,14 @@ namespace LabSolution.Controllers
         private readonly IOrderService _orderService;
         private readonly IPdfReportProvider _pdfReportProvider;
 
-        public OrdersController(ICustomerService customerService, IOrderService orderService, IPdfReportProvider pdfReportProvider)
+        private readonly ILogger<OrdersController> _logger;
+
+        public OrdersController(ICustomerService customerService, IOrderService orderService, IPdfReportProvider pdfReportProvider, ILogger<OrdersController> logger)
         {
             _customerService = customerService;
             _orderService = orderService;
             _pdfReportProvider = pdfReportProvider;
+            _logger = logger;
         }
 
         // public order submit
@@ -158,7 +162,7 @@ namespace LabSolution.Controllers
                 {
                     byte[] bytes = System.IO.File.ReadAllBytes(path);
                     MemoryStream memoryStream = new MemoryStream(bytes);
-                    
+
                     return new FileStreamResult(memoryStream, "application/pdf");
                 }
             }
@@ -180,15 +184,72 @@ namespace LabSolution.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("{processedOrderId}/generate-pdfresult")]
-        public async Task<IActionResult> GeneratePdfResultOnTheFly(int processedOrderId)
+        [HttpGet("{processedOrderId}/generate-streampdf")]
+        public async Task<IActionResult> GeneratePdfResultOnTheFlyAsStream(int processedOrderId)
         {
             var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
 
-            var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf);
+            _logger.LogInformation("Start generating PDF as STREAM");
 
-            MemoryStream ms = new MemoryStream(pdfBytes);
-            return new FileStreamResult(ms, "application/pdf");
+            try
+            {
+                var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf);
+                _logger.LogInformation($"Finished generating PDF as STREAM. Length is {pdfBytes.Length}");
+
+                MemoryStream ms = new MemoryStream(pdfBytes);
+                return new FileStreamResult(ms, "application/pdf");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"Error generating PDF as STREAM. {ex.Message}");
+                return UnprocessableEntity();
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{processedOrderId}/generate-filepdf")]
+        public async Task<IActionResult> GeneratePdfResultOnTheFlyAsFile(int processedOrderId)
+        {
+            var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
+
+            _logger.LogInformation("Start generating PDF as FILE");
+
+            try
+            {
+                var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf);
+                _logger.LogInformation($"Finished generating PDF as FILE. Length is {pdfBytes.Length}");
+
+
+                _logger.LogInformation("Start writing bytes to Storage");
+                var reportsResultDirectory = Path.Combine(Directory.GetCurrentDirectory(), "assets", "GeneratedReports");
+                var fileName = $"{Guid.NewGuid()}";
+                var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"{fileName}.pdf");
+
+                using (var fs = new FileStream(fullyQualifiedFilePath, FileMode.Create, FileAccess.Write))
+                {
+                    await fs.WriteAsync(pdfBytes, 0, pdfBytes.Length);
+                }
+                _logger.LogInformation("End writing bytes to Storage");
+
+                var stream = new FileStream(fullyQualifiedFilePath, FileMode.Open);
+                return File(stream, "application/pdf", $"{fileName}.pdf");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"Error generating PDF as FILE. {ex.Message}");
+                return UnprocessableEntity();
+            }
+        }
+
+        [AllowAnonymous]
+        // reception getPdfResult by processedOrderId
+        [HttpGet("{processedOrderId}/pdfresult/file")]
+        public async Task<IActionResult> GetFile(int processedOrderId)
+        {
+            var reportsResultDirectory = Path.Combine(Directory.GetCurrentDirectory(), "assets", "GeneratedReports");
+
+            var stream = new FileStream(Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf"), FileMode.Open);
+            return File(stream, "application/pdf", $"demoPcrEn.pdf");
         }
     }
 }
