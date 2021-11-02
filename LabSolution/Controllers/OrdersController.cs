@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -149,45 +148,32 @@ namespace LabSolution.Controllers
         {
             var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
 
-            var directory = Directory.GetCurrentDirectory();
-            var parentDir = Directory.GetParent(directory);
-            var rootDir = Directory.GetParent(parentDir.FullName);
-
-            var pdfReportsDir = Path.Combine(rootDir.FullName, "PdfResults");
-
             var reportsResultDirectory = Path.Combine(Directory.GetCurrentDirectory(), "assets", "GeneratedReports");
 
             if (!string.IsNullOrEmpty(processedOrderForPdf.PdfName))
             {
-                //TODO: #2672 file path should be sent from UI
-                var filename = Path.Combine(pdfReportsDir, $"{processedOrderForPdf.PdfName}.pdf");
-                //string path = Path.Combine(reportsResultDirectory, $"{processedOrderForPdf.PdfName}.pdf");
+                string path = Path.Combine(reportsResultDirectory, $"{processedOrderForPdf.PdfName}.pdf");
 
-                //var stream = new FileStream(path, FileMode.Open);
-                //return new FileStreamResult(stream, "application/pdf");
+                if (System.IO.File.Exists(path))
+                {
+                    byte[] bytes = System.IO.File.ReadAllBytes(path);
+                    MemoryStream memoryStream = new MemoryStream(bytes);
+                    return new FileStreamResult(memoryStream, "application/pdf");
+                }
             }
 
-            //var fileName = $"{Guid.NewGuid()}";
-            var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf");
-            //var pdfBytes = await _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
+            var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf);
 
-            //await _orderService.SetPdfName(processedOrderId, fileName);
-            //return Ok();
-            // TODO: create a FileStream from bytes 
-            //using (var ms = new MemoryStream(pdfBytes))
-            //{
-            //    return new FileStreamResult(ms, "application/pdf");
-            //}
-            /*
-            var stream = new FileStream(fullyQualifiedFilePath, FileMode.Open);
-            return File(stream, "application/pdf", $"demoPcrEn.pdf");
-            */
-            //var fs = new FileStream( Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf"), FileMode.Open);
-            //return new FileStreamResult(fs, "application/pdf");
+            var fileName = $"{Guid.NewGuid()}";
+            var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"{fileName}.pdf");
 
-            //------------------
-            string physicalPath = fullyQualifiedFilePath;
-            byte[] pdfBytes = System.IO.File.ReadAllBytes(physicalPath);
+            using (var fs = new FileStream(fullyQualifiedFilePath, FileMode.Create, FileAccess.Write))
+            {
+                await fs.WriteAsync(pdfBytes, 0, pdfBytes.Length);
+            }
+
+            await _orderService.SetPdfName(processedOrderId, fileName);
+
             MemoryStream ms = new MemoryStream(pdfBytes);
             return new FileStreamResult(ms, "application/pdf");
         }
