@@ -29,6 +29,12 @@ namespace LabSolution
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var appInsightsInstrumentationKey = Configuration.GetValue<string>("ApplicationInsights:InstrumentationKey");
+            if (!string.IsNullOrWhiteSpace(appInsightsInstrumentationKey))
+            {
+                services.AddApplicationInsightsTelemetry();
+            }
+
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
             services.AddControllers();
