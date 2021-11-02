@@ -154,27 +154,28 @@ namespace LabSolution.Controllers
             {
                 string path = Path.Combine(reportsResultDirectory, $"{processedOrderForPdf.PdfName}.pdf");
 
-                byte[] pdfBytes = System.IO.File.ReadAllBytes(path);
-                MemoryStream ms = new MemoryStream(pdfBytes);
-                return new FileStreamResult(ms, "application/pdf");
-            }
-            else
-            {
-                var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf);
-
-                var fileName = $"{Guid.NewGuid()}";
-                var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"{fileName}.pdf");
-
-                using (var fs = new FileStream(fullyQualifiedFilePath, FileMode.Create, FileAccess.Write))
+                if (System.IO.File.Exists(path))
                 {
-                    await fs.WriteAsync(pdfBytes, 0, pdfBytes.Length);
+                    byte[] bytes = System.IO.File.ReadAllBytes(path);
+                    MemoryStream memoryStream = new MemoryStream(bytes);
+                    return new FileStreamResult(memoryStream, "application/pdf");
                 }
-
-                await _orderService.SetPdfName(processedOrderId, fileName);
-
-                MemoryStream ms = new MemoryStream(pdfBytes);
-                return new FileStreamResult(ms, "application/pdf");
             }
+
+            var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf);
+
+            var fileName = $"{Guid.NewGuid()}";
+            var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"{fileName}.pdf");
+
+            using (var fs = new FileStream(fullyQualifiedFilePath, FileMode.Create, FileAccess.Write))
+            {
+                await fs.WriteAsync(pdfBytes, 0, pdfBytes.Length);
+            }
+
+            await _orderService.SetPdfName(processedOrderId, fileName);
+
+            MemoryStream ms = new MemoryStream(pdfBytes);
+            return new FileStreamResult(ms, "application/pdf");
         }
 
 
