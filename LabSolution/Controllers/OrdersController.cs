@@ -160,9 +160,15 @@ namespace LabSolution.Controllers
             }
             else
             {
+                var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf);
+
                 var fileName = $"{Guid.NewGuid()}";
                 var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"{fileName}.pdf");
-                var pdfBytes = _pdfReportProvider.CreatePdfReport(fullyQualifiedFilePath, processedOrderForPdf);
+
+                using (var fs = new FileStream(fullyQualifiedFilePath, FileMode.Create, FileAccess.Write))
+                {
+                    await fs.WriteAsync(pdfBytes, 0, pdfBytes.Length);
+                }
 
                 await _orderService.SetPdfName(processedOrderId, fileName);
 
