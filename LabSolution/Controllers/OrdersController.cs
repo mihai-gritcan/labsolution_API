@@ -158,6 +158,7 @@ namespace LabSolution.Controllers
                 {
                     byte[] bytes = System.IO.File.ReadAllBytes(path);
                     MemoryStream memoryStream = new MemoryStream(bytes);
+                    
                     return new FileStreamResult(memoryStream, "application/pdf");
                 }
             }
@@ -176,30 +177,6 @@ namespace LabSolution.Controllers
 
             MemoryStream ms = new MemoryStream(pdfBytes);
             return new FileStreamResult(ms, "application/pdf");
-        }
-
-
-        [AllowAnonymous]
-        [HttpGet("{processedOrderId}/pdfresult/filestream")]
-        public async Task<IActionResult> GetPdfFile(int processedOrderId)
-        {
-            var reportsResultDirectory = Path.Combine(Directory.GetCurrentDirectory(), "assets", "GeneratedReports");
-
-            string physicalPath = Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf");
-            byte[] pdfBytes = System.IO.File.ReadAllBytes(physicalPath);
-            MemoryStream ms = new MemoryStream(pdfBytes);
-            return new FileStreamResult(ms, "application/pdf");
-        }
-
-        [AllowAnonymous]
-        // reception getPdfResult by processedOrderId
-        [HttpGet("{processedOrderId}/pdfresult/file")]
-        public async Task<IActionResult> GetFile(int processedOrderId)
-        {
-            var reportsResultDirectory = Path.Combine(Directory.GetCurrentDirectory(), "assets", "GeneratedReports");
-
-            var stream = new FileStream(Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf"), FileMode.Open);
-            return File(stream, "application/pdf", $"demoPcrEn.pdf");
         }
     }
 }
