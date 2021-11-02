@@ -251,5 +251,27 @@ namespace LabSolution.Controllers
             var stream = new FileStream(Path.Combine(reportsResultDirectory, $"demoPcrEn.pdf"), FileMode.Open);
             return File(stream, "application/pdf", $"demoPcrEn.pdf");
         }
+
+        [AllowAnonymous]
+        [HttpGet("{processedOrderId}/pdfresult/bytes")]
+        public async Task<IActionResult> GetPdfResultBytes(int processedOrderId)
+        {
+            var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
+
+            _logger.LogInformation("Start generating PDF as bytes");
+
+            try
+            {
+                var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf);
+                _logger.LogInformation($"Finished generating PDF as STREAM. Length is {pdfBytes.Length}");
+
+                return Ok(new { Name = "FileName", Bytes = pdfBytes });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"Error generating PDF as bytes. {ex.Message}");
+                return UnprocessableEntity();
+            }
+        }
     }
 }
