@@ -178,5 +178,17 @@ namespace LabSolution.Controllers
             MemoryStream ms = new MemoryStream(pdfBytes);
             return new FileStreamResult(ms, "application/pdf");
         }
+
+        [AllowAnonymous]
+        [HttpGet("{processedOrderId}/generate-pdfresult")]
+        public async Task<IActionResult> GeneratePdfResultOnTheFly(int processedOrderId)
+        {
+            var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
+
+            var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf);
+
+            MemoryStream ms = new MemoryStream(pdfBytes);
+            return new FileStreamResult(ms, "application/pdf");
+        }
     }
 }
