@@ -18,6 +18,22 @@ namespace LabSolution.Controllers
             _context = context;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetCustomers([FromQuery] long? idnp, [FromQuery] string firstName, [FromQuery] string lastName)
+        {
+            var queryableCustomers = _context.Customers.Select(x => x);
+            if (idnp.HasValue)
+                queryableCustomers = queryableCustomers.Where(x => x.PersonalNumber.Contains(idnp.Value.ToString()));
+
+            if(!string.IsNullOrWhiteSpace(firstName))
+                queryableCustomers = queryableCustomers.Where(x => x.FirstName.Contains(firstName));
+
+            if (!string.IsNullOrWhiteSpace(lastName))
+                queryableCustomers = queryableCustomers.Where(x => x.LastName.Contains(lastName));
+
+            return Ok(await queryableCustomers.Select(x => CustomerDto.CreateDtoFromEntity(x)).ToListAsync());
+        }
+
         // reception update Customer details
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCustomer(int id, CustomerDto customer)

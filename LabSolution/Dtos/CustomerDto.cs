@@ -44,6 +44,24 @@ namespace LabSolution.Dtos
 
         public bool IsRootCustomer { get; set; }
 
+        public static CustomerDto CreateDtoFromEntity(Customer entity)
+        {
+            return new CustomerDto
+            {
+                Id = entity.Id,
+                FirstName = entity.FirstName,
+                LastName = entity.LastName,
+                DateOfBirth = entity.DateOfBirth,
+                Gender = (Gender)entity.Gender,
+                Address = entity.Address,
+                Passport = entity.Passport,
+                PersonalNumber = long.Parse(entity.PersonalNumber),
+                Phone = entity.Phone,
+                Email = entity.Email,
+                IsRootCustomer = false
+            };
+        }
+
         public static CustomerDto CreateDtoFromEntity(Customer entity, bool isRootCustomer)
         {
             return new CustomerDto

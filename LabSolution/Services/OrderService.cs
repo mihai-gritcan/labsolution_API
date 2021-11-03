@@ -22,8 +22,11 @@ namespace LabSolution.Services
         Task<ProcessedOrderForPdf> GetProcessedOrderForPdf(int processedOrderId);
 
         Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, long? idnp);
-        Task SetPdfName(int processedOrderId, string pdfName);
+        Task SavePdfBytes(int processedOrderId, string pdfName, byte[] pdfBytes);
         Task<List<ProcessedOrderToSetResultResponse>> GetOrdersToSetResult(DateTime date, string numericCode);
+
+        Task<ProcessedOrderPdf> GetPdfBytes(int processedOrderId);
+        Task SetPdfName(int processedOrderId, string pdfName);
     }
 
     public class OrderService : IOrderService
@@ -170,12 +173,19 @@ namespace LabSolution.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task SetPdfName(int processedOrderId, string pdfName)
+        public async Task SavePdfBytes(int processedOrderId, string pdfName, byte[] pdfBytes)
         {
+            var processedOrderPdfEntity = new ProcessedOrderPdf
+            {
+                DateCreated = DateTime.Now,
+                ProcessedOrderId = processedOrderId,
+                PdfBytes = pdfBytes
+            };
+
+            await _context.ProcessedOrderPdfs.AddAsync(processedOrderPdfEntity);
+
             var processedOrder = await _context.ProcessedOrders.SingleAsync(x => x.Id == processedOrderId);
-
             processedOrder.PdfName = pdfName;
-
             _context.ProcessedOrders.Update(processedOrder);
 
             await _context.SaveChangesAsync();
@@ -194,6 +204,22 @@ namespace LabSolution.Services
                     LastName = x.CustomerOrder.Customer.LastName,
                     DateOfBirth = x.CustomerOrder.Customer.DateOfBirth,
                 }).OrderBy(x => x.ProcessedOrderId).ToListAsync();
+        }
+
+        public Task<ProcessedOrderPdf> GetPdfBytes(int processedOrderId)
+        {
+            return _context.ProcessedOrderPdfs.SingleOrDefaultAsync(x => x.ProcessedOrderId == processedOrderId);
+        }
+
+        public async Task SetPdfName(int processedOrderId, string pdfName)
+        {
+            var processedOrder = await _context.ProcessedOrders.SingleAsync(x => x.Id == processedOrderId);
+
+            processedOrder.PdfName = pdfName;
+
+            _context.ProcessedOrders.Update(processedOrder);
+
+            await _context.SaveChangesAsync();
         }
     }
 }

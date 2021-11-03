@@ -24,5 +24,8 @@ namespace LabSolution.Models
         public string CheckedBy { get; internal set; }
         public string ValidatedBy { get; internal set; }
         public string PdfName { get; internal set; }
+
+        [InverseProperty("ProcessedOrder")]
+        public virtual ProcessedOrderPdf ProcessedOrderPdf { get; set; }
     }
 }

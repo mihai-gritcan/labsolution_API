@@ -18,6 +18,7 @@ namespace LabSolution.Models
         public virtual DbSet<CustomerOrder> CustomerOrders { get; set; }
         public virtual DbSet<ProcessedOrder> ProcessedOrders { get; set; }
         public virtual DbSet<AppConfig> AppConfigs { get; set; }
+        public virtual DbSet<ProcessedOrderPdf> ProcessedOrderPdfs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
