@@ -147,7 +147,6 @@ namespace LabSolution.Controllers
         }
 
 
-        [AllowAnonymous]
         // reception getPdfResult by processedOrderId
         [HttpGet("{processedOrderId}/pdfresult-db")]
         public async Task<IActionResult> GetPdfResultDb(int processedOrderId)
@@ -172,6 +171,7 @@ namespace LabSolution.Controllers
             return new FileStreamResult(ms, "application/pdf");
         }
 
+        [AllowAnonymous]
         [Obsolete("Azure Linux Plan doesn't allow to write on storage. Can re-try using the implementation on a paid hosting")]
         [ApiExplorerSettings(IgnoreApi = true)]
         // reception getPdfResult by processedOrderId
