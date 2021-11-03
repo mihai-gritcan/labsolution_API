@@ -1,5 +1,6 @@
 ﻿using LabSolution.HttpModels;
 using LabSolution.Infrastructure;
+using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Text;
@@ -17,10 +18,12 @@ namespace LabSolution.Utils
     public class PdfReportProvider: IPdfReportProvider
     {
         private readonly IConverter _converter;
+        private readonly LabConfigOptions _labConfigOptions;
 
-        public PdfReportProvider(IConverter converter)
+        public PdfReportProvider(IConverter converter, IOptions<LabConfigOptions> labConfigOptions)
         {
             _converter = converter;
+            _labConfigOptions = labConfigOptions.Value;
         }
 
         public async Task<byte[]> CreatePdfReport(ProcessedOrderForPdf processedOrderForPdf)
@@ -39,7 +42,7 @@ namespace LabSolution.Utils
                 DPI = 400
             };
 
-            var htmlContent = await TemplateBuilder.GetReportTemplate(processedOrderForPdf, barcode, qrCode);
+            var htmlContent = await TemplateBuilder.GetReportTemplate(processedOrderForPdf, barcode, qrCode, _labConfigOptions);
 
             var objectSettings = new ObjectSettings
             {
@@ -60,11 +63,6 @@ namespace LabSolution.Utils
 
     public static class TemplateBuilder
     {
-        private const string LAB_NAME = "UNIVERSUL DIAGNOSTIC";
-        private const string LAB_ADDRESS = "mun. Chișinău, str. Gh. Asachi 54";
-        private const string LAB_PHONE = "022-123-456";
-        private const string LAB_SITE = "www.universdiagnostic.md";
-
         private const string _labNameKey = "#LAB_NAME_KEY";
         private const string _labAddressKey = "#LAB_ADDRESS_KEY";
         private const string _labPhoneKey = "#LAB_PHONE_KEY";
@@ -95,15 +93,15 @@ namespace LabSolution.Utils
         private const string _sampleIdKey = "#SAMPLE_ID_KEY";
         private const string _testResultKey = "#TEST_RESULT_KEY";
 
-        public static async Task<string> GetReportTemplate(ProcessedOrderForPdf processedOrderForPdf, byte[] barcode, byte[] qrcode)
+        public static async Task<string> GetReportTemplate(ProcessedOrderForPdf processedOrderForPdf, byte[] barcode, byte[] qrcode, LabConfigOptions labConfigOptions)
         {
             var htmlTemplate = await TemplateLoader.GetDefaultTemplateHtml(processedOrderForPdf.TestLanguage, processedOrderForPdf.TestType);
             
             return htmlTemplate
-                .Replace(_labNameKey, LAB_NAME)
-                .Replace(_labAddressKey, LAB_ADDRESS)
-                .Replace(_labPhoneKey, LAB_PHONE)
-                .Replace(_labSiteKey, LAB_SITE)
+                .Replace(_labNameKey, labConfigOptions.Name)
+                .Replace(_labAddressKey, labConfigOptions.Address)
+                .Replace(_labPhoneKey, labConfigOptions.Phone)
+                .Replace(_labSiteKey, labConfigOptions.Site)
 
                 .Replace(_barcodeKey, Convert.ToBase64String(barcode))
                 .Replace(_qrcodeKey, Convert.ToBase64String(qrcode))

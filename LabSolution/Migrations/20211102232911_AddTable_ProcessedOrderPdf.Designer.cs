@@ -4,14 +4,16 @@ using LabSolution.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LabSolution.Migrations
 {
     [DbContext(typeof(LabSolutionContext))]
-    partial class LabSolutionContextModelSnapshot : ModelSnapshot
+    [Migration("20211102232911_AddTable_ProcessedOrderPdf")]
+    partial class AddTable_ProcessedOrderPdf
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -205,8 +207,8 @@ namespace LabSolution.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime");
 
-                    b.Property<byte[]>("PdfBytes")
-                        .HasColumnType("varbinary(max)");
+                    b.Property<byte>("PdfBytes")
+                        .HasColumnType("tinyint");
 
                     b.Property<int>("ProcessedOrderId")
                         .HasColumnType("int");
