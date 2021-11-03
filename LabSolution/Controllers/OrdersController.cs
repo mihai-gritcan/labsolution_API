@@ -146,10 +146,9 @@ namespace LabSolution.Controllers
             return NoContent();
         }
 
-
         // reception getPdfResult by processedOrderId
         [HttpGet("{processedOrderId}/pdfresult-db")]
-        public async Task<IActionResult> GetPdfResultDb(int processedOrderId)
+        public async Task<IActionResult> GetPdfResultStoreInDb(int processedOrderId)
         {
             var existingPdf = await _orderService.GetPdfBytes(processedOrderId);
 
@@ -176,7 +175,7 @@ namespace LabSolution.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         // reception getPdfResult by processedOrderId
         [HttpGet("{processedOrderId}/pdfresult-file")]
-        public async Task<IActionResult> GetPdfResult(int processedOrderId)
+        public async Task<IActionResult> GetPdfResultStoreAsFile(int processedOrderId)
         {
             var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
 
