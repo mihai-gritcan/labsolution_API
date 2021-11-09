@@ -15,7 +15,6 @@ using System.Transactions;
 
 namespace LabSolution.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OrdersController : BaseApiController
@@ -26,7 +25,7 @@ namespace LabSolution.Controllers
 
         private readonly ILogger<OrdersController> _logger;
 
-        public OrdersController(ICustomerService customerService, IOrderService orderService, 
+        public OrdersController(ICustomerService customerService, IOrderService orderService,
             IPdfReportProvider pdfReportProvider, ILogger<OrdersController> logger)
         {
             _customerService = customerService;

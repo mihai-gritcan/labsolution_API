@@ -141,10 +141,22 @@ namespace LabSolution.Utils
     {
         public static async Task<string> GetDefaultTemplateHtml(TestLanguage testLanguage, TestType testType)
         {
-            var templateName = testType == TestType.Antigen ? "testAntigen" : "testPcr";
+            var templateName = string.Empty;
+            switch (testType)
+            {
+                case TestType.Antigen:
+                    templateName = "testAntigen";
+                    break;
+                case TestType.PCR:
+                    templateName = "testPcr";
+                    break;
+                case TestType.Antibody:
+                    templateName = "testAntibody";
+                    break;
+            }
             templateName = testLanguage == TestLanguage.Romanian ? $"{templateName}Ro" : $"{templateName}En";
 
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", "Templates",$"{templateName}.html");
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", "Templates", $"{templateName}.html");
             using var streamReader = new StreamReader(path, Encoding.UTF8);
             return await streamReader.ReadToEndAsync();
         }

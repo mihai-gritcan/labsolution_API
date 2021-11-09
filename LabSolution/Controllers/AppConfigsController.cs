@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace LabSolution.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AppConfigsController : ControllerBase

@@ -1,0 +1,282 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Rezultat test antigen - Ro</title>
+    <link href="styles.css" rel="stylesheet" />
+</head>
+
+<body>
+    <table>
+        <tr>
+            <td class="header-left">
+                <p> #LAB_NAME_KEY </p>
+                <p> #LAB_ADDRESS_KEY </p>
+                <p>tel. #LAB_PHONE_KEY </p>
+                <p>Site: #LAB_SITE_KEY </p>
+            </td>
+            <td class="header-right">
+                <!-- replace relative path with absolute path to have the image in the exported PDF-->
+                <!-- https://github.com/rdvojmoc/DinkToPdf/issues/27#issuecomment-447225700 -->
+                <!--<img src="../assets/img/logo.png" alt="Logo" />-->
+                <img alt="Logo" src="data:image/png;base64,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" />
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2" style="text-align: center; height: 100px;">
+                <br />
+                <br />
+                <br />
+                <br />
+                <h3>BULETIN DE ANALIZE MEDICALE</h3>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2" class="customer">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td style="width: 80px;">
+                                <span> <strong>Numele:</strong> </span>
+                            </td>
+                            <td style="width: 372px;">
+                                <p> #CUSTOMER_LAST_NAME_KEY </p>
+                            </td>
+                            <td style="width: 496px;">
+                                <p> <strong>ID proba:</strong> </p>
+                            </td>
+                            <td style="width: auto;">
+                                <p> #SAMPLE_ID_KEY </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 80px;">
+                                <span> <strong>Prenumele:</strong> </span>
+                            </td>
+                            <td style="width: 372px;">
+                                <p> #CUSTOMER_FIRST_NAME_KEY </p>
+                            </td>
+                            <td style="width: 496px;">
+
+                            </td>
+                            <td style="width: auto;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 80px;">
+                                <span> <strong>Data nașterii:</strong> </span>
+                            </td>
+                            <td style="width: 372px;">
+                                <p> #CUSTOMER_DOB_KEY </p>
+                            </td>
+                            <td style="width: 496px;">
+                                <p> <strong>Data și ora recoltării:</strong> </p>
+                            </td>
+                            <td style="width: auto;">
+                                <p> #ORDER_PROCESSING_DATE_TIME </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 80px;">
+                                <span> <strong>Vârsta:</strong> </span>
+                            </td>
+                            <td style="width: 372px;">
+                                <p> #CUSTOMER_AGE_KEY </p>
+                            </td>
+                            <td style="width: 496px;">
+                                <p> <strong>Data și ora recepționării în laborator: </strong> </p>
+                            </td>
+                            <td style="width: auto;">
+                                <p> #ORDER_RECEIVED_IN_LAB_DATE_TIME </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 80px;">
+                                <span> <strong>Sex:</strong> </span>
+                            </td>
+                            <td style="width: 372px;">
+                                <p> #CUSTOMER_GENDER_KEY </p>
+                            </td>
+                            <td style="width: 496px;">
+                                <p> <strong>Data efectuării examinărilor: </strong> </p>
+                            </td>
+                            <td style="width: auto;">
+                                <p> #DATE_OF_EXAMINATION_KEY </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 80px;">
+                                <span> <strong>CNP:</strong> </span>
+                            </td>
+                            <td style="width: 372px;">
+                                <p> #CUSTOMER_PERSONAL_NUMBER_KEY </p>
+                            </td>
+                            <td style="width: auto" colspan="2" rowspan="3">
+                                <p class="barcode">
+                                    <img alt="Barcode" src="data:image/png;base64,#BARCODE_KEY" />
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 80px;">
+                                <span> <strong>Nr. pașaport:</strong> </span>
+                            </td>
+                            <td style="width: 372px;">
+                                <p> #CUSTOMER_PASSPORT_NUMBER_KEY </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 496px;">
+                                <p> <strong>Telefon:</strong> </p>
+                            </td>
+                            <td style="width: auto;">
+                                <p> #CUSTOMER_PHONE_KEY </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 80px;">
+                                <span> <strong>Adresa:</strong> </span>
+                            </td>
+                            <td style="width: 372px;">
+                                <p> #CUSTOMER_ADDRESS_KEY </p>
+                            </td>
+                            <td style="width: 496px;">
+                                <p> <strong>Punct de recoltare: </strong> </p>
+                            </td>
+                            <td style="width: auto;">
+                                <p> #LAB_ADDRESS_KEY </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 80px;">
+                                <span> <strong>e-mail:</strong> </span>
+                            </td>
+                            <td style="width: 372px;">
+                                <p> #CUSTOMER_EMAIL_KEY </p>
+                            </td>
+                            <td style="width: 496px;">
+                                <p> <strong></strong> </p>
+                            </td>
+                            <td style="width: 292px;">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2" class="qr-code">
+                <!--<img src="../assets/img/qrcode.jpg" alt="QR Code" />-->
+                <img alt="QR Code" src="data:image/png;base64,#QRCODE_KEY" />
+            </td>
+        </tr>
+
+
+        <tr>
+            <td colspan="2" class="notes">
+                <p><span>Natura și starea eșantionului primar: conformă</span></p>
+
+                <p>
+                    <b><span>Notă: </span></b><span>intervalul de referință corespunde sexului și vârstei pacientului</span>
+                </p>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2" class="parameters">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td style="width: 40%;">
+                                <p> <strong>Parametru</strong> </p>
+                            </td>
+                            <td style="width: 15%;">
+                                <p> <strong>Rezultat </strong> </p>
+                            </td>
+                            <td style="width: 15%;">
+                                <p> <strong>Valori de referință </strong> </p>
+                            </td>
+                            <td style="width: 15%;">
+                                <p> <strong>Unități de măsură</strong> </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+
+        <tr>
+            <td colspan="2" class="other">
+                <p> <strong>Alte infecții</strong> </p>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2" class="other-details">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td style="width: 40%;">
+                                <p> SARS-CoV-2 / COVID 19 / în exudat nazofaringean (ARN calitativ) </p>
+                            </td>
+                            <td style="width: 15%;">
+                                <p> <strong> #TEST_RESULT_KEY </strong> </p>
+                            </td>
+                            <td style="width: 15%;">
+                                <p> <strong>negativ </strong> </p>
+                            </td>
+                            <td style="width: 15%;">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="4">
+                                <p> <strong>Metoda de investigare:</strong> Anticocorpi Ig/G </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <p> <strong>Comentariu:</strong> </p>
+                                <p>
+                                    Acest rezultat confirmă prezența virusului SARS-CoV-2 / COVID 19 în exudat nazofaringean, la momentul prelevării materialului biologic
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <p>
+                                    <strong>IMPORTANT: </strong> Raportul de analize medicale cu QR cod este valid fără prezența ștampilei umede și a semnăturii persoanei autorizate. Pentru validare, vă rugăm să scanați QR codul
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+
+
+        <tr>
+            <td colspan="2" class="processors">
+                <br />
+                <br />
+
+                <table>
+                    <tr>
+                        <td style="width: 25%;">
+                            <strong>Verificat și validat:</strong>
+                        </td>
+                        <td style="width: 75%;">
+                            <p>Șef laborator, <span style="color: red; font-weight: bold"> #ORDER_PROCESSED_BY_KEY </span></p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
