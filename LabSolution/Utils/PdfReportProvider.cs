@@ -92,7 +92,8 @@ namespace LabSolution.Utils
 
         private const string _sampleIdKey = "#SAMPLE_ID_KEY";
         private const string _testResultKey = "#TEST_RESULT_KEY";
-        private const string _testResultComment = "#TEST_RESULT_COMMENT";
+        private const string _testResultCommentKey = "#TEST_RESULT_COMMENT_KEY";
+        private const string _testEquipmentAnalyzerKey = "#TEST_EQUIPMENT_ANALYZER_KEY";
 
         private static string IsVirusConfirmed(TestResult testResult, TestLanguage testLanguage)
         {
@@ -135,7 +136,8 @@ namespace LabSolution.Utils
 
                 .Replace(_sampleIdKey, processedOrderForPdf.OrderId.ToString())
                 .Replace(_testResultKey, processedOrderForPdf.TestResult.ToString())
-                .Replace(_testResultComment, IsVirusConfirmed(processedOrderForPdf.TestResult, processedOrderForPdf.TestLanguage));
+                .Replace(_testResultCommentKey, IsVirusConfirmed(processedOrderForPdf.TestResult, processedOrderForPdf.TestLanguage))
+                .Replace(_testEquipmentAnalyzerKey, labConfigOptions.TestEquipmentAnalyzer);
         }
 
         private static int CalculateCustomerAge(DateTime dateOfBirth)

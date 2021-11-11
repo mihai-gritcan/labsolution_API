@@ -1,9 +1,18 @@
 ﻿body {
     font-family: Arial, 'Times New Roman', sans-serif;
+    color: black;
 }
 
 table {
     border-collapse: collapse;
+}
+
+.gray-color {
+    color: gray;
+}
+
+.table-without-border::after{
+    border: none !important;
 }
 
 .main-table > table, tr, td {

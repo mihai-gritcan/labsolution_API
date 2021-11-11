@@ -16,10 +16,7 @@
                 <p>Site: #LAB_SITE_KEY </p>
             </td>
             <td class="header-right">
-                <!-- replace relative path with absolute path to have the image in the exported PDF-->
-                <!-- https://github.com/rdvojmoc/DinkToPdf/issues/27#issuecomment-447225700 -->
-                <!--<img src="../assets/img/logo.png" alt="Logo" />-->
-                <img alt="Logo" src="data:image/png;base64,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" />
+                <img alt="Logo" src="data:image/png;base64,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" />
             </td>
         </tr>
 
@@ -29,7 +26,8 @@
                 <br />
                 <br />
                 <br />
-                <h3>BULETIN DE ANALIZE MEDICALE</h3>
+                <h3>MARCHERII BOLILOR INFECȚIOASE (SEROLOGIE)</h3>
+                <h3 class="gray-color">INFECTIOUS DISEASES MARKERS | МАРКЕРЫ ИНФЕКЦИОННЫХ ЗАБОЛЕВАНИЙ</h3>
             </td>
         </tr>
 
@@ -39,13 +37,15 @@
                     <tbody>
                         <tr>
                             <td style="width: 80px;">
-                                <span> <strong>Numele:</strong> </span>
+                                <p> <strong>Numele:</strong> </p>
+                                <p class="gray-color"> <strong>Surname / Фамилия</strong> </p>
                             </td>
                             <td style="width: 372px;">
                                 <p> #CUSTOMER_LAST_NAME_KEY </p>
                             </td>
                             <td style="width: 496px;">
                                 <p> <strong>ID proba:</strong> </p>
+                                <p class="gray-color"> <strong>Sample No. / Образец N</strong> </p>
                             </td>
                             <td style="width: auto;">
                                 <p> #SAMPLE_ID_KEY </p>
@@ -53,26 +53,31 @@
                         </tr>
                         <tr>
                             <td style="width: 80px;">
-                                <span> <strong>Prenumele:</strong> </span>
+                                <p> <strong>Prenumele:</strong> </p>
+                                <p class="gray-color"> <strong>Given name / Имя</strong> </p>
                             </td>
                             <td style="width: 372px;">
                                 <p> #CUSTOMER_FIRST_NAME_KEY </p>
                             </td>
                             <td style="width: 496px;">
-
+                                <p> <strong>Prelevarea probei, adresa:</strong> </p>
+                                <p class="gray-color"> <strong>Place of sampling / Место сбора</strong> </p>
                             </td>
                             <td style="width: auto;">
+                                <p> #LAB_ADDRESS_KEY </p>
                             </td>
                         </tr>
                         <tr>
                             <td style="width: 80px;">
-                                <span> <strong>Data nașterii:</strong> </span>
+                                <p> <strong>Data nașterii:</strong> </p>
+                                <p class="gray-color"> <strong>Date of birth / Дата рождения</strong> </p>
                             </td>
                             <td style="width: 372px;">
                                 <p> #CUSTOMER_DOB_KEY </p>
                             </td>
                             <td style="width: 496px;">
-                                <p> <strong>Data și ora recoltării:</strong> </p>
+                                <p> <strong>Prelevarea probei, data și ora:</strong> </p>
+                                <p class="gray-color"> <strong>Date/time of sampling / Дата / время сбора</strong> </p>
                             </td>
                             <td style="width: auto;">
                                 <p> #ORDER_PROCESSING_DATE_TIME </p>
@@ -80,13 +85,15 @@
                         </tr>
                         <tr>
                             <td style="width: 80px;">
-                                <span> <strong>Vârsta:</strong> </span>
+                                <p> <strong>Sex:</strong> </p>
+                                <p class="gray-color"> <strong>Sex / Пол</strong> </p>
                             </td>
                             <td style="width: 372px;">
-                                <p> #CUSTOMER_AGE_KEY </p>
+                                <p> #CUSTOMER_GENDER_KEY </p>
                             </td>
                             <td style="width: 496px;">
-                                <p> <strong>Data și ora recepționării în laborator: </strong> </p>
+                                <p> <strong>Înregistrarea probei în laborator, data / ora: </strong> </p>
+                                <p class="gray-color"> <strong>Time of simple received by laboratory / Время получения пробы в лабораторию</strong> </p>
                             </td>
                             <td style="width: auto;">
                                 <p> #ORDER_RECEIVED_IN_LAB_DATE_TIME </p>
@@ -94,59 +101,18 @@
                         </tr>
                         <tr>
                             <td style="width: 80px;">
-                                <span> <strong>Sex:</strong> </span>
-                            </td>
-                            <td style="width: 372px;">
-                                <p> #CUSTOMER_GENDER_KEY </p>
-                            </td>
-                            <td style="width: 496px;">
-                                <p> <strong>Data efectuării examinărilor: </strong> </p>
-                            </td>
-                            <td style="width: auto;">
-                                <p> #DATE_OF_EXAMINATION_KEY </p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 80px;">
-                                <span> <strong>CNP:</strong> </span>
+                                <p> <strong>CNP:</strong> </p>
+                                <p class="gray-color"> <strong>Personal no. / ИПН</strong> </p>
                             </td>
                             <td style="width: 372px;">
                                 <p> #CUSTOMER_PERSONAL_NUMBER_KEY </p>
                             </td>
-                            <td style="width: auto" colspan="2" rowspan="3">
-                                <p class="barcode">
-                                    <img alt="Barcode" src="data:image/png;base64,#BARCODE_KEY" />
-                                </p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 80px;">
-                                <span> <strong>Nr. pașaport:</strong> </span>
-                            </td>
-                            <td style="width: 372px;">
-                                <p> #CUSTOMER_PASSPORT_NUMBER_KEY </p>
-                            </td>
-                        </tr>
-                        <tr>
                             <td style="width: 496px;">
-                                <p> <strong>Telefon:</strong> </p>
+                                <p> <strong>Data efectuării examinărilor: </strong> </p>
+                                <p class="gray-color"> <strong>Examination date / Дата иследования</strong> </p>
                             </td>
                             <td style="width: auto;">
-                                <p> #CUSTOMER_PHONE_KEY </p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 80px;">
-                                <span> <strong>Adresa:</strong> </span>
-                            </td>
-                            <td style="width: 372px;">
-                                <p> #CUSTOMER_ADDRESS_KEY </p>
-                            </td>
-                            <td style="width: 496px;">
-                                <p> <strong>Punct de recoltare: </strong> </p>
-                            </td>
-                            <td style="width: auto;">
-                                <p> #LAB_ADDRESS_KEY </p>
+                                <p> #DATE_OF_EXAMINATION_KEY </p>
                             </td>
                         </tr>
                         <tr>
@@ -156,10 +122,10 @@
                             <td style="width: 372px;">
                                 <p> #CUSTOMER_EMAIL_KEY </p>
                             </td>
-                            <td style="width: 496px;">
-                                <p> <strong></strong> </p>
-                            </td>
-                            <td style="width: 292px;">
+                            <td style="width: auto" colspan="2" rowspan="3">
+                                <p class="barcode">
+                                    <img alt="Barcode" src="data:image/png;base64,#BARCODE_KEY" />
+                                </p>
                             </td>
                         </tr>
                     </tbody>
@@ -177,10 +143,10 @@
 
         <tr>
             <td colspan="2" class="notes">
-                <p><span>Natura și starea eșantionului primar: conformă</span></p>
-
+                <p>Examination date / Eșantion primar / Primary sample / Первичный образец: sânge / blood / кровь.</p>
+                <p>Echipament / Equipment / Анализатор: #TEST_EQUIPMENT_ANALYZER_KEY</p>
                 <p>
-                    <b><span>Notă: </span></b><span>intervalul de referință corespunde sexului și vârstei pacientului</span>
+                    <span> Metoda de investigare / Investigation method / Метод иследования: </span><b><span>CMIA</span></b>
                 </p>
             </td>
         </tr>
@@ -190,17 +156,17 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td style="width: 40%;">
-                                <p> <strong>Parametru</strong> </p>
+                            <td style="width: 50%;">
+                                <p> <strong>Investigație</strong> </p>
+                                <p class="gray-color"> <strong>Test / Название (показатель)</strong> </p>
                             </td>
-                            <td style="width: 15%;">
+                            <td style="width: 25%;">
                                 <p> <strong>Rezultat </strong> </p>
+                                <p class="gray-color"> <strong>Result / Результат</strong> </p>
                             </td>
-                            <td style="width: 15%;">
+                            <td style="width: 25%;">
                                 <p> <strong>Valori de referință </strong> </p>
-                            </td>
-                            <td style="width: 15%;">
-                                <p> <strong>Unități de măsură</strong> </p>
+                                <p class="gray-color"> <strong>Reference range / Референсные значения</strong> </p>
                             </td>
                         </tr>
                     </tbody>
@@ -211,7 +177,7 @@
 
         <tr>
             <td colspan="2" class="other">
-                <p> <strong>Alte infecții</strong> </p>
+                <p> <strong>Marcher serologic către COVID-19 / Serological marker to COVID-19 / Серологический маркер COVID-19</strong> </p>
             </td>
         </tr>
 
@@ -220,37 +186,37 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td style="width: 40%;">
-                                <p> SARS-CoV-2 / COVID 19 / în exudat nazofaringean (ARN calitativ) </p>
-                            </td>
-                            <td style="width: 15%;">
-                                <p> <strong> #TEST_RESULT_KEY </strong> </p>
-                            </td>
-                            <td style="width: 15%;">
-                                <p> <strong>negativ </strong> </p>
-                            </td>
-                            <td style="width: 15%;">
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td colspan="4">
-                                <p> <strong>Metoda de investigare:</strong> Anticocorpi Ig/G </p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                <p> <strong>Comentariu:</strong> </p>
+                            <td style="width: 50%;">
                                 <p>
-                                    Acest rezultat confirmă prezența virusului SARS-CoV-2 / COVID 19 în exudat nazofaringean, la momentul prelevării materialului biologic
+                                    SARS-CoV-2, IgG / RBD-S1 anticorpi neutralizanți /cantitativ
+                                    SARS-CoV-2, IgG / RBD-S1 netralizing antibodies / quantitative
+                                    SARS-CoV-2, IgG / RBD-S1 нейтрализующие антитела / количественный
                                 </p>
                             </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4">
-                                <p>
-                                    <strong>IMPORTANT: </strong> Raportul de analize medicale cu QR cod este valid fără prezența ștampilei umede și a semnăturii persoanei autorizate. Pentru validare, vă rugăm să scanați QR codul
-                                </p>
+                            <td style="width: 5%;">
+                                <p> <strong> xxx </strong> </p>
+                            </td>
+                            <td style="width: 10%;">
+                                <p> <strong> AU/mL </strong> </p>
+                            </td>
+                            <td style="width: 10%;">
+                                <p> <strong>#TEST_RESULT_KEY</strong> </p>
+                            </td>
+                            <td style="width: 12%;">
+                                <table class="table-without-border">
+                                    <tbody>
+                                        <tr><td><p> < 50,0 </p></td></tr>
+                                        <tr><td><p> > 50,0 </p></td></tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td style="width: 13%;">
+                                <table class="table-without-border">
+                                    <tbody>
+                                        <tr><td><p> <strong>negativ</strong> | negative | отртц </p></td></tr>
+                                        <tr><td><p> <strong>pozitiv</strong> | positive | положитл </p></td></tr>
+                                    </tbody>
+                                </table>
                             </td>
                         </tr>
                     </tbody>
@@ -258,10 +224,22 @@
             </td>
         </tr>
 
+        <tr>
+            <td colspan="2">
+                <p>
+                    Valorile de referință sunt indicate în conformitate cu instrucțiunea producătorului kitului de reactivi utilizați.
+                </p>
+                <p>
+                    The reference values are indicated according to the instruction of the manufacturer of the reagent kits used.
+                </p>
+                <p>
+                    Референсные значения указаны в соответствии с инструкциями производителя используемых наборов реагентов.
+                </p>
+            </td>
+        </tr>
 
         <tr>
             <td colspan="2" class="processors">
-                <br />
                 <br />
 
                 <table>

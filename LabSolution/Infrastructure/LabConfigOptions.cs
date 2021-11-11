@@ -8,6 +8,7 @@ namespace LabSolution.Infrastructure
         public string Address { get; set; }
         public string Phone { get; set; }
         public string Site { get; set; }
+        public string TestEquipmentAnalyzer { get; internal set; }
     }
 
     public class LabOpeningHoursOptions
