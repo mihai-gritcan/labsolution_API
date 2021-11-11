@@ -92,6 +92,17 @@ namespace LabSolution.Utils
 
         private const string _sampleIdKey = "#SAMPLE_ID_KEY";
         private const string _testResultKey = "#TEST_RESULT_KEY";
+        private const string _testResultComment = "#TEST_RESULT_COMMENT";
+
+        private static string IsVirusConfirmed(TestResult testResult, TestLanguage testLanguage)
+        {
+            return testLanguage switch
+            {
+                TestLanguage.Romanian => testResult == TestResult.Positive ? "prezența" : "absența",
+                TestLanguage.English => testResult == TestResult.Positive ? "presence" : "absence",
+                _ => testResult == TestResult.Positive ? "presence" : "absence",
+            };
+        }
 
         public static async Task<string> GetReportTemplate(ProcessedOrderForPdf processedOrderForPdf, byte[] barcode, byte[] qrcode, LabConfigOptions labConfigOptions)
         {
@@ -123,12 +134,13 @@ namespace LabSolution.Utils
                 .Replace(_orderProcessedByKey, processedOrderForPdf.ProcessedBy)
 
                 .Replace(_sampleIdKey, processedOrderForPdf.OrderId.ToString())
-                .Replace(_testResultKey, processedOrderForPdf.TestResult.ToString());
+                .Replace(_testResultKey, processedOrderForPdf.TestResult.ToString())
+                .Replace(_testResultComment, IsVirusConfirmed(processedOrderForPdf.TestResult, processedOrderForPdf.TestLanguage));
         }
 
         private static int CalculateCustomerAge(DateTime dateOfBirth)
         {
-            var today = DateTime.Today;
+            var today = DateTime.UtcNow.ToBucharestTimeZone().Date;
             var age = today.Year - dateOfBirth.Year;
             // Go back to the year in which the person was born in case of a leap year
             if (dateOfBirth.Date > today.AddYears(-age)) age--;
@@ -145,20 +157,24 @@ namespace LabSolution.Utils
             switch (testType)
             {
                 case TestType.Antigen:
-                    templateName = "testAntigen";
+                    templateName = $"testAntigen".AppendLanguageSuffix(testLanguage);
                     break;
                 case TestType.PCR:
-                    templateName = "testPcr";
+                    templateName = "testPcr".AppendLanguageSuffix(testLanguage);
                     break;
                 case TestType.Antibody:
-                    templateName = "testAntibody";
+                    templateName = "testAntibodyRo_En_Ru";
                     break;
             }
-            templateName = testLanguage == TestLanguage.Romanian ? $"{templateName}Ro" : $"{templateName}En";
 
             string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", "Templates", $"{templateName}.html");
             using var streamReader = new StreamReader(path, Encoding.UTF8);
             return await streamReader.ReadToEndAsync();
+        }
+
+        private static string AppendLanguageSuffix(this string fileName, TestLanguage testLanguage)
+        {
+            return testLanguage == TestLanguage.Romanian ? $"{fileName}Ro" : $"{fileName}En";
         }
     }
 }
