@@ -35,6 +35,9 @@ table {
     text-align: right;
     border: 1px dashed grey;
 }
+.header-right > img {
+    height: 125px;
+}
 
 .customer > table tr td {
     border: 1px solid black;
@@ -63,9 +66,9 @@ table {
     width: 100%;
 }
 
-    .parameters table td {
-        border: 1px solid black;
-    }
+.parameters table td {
+    border: 1px solid black;
+}
 
 .other {
 }
@@ -78,9 +81,9 @@ table {
     width: 100%;
 }
 
-    .other-details table td {
-        border: 1px solid black;
-    }
+.other-details table td {
+    border: 1px solid black;
+}
 
 .processors p {
     margin: 0;

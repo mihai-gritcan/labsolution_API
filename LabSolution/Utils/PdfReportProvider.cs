@@ -130,7 +130,7 @@ namespace LabSolution.Utils
                 .Replace(_customerEmailKey, processedOrderForPdf.Customer.Email ?? string.Empty)
 
                 .Replace(_orderProcessingDateTimeKey, processedOrderForPdf.ProcessedAt.ToString("dd/MM/yyyy HH:mm"))
-                .Replace(_orderReceivedInLabDateTimeKey, processedOrderForPdf.OrderDate.ToString("dd/MM/yyyy HH:mm"))
+                .Replace(_orderReceivedInLabDateTimeKey, processedOrderForPdf.ProcessedAt.ToString("dd/MM/yyyy HH:mm"))
                 .Replace(_dateOfExaminationKey, processedOrderForPdf.OrderDate.ToString("dd/MM/yyyy"))
                 .Replace(_orderProcessedByKey, processedOrderForPdf.ProcessedBy)
 
