@@ -2,6 +2,7 @@
 using LabSolution.HttpModels;
 using LabSolution.Infrastructure;
 using LabSolution.Models;
+using LabSolution.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -104,7 +105,7 @@ namespace LabSolution.Services
                 var customerOrder = new CustomerOrder
                 {
                     CustomerId = customerId,
-                    PlacedAt = DateTime.Now,
+                    PlacedAt = DateTime.UtcNow.ToBucharestTimeZone(),
                     Scheduled = createOrder.ScheduledDateTime,
                     TestType = (short)createOrder.TestType,
                     TestLanguage = (short)createOrder.TestLanguage,
@@ -140,13 +141,13 @@ namespace LabSolution.Services
             var processedOrder = await _context.ProcessedOrders.Where(x => x.CustomerOrderId == orderId).SingleOrDefaultAsync() ?? new ProcessedOrder
             {
                 CustomerOrderId = orderId,
-                ProcessedAt = DateTime.Now,
+                ProcessedAt = DateTime.UtcNow.ToBucharestTimeZone(),
                 PrintCount = 1
             };
 
             if(processedOrder.Id > 0)
             {
-                processedOrder.ProcessedAt = DateTime.Now;
+                processedOrder.ProcessedAt = DateTime.UtcNow.ToBucharestTimeZone();
                 processedOrder.PrintCount++;
             }
             else
@@ -177,7 +178,7 @@ namespace LabSolution.Services
         {
             var processedOrderPdfEntity = new ProcessedOrderPdf
             {
-                DateCreated = DateTime.Now,
+                DateCreated = DateTime.UtcNow.ToBucharestTimeZone(),
                 ProcessedOrderId = processedOrderId,
                 PdfBytes = pdfBytes
             };

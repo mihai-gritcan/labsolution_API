@@ -17,7 +17,7 @@ namespace LabSolution.Controllers
         {
             public TimeSlot(DateTime date, int numberOfSlots)
             {
-                Time = $"{date.Hour}:{date.Minute}";
+                Time = date.ToString("HH:mm");
                 NumberOfSlots = numberOfSlots;
             }
 

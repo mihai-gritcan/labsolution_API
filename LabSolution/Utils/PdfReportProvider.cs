@@ -92,6 +92,18 @@ namespace LabSolution.Utils
 
         private const string _sampleIdKey = "#SAMPLE_ID_KEY";
         private const string _testResultKey = "#TEST_RESULT_KEY";
+        private const string _testResultCommentKey = "#TEST_RESULT_COMMENT_KEY";
+        private const string _testEquipmentAnalyzerKey = "#TEST_EQUIPMENT_ANALYZER_KEY";
+
+        private static string IsVirusConfirmed(TestResult testResult, TestLanguage testLanguage)
+        {
+            return testLanguage switch
+            {
+                TestLanguage.Romanian => testResult == TestResult.Positive ? "prezența" : "absența",
+                TestLanguage.English => testResult == TestResult.Positive ? "presence" : "absence",
+                _ => testResult == TestResult.Positive ? "presence" : "absence",
+            };
+        }
 
         public static async Task<string> GetReportTemplate(ProcessedOrderForPdf processedOrderForPdf, byte[] barcode, byte[] qrcode, LabConfigOptions labConfigOptions)
         {
@@ -118,17 +130,19 @@ namespace LabSolution.Utils
                 .Replace(_customerEmailKey, processedOrderForPdf.Customer.Email ?? string.Empty)
 
                 .Replace(_orderProcessingDateTimeKey, processedOrderForPdf.ProcessedAt.ToString("dd/MM/yyyy HH:mm"))
-                .Replace(_orderReceivedInLabDateTimeKey, processedOrderForPdf.OrderDate.ToString("dd/MM/yyyy HH:mm"))
+                .Replace(_orderReceivedInLabDateTimeKey, processedOrderForPdf.ProcessedAt.ToString("dd/MM/yyyy HH:mm"))
                 .Replace(_dateOfExaminationKey, processedOrderForPdf.OrderDate.ToString("dd/MM/yyyy"))
                 .Replace(_orderProcessedByKey, processedOrderForPdf.ProcessedBy)
 
                 .Replace(_sampleIdKey, processedOrderForPdf.OrderId.ToString())
-                .Replace(_testResultKey, processedOrderForPdf.TestResult.ToString());
+                .Replace(_testResultKey, processedOrderForPdf.TestResult.ToString())
+                .Replace(_testResultCommentKey, IsVirusConfirmed(processedOrderForPdf.TestResult, processedOrderForPdf.TestLanguage))
+                .Replace(_testEquipmentAnalyzerKey, labConfigOptions.TestEquipmentAnalyzer);
         }
 
         private static int CalculateCustomerAge(DateTime dateOfBirth)
         {
-            var today = DateTime.Today;
+            var today = DateTime.UtcNow.ToBucharestTimeZone().Date;
             var age = today.Year - dateOfBirth.Year;
             // Go back to the year in which the person was born in case of a leap year
             if (dateOfBirth.Date > today.AddYears(-age)) age--;
@@ -141,12 +155,28 @@ namespace LabSolution.Utils
     {
         public static async Task<string> GetDefaultTemplateHtml(TestLanguage testLanguage, TestType testType)
         {
-            var templateName = testType == TestType.Antigen ? "testAntigen" : "testPcr";
-            templateName = testLanguage == TestLanguage.Romanian ? $"{templateName}Ro" : $"{templateName}En";
+            var templateName = string.Empty;
+            switch (testType)
+            {
+                case TestType.Antigen:
+                    templateName = $"testAntigen".AppendLanguageSuffix(testLanguage);
+                    break;
+                case TestType.PCR:
+                    templateName = "testPcr".AppendLanguageSuffix(testLanguage);
+                    break;
+                case TestType.Antibody:
+                    templateName = "testAntibodyRo_En_Ru";
+                    break;
+            }
 
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", "Templates",$"{templateName}.html");
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", "Templates", $"{templateName}.html");
             using var streamReader = new StreamReader(path, Encoding.UTF8);
             return await streamReader.ReadToEndAsync();
+        }
+
+        private static string AppendLanguageSuffix(this string fileName, TestLanguage testLanguage)
+        {
+            return testLanguage == TestLanguage.Romanian ? $"{fileName}Ro" : $"{fileName}En";
         }
     }
 }

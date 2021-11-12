@@ -1,4 +1,5 @@
 ﻿using LabSolution.Models;
+using LabSolution.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -17,10 +18,12 @@ namespace LabSolution.Services
     public class TokenService : ITokenService
     {
         private readonly SymmetricSecurityKey _key;
+        private readonly IConfiguration _configuration;
 
         public TokenService(IConfiguration config)
         {
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]));
+            _configuration = config;
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["AppSecurityOptions:TokenKey"]));
         }
 
         public string CreateToken(AppUser appUser)
@@ -34,10 +37,10 @@ namespace LabSolution.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
-                SigningCredentials = creds, 
-                Audience = "https://localhost:44314",
-                Issuer = "https://localhost:44314"
+                Expires = DateTime.UtcNow.ToBucharestTimeZone().AddHours(double.Parse(_configuration["AppSecurityOptions:TokenLifetimeHours"])),
+                SigningCredentials = creds,
+                Audience = _configuration["AppSecurityOptions:Audience"],
+                Issuer = _configuration["AppSecurityOptions:Issuer"]
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();

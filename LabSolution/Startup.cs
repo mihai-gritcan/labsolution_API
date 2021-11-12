@@ -22,14 +22,19 @@ namespace LabSolution
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            StaticConfig = configuration;
         }
 
         public IConfiguration Configuration { get; }
+
+        public static IConfiguration StaticConfig { get; private set; }
+
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<LabConfigOptions>(options => Configuration.GetSection(nameof(LabConfigOptions)).Bind(options));
+            services.Configure<LabOpeningHoursOptions>(options => Configuration.GetSection(nameof(LabOpeningHoursOptions)).Bind(options));
 
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
@@ -72,9 +77,9 @@ namespace LabSolution
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
 
-                    ValidIssuer = "https://localhost:44314",
-                    ValidAudience = "https://localhost:44314",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenKey"]))
+                    ValidIssuer = Configuration["AppSecurityOptions:Issuer"],
+                    ValidAudience = Configuration["AppSecurityOptions:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AppSecurityOptions:TokenKey"]))
                 };
             });
         }

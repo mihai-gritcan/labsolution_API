@@ -26,10 +26,10 @@ namespace LabSolution.Controllers
                 queryableCustomers = queryableCustomers.Where(x => x.PersonalNumber.Contains(idnp.Value.ToString()));
 
             if(!string.IsNullOrWhiteSpace(firstName))
-                queryableCustomers = queryableCustomers.Where(x => x.FirstName.Contains(firstName));
+                queryableCustomers = queryableCustomers.Where(x => x.FirstName.Contains(firstName) || x.LastName.Contains(firstName));
 
             if (!string.IsNullOrWhiteSpace(lastName))
-                queryableCustomers = queryableCustomers.Where(x => x.LastName.Contains(lastName));
+                queryableCustomers = queryableCustomers.Where(x => x.LastName.Contains(lastName) || x.FirstName.Contains(lastName));
 
             return Ok(await queryableCustomers.Select(x => CustomerDto.CreateDtoFromEntity(x)).ToListAsync());
         }

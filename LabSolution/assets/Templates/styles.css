@@ -1,9 +1,18 @@
 ﻿body {
     font-family: Arial, 'Times New Roman', sans-serif;
+    color: black;
 }
 
 table {
     border-collapse: collapse;
+}
+
+.gray-color {
+    color: gray;
+}
+
+.table-without-border::after{
+    border: none !important;
 }
 
 .main-table > table, tr, td {
@@ -25,6 +34,9 @@ table {
     width: 50%;
     text-align: right;
     border: 1px dashed grey;
+}
+.header-right > img {
+    height: 125px;
 }
 
 .customer > table tr td {
@@ -54,9 +66,9 @@ table {
     width: 100%;
 }
 
-    .parameters table td {
-        border: 1px solid black;
-    }
+.parameters table td {
+    border: 1px solid black;
+}
 
 .other {
 }
@@ -69,9 +81,9 @@ table {
     width: 100%;
 }
 
-    .other-details table td {
-        border: 1px solid black;
-    }
+.other-details table td {
+    border: 1px solid black;
+}
 
 .processors p {
     margin: 0;
