@@ -1,6 +1,5 @@
 ﻿using LabSolution.HttpModels;
 using LabSolution.Infrastructure;
-using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Text;
@@ -12,24 +11,22 @@ namespace LabSolution.Utils
 {
     public interface IPdfReportProvider
     {
-        Task<byte[]> CreatePdfReport(ProcessedOrderForPdf processedOrderForPdf);
+        Task<byte[]> CreatePdfReport(ProcessedOrderForPdf processedOrderForPdf, LabConfigOptions configOptions);
     }
 
     public class PdfReportProvider: IPdfReportProvider
     {
         private readonly IConverter _converter;
-        private readonly LabConfigOptions _labConfigOptions;
 
-        public PdfReportProvider(IConverter converter, IOptions<LabConfigOptions> labConfigOptions)
+        public PdfReportProvider(IConverter converter)
         {
             _converter = converter;
-            _labConfigOptions = labConfigOptions.Value;
         }
 
-        public async Task<byte[]> CreatePdfReport(ProcessedOrderForPdf processedOrderForPdf)
+        public async Task<byte[]> CreatePdfReport(ProcessedOrderForPdf processedOrderForPdf, LabConfigOptions configOptions)
         {
             var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(processedOrderForPdf.NumericCode);
-            var qrCode = QRCodeProvider.GeneratQRCode(processedOrderForPdf.NumericCode);
+            var qrCode = QRCodeProvider.GeneratQRCode(processedOrderForPdf.NumericCode, configOptions.WebSiteName);
 
             var globalSettings = new GlobalSettings
             {
@@ -42,7 +39,7 @@ namespace LabSolution.Utils
                 DPI = 400
             };
 
-            var htmlContent = await TemplateBuilder.GetReportTemplate(processedOrderForPdf, barcode, qrCode, _labConfigOptions);
+            var htmlContent = await TemplateBuilder.GetReportTemplate(processedOrderForPdf, barcode, qrCode, configOptions);
 
             var objectSettings = new ObjectSettings
             {
@@ -110,10 +107,10 @@ namespace LabSolution.Utils
             var htmlTemplate = await TemplateLoader.GetDefaultTemplateHtml(processedOrderForPdf.TestLanguage, processedOrderForPdf.TestType);
             
             return htmlTemplate
-                .Replace(_labNameKey, labConfigOptions.Name)
-                .Replace(_labAddressKey, labConfigOptions.Address)
-                .Replace(_labPhoneKey, labConfigOptions.Phone)
-                .Replace(_labSiteKey, labConfigOptions.Site)
+                .Replace(_labNameKey, labConfigOptions.LabName)
+                .Replace(_labAddressKey, labConfigOptions.LabAddress)
+                .Replace(_labPhoneKey, labConfigOptions.PhoneNumber)
+                .Replace(_labSiteKey, labConfigOptions.WebSiteName)
 
                 .Replace(_barcodeKey, Convert.ToBase64String(barcode))
                 .Replace(_qrcodeKey, Convert.ToBase64String(qrcode))

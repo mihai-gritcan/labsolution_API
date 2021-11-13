@@ -27,6 +27,7 @@ namespace LabSolution.Services
         Task<List<ProcessedOrderToSetResultResponse>> GetOrdersToSetResult(DateTime date, string numericCode);
 
         Task<ProcessedOrderPdf> GetPdfBytes(int processedOrderId);
+        Task<ProcessedOrderPdf> GetPdfBytes(string pdfNameHex);
         Task SetPdfName(int processedOrderId, string pdfName);
     }
 
@@ -210,6 +211,11 @@ namespace LabSolution.Services
         public Task<ProcessedOrderPdf> GetPdfBytes(int processedOrderId)
         {
             return _context.ProcessedOrderPdfs.SingleOrDefaultAsync(x => x.ProcessedOrderId == processedOrderId);
+        }
+
+        public Task<ProcessedOrderPdf> GetPdfBytes(string pdfNameHex)
+        {
+            return _context.ProcessedOrderPdfs.Include(x => x.ProcessedOrder).SingleOrDefaultAsync(x => x.ProcessedOrder.PdfName == pdfNameHex);
         }
 
         public async Task SetPdfName(int processedOrderId, string pdfName)
