@@ -7,8 +7,8 @@ namespace LabSolution.Dtos
 {
     public class CustomerDto
     {
-        private const long MinPersonalNumberValue = 1000000000000;
-        private const long MaxPersonalNumberValue = 9999999999999;
+        private const long MinPersonalNumberValue = 1;
+        private const long MaxPersonalNumberValue = long.MaxValue;
 
         public int Id { get; set; }
 
