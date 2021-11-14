@@ -23,7 +23,7 @@ namespace LabSolution.Controllers
 
         [AllowAnonymous]
         // public serve existing pdf 
-        [HttpGet("{pdfNameHex}/pdf-file")]
+        [HttpGet("{pdfNameHex}")]
         public async Task<IActionResult> GetPdfResultFromDb(string pdfNameHex)
         {
             var existingPdf = await _orderService.GetPdfBytes(pdfNameHex);
