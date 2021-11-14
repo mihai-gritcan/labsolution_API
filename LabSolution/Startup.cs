@@ -43,6 +43,7 @@ namespace LabSolution
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IAppConfigService, AppConfigService>();
             services.AddSingleton<IPdfReportProvider, PdfReportProvider>();
 
             services.AddDbContext<LabSolutionContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
@@ -90,16 +91,12 @@ namespace LabSolution
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "LabSolution v1"));
+                EnableSwagger(app);
             }
             else
             {
                 if (string.Equals(Configuration.GetSection("UseSwaggerInProd").Value, "true", System.StringComparison.InvariantCultureIgnoreCase))
-                {
-                    app.UseSwagger();
-                    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "LabSolution v1"));
-                }
+                    EnableSwagger(app);
             }
 
             app.UseHttpsRedirection();
@@ -118,6 +115,12 @@ namespace LabSolution
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private static void EnableSwagger(IApplicationBuilder app)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SmallHrApi v1"));
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿body {
     font-family: Arial, 'Times New Roman', sans-serif;
     color: black;
+    /*font-size: 11px;*/
 }
 
 table {
@@ -11,8 +12,8 @@ table {
     color: gray;
 }
 
-.table-without-border::after{
-    border: none !important;
+.table-without-border > table > tbody > tr > td {
+    border: none;
 }
 
 .main-table > table, tr, td {
@@ -70,6 +71,10 @@ table {
     border: 1px solid black;
 }
 
+.parameters p {
+    margin: 0;
+}
+
 .other {
 }
 
@@ -91,4 +96,8 @@ table {
 
 .processors table {
     width: 100%;
+}
+
+.antibody-reference-quantity {
+    text-align: center;
 }

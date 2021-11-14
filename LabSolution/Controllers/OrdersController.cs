@@ -25,13 +25,16 @@ namespace LabSolution.Controllers
 
         private readonly ILogger<OrdersController> _logger;
 
+        private readonly IAppConfigService _appConfigService;
+
         public OrdersController(ICustomerService customerService, IOrderService orderService,
-            IPdfReportProvider pdfReportProvider, ILogger<OrdersController> logger)
+            IPdfReportProvider pdfReportProvider, ILogger<OrdersController> logger, IAppConfigService appConfigService)
         {
             _customerService = customerService;
             _orderService = orderService;
             _pdfReportProvider = pdfReportProvider;
             _logger = logger;
+            _appConfigService = appConfigService;
         }
 
         // public order submit
@@ -140,7 +143,8 @@ namespace LabSolution.Controllers
             if (processedOrderId != setResultRequest.ProcessedOrderId)
                 return BadRequest();
 
-            await _orderService.SetTestResult(setResultRequest.ProcessedOrderId, setResultRequest.TestResult, setResultRequest.ExecutorName, setResultRequest.VerifierName, setResultRequest.ValidatorName);
+            await _orderService.SetTestResult(setResultRequest.ProcessedOrderId, setResultRequest.TestResult, 
+                setResultRequest.ExecutorName, setResultRequest.VerifierName, setResultRequest.ValidatorName);
 
             return NoContent();
         }
@@ -159,7 +163,9 @@ namespace LabSolution.Controllers
 
             var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
 
-            var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf);
+            var labConfigs = await _appConfigService.GetLabConfigOptions();
+
+            var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf, labConfigs);
 
             var fileName = $"{Guid.NewGuid()}";
 
@@ -169,7 +175,6 @@ namespace LabSolution.Controllers
             return new FileStreamResult(ms, "application/pdf");
         }
 
-        [AllowAnonymous]
         [Obsolete("Azure Linux Plan doesn't allow to write on storage. Can re-try using the implementation on a paid hosting")]
         [ApiExplorerSettings(IgnoreApi = true)]
         // reception getPdfResult by processedOrderId
@@ -193,7 +198,9 @@ namespace LabSolution.Controllers
                 }
             }
 
-            var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf);
+            var labConfigs = await _appConfigService.GetLabConfigOptions();
+
+            var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf, labConfigs);
 
             var fileName = $"{Guid.NewGuid()}";
             var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"{fileName}.pdf");

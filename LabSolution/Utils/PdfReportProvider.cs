@@ -1,6 +1,5 @@
 ﻿using LabSolution.HttpModels;
 using LabSolution.Infrastructure;
-using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Text;
@@ -12,24 +11,25 @@ namespace LabSolution.Utils
 {
     public interface IPdfReportProvider
     {
-        Task<byte[]> CreatePdfReport(ProcessedOrderForPdf processedOrderForPdf);
+        Task<byte[]> CreatePdfReport(ProcessedOrderForPdf processedOrderForPdf, LabConfigOptions configOptions);
     }
 
     public class PdfReportProvider: IPdfReportProvider
     {
         private readonly IConverter _converter;
-        private readonly LabConfigOptions _labConfigOptions;
 
-        public PdfReportProvider(IConverter converter, IOptions<LabConfigOptions> labConfigOptions)
+        public PdfReportProvider(IConverter converter)
         {
             _converter = converter;
-            _labConfigOptions = labConfigOptions.Value;
         }
 
-        public async Task<byte[]> CreatePdfReport(ProcessedOrderForPdf processedOrderForPdf)
+        public async Task<byte[]> CreatePdfReport(ProcessedOrderForPdf processedOrderForPdf, LabConfigOptions configOptions)
         {
             var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(processedOrderForPdf.NumericCode);
-            var qrCode = QRCodeProvider.GeneratQRCode(processedOrderForPdf.NumericCode);
+
+            var path = $"{configOptions.WebSiteAddress}/result/{processedOrderForPdf.PdfName}";
+
+            var qrCode = QRCodeProvider.GeneratQRCode(path);
 
             var globalSettings = new GlobalSettings
             {
@@ -42,7 +42,7 @@ namespace LabSolution.Utils
                 DPI = 400
             };
 
-            var htmlContent = await TemplateBuilder.GetReportTemplate(processedOrderForPdf, barcode, qrCode, _labConfigOptions);
+            var htmlContent = await TemplateBuilder.GetReportTemplate(processedOrderForPdf, barcode, qrCode, configOptions);
 
             var objectSettings = new ObjectSettings
             {
@@ -94,6 +94,7 @@ namespace LabSolution.Utils
         private const string _testResultKey = "#TEST_RESULT_KEY";
         private const string _testResultCommentKey = "#TEST_RESULT_COMMENT_KEY";
         private const string _testEquipmentAnalyzerKey = "#TEST_EQUIPMENT_ANALYZER_KEY";
+        private const string _neutralizingAntibodyQuantityKey = "#NEUTRALIZING_ANTIBODY_QUANTITY_KEY";
 
         private static string IsVirusConfirmed(TestResult testResult, TestLanguage testLanguage)
         {
@@ -110,10 +111,10 @@ namespace LabSolution.Utils
             var htmlTemplate = await TemplateLoader.GetDefaultTemplateHtml(processedOrderForPdf.TestLanguage, processedOrderForPdf.TestType);
             
             return htmlTemplate
-                .Replace(_labNameKey, labConfigOptions.Name)
-                .Replace(_labAddressKey, labConfigOptions.Address)
-                .Replace(_labPhoneKey, labConfigOptions.Phone)
-                .Replace(_labSiteKey, labConfigOptions.Site)
+                .Replace(_labNameKey, labConfigOptions.LabName)
+                .Replace(_labAddressKey, labConfigOptions.LabAddress)
+                .Replace(_labPhoneKey, labConfigOptions.PhoneNumber)
+                .Replace(_labSiteKey, labConfigOptions.WebSiteAddress)
 
                 .Replace(_barcodeKey, Convert.ToBase64String(barcode))
                 .Replace(_qrcodeKey, Convert.ToBase64String(qrcode))
@@ -137,7 +138,8 @@ namespace LabSolution.Utils
                 .Replace(_sampleIdKey, processedOrderForPdf.OrderId.ToString())
                 .Replace(_testResultKey, processedOrderForPdf.TestResult.ToString())
                 .Replace(_testResultCommentKey, IsVirusConfirmed(processedOrderForPdf.TestResult, processedOrderForPdf.TestLanguage))
-                .Replace(_testEquipmentAnalyzerKey, labConfigOptions.TestEquipmentAnalyzer);
+                .Replace(_testEquipmentAnalyzerKey, labConfigOptions.TestEquipmentAnalyzer)
+                .Replace(_neutralizingAntibodyQuantityKey, "xxx");
         }
 
         private static int CalculateCustomerAge(DateTime dateOfBirth)
