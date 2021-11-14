@@ -6,12 +6,11 @@ namespace LabSolution.Utils
 {
     public static class QRCodeProvider
     {
-        public static byte[] GeneratQRCode(string pdfNameHex, string labWebsite)
+        public static byte[] GeneratQRCode(string qrCodeValue)
         {
             var qrCodeGenerator = new QRCodeGenerator();
-            var path = $"";
 
-            var qrCodeData = qrCodeGenerator.CreateQrCode(path, QRCodeGenerator.ECCLevel.Q);
+            var qrCodeData = qrCodeGenerator.CreateQrCode(qrCodeValue, QRCodeGenerator.ECCLevel.Q);
             var qrCode = new QRCode(qrCodeData);
             Bitmap bitmap = qrCode.GetGraphic(15);
             return ConvertBitmapToBytes(bitmap);

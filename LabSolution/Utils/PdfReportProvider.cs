@@ -26,7 +26,10 @@ namespace LabSolution.Utils
         public async Task<byte[]> CreatePdfReport(ProcessedOrderForPdf processedOrderForPdf, LabConfigOptions configOptions)
         {
             var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(processedOrderForPdf.NumericCode);
-            var qrCode = QRCodeProvider.GeneratQRCode(processedOrderForPdf.NumericCode, configOptions.WebSiteAddress);
+
+            var path = $"{configOptions.WebSiteAddress}/result/{processedOrderForPdf.PdfName}";
+
+            var qrCode = QRCodeProvider.GeneratQRCode(path);
 
             var globalSettings = new GlobalSettings
             {
