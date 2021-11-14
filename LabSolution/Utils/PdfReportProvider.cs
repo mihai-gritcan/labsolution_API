@@ -26,7 +26,7 @@ namespace LabSolution.Utils
         public async Task<byte[]> CreatePdfReport(ProcessedOrderForPdf processedOrderForPdf, LabConfigOptions configOptions)
         {
             var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(processedOrderForPdf.NumericCode);
-            var qrCode = QRCodeProvider.GeneratQRCode(processedOrderForPdf.NumericCode, configOptions.WebSiteName);
+            var qrCode = QRCodeProvider.GeneratQRCode(processedOrderForPdf.NumericCode, configOptions.WebSiteAddress);
 
             var globalSettings = new GlobalSettings
             {
@@ -91,6 +91,7 @@ namespace LabSolution.Utils
         private const string _testResultKey = "#TEST_RESULT_KEY";
         private const string _testResultCommentKey = "#TEST_RESULT_COMMENT_KEY";
         private const string _testEquipmentAnalyzerKey = "#TEST_EQUIPMENT_ANALYZER_KEY";
+        private const string _neutralizingAntibodyQuantityKey = "#NEUTRALIZING_ANTIBODY_QUANTITY_KEY";
 
         private static string IsVirusConfirmed(TestResult testResult, TestLanguage testLanguage)
         {
@@ -110,7 +111,7 @@ namespace LabSolution.Utils
                 .Replace(_labNameKey, labConfigOptions.LabName)
                 .Replace(_labAddressKey, labConfigOptions.LabAddress)
                 .Replace(_labPhoneKey, labConfigOptions.PhoneNumber)
-                .Replace(_labSiteKey, labConfigOptions.WebSiteName)
+                .Replace(_labSiteKey, labConfigOptions.WebSiteAddress)
 
                 .Replace(_barcodeKey, Convert.ToBase64String(barcode))
                 .Replace(_qrcodeKey, Convert.ToBase64String(qrcode))
@@ -134,7 +135,8 @@ namespace LabSolution.Utils
                 .Replace(_sampleIdKey, processedOrderForPdf.OrderId.ToString())
                 .Replace(_testResultKey, processedOrderForPdf.TestResult.ToString())
                 .Replace(_testResultCommentKey, IsVirusConfirmed(processedOrderForPdf.TestResult, processedOrderForPdf.TestLanguage))
-                .Replace(_testEquipmentAnalyzerKey, labConfigOptions.TestEquipmentAnalyzer);
+                .Replace(_testEquipmentAnalyzerKey, labConfigOptions.TestEquipmentAnalyzer)
+                .Replace(_neutralizingAntibodyQuantityKey, "xxx");
         }
 
         private static int CalculateCustomerAge(DateTime dateOfBirth)

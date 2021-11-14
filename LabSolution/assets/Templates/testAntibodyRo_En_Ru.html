@@ -21,6 +21,12 @@
         </tr>
 
         <tr>
+            <td colspan="2" class="qr-code">
+                <img alt="QR Code" src="data:image/png;base64,#QRCODE_KEY" />
+            </td>
+        </tr>
+
+        <tr>
             <td colspan="2" style="text-align: center; height: 80px;">
                 <br />
                 <h3>MARCHERII BOLILOR INFECȚIOASE (SEROLOGIE)</h3>
@@ -33,14 +39,14 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td style="width: 300px;">
+                            <td style="width: 27%;">
                                 <p> <strong>Numele:</strong> </p>
                                 <p class="gray-color"> <strong>Surname / Фамилия</strong> </p>
                             </td>
-                            <td style="width: 152px;">
+                            <td style="width: 18%;">
                                 <p> #CUSTOMER_LAST_NAME_KEY </p>
                             </td>
-                            <td style="width: 400px;">
+                            <td style="width: 40%;">
                                 <p> <strong>ID proba:</strong> </p>
                                 <p class="gray-color"> <strong>Sample No. / Образец N</strong> </p>
                             </td>
@@ -49,14 +55,14 @@
                             </td>
                         </tr>
                         <tr>
-                            <td style="width: 300px;">
+                            <td style="width: 27%;">
                                 <p> <strong>Prenumele:</strong> </p>
                                 <p class="gray-color"> <strong>Given name / Имя</strong> </p>
                             </td>
-                            <td style="width: 152px;">
+                            <td style="width: 18%;">
                                 <p> #CUSTOMER_FIRST_NAME_KEY </p>
                             </td>
-                            <td style="width: 400px;">
+                            <td style="width: 40%;">
                                 <p> <strong>Prelevarea probei, adresa:</strong> </p>
                                 <p class="gray-color"> <strong>Place of sampling / Место сбора</strong> </p>
                             </td>
@@ -65,14 +71,14 @@
                             </td>
                         </tr>
                         <tr>
-                            <td style="width: 300px;">
+                            <td style="width: 27%;">
                                 <p> <strong>Data nașterii:</strong> </p>
                                 <p class="gray-color"> <strong>Date of birth / Дата рождения</strong> </p>
                             </td>
-                            <td style="width: 152px;">
+                            <td style="width: 18%;">
                                 <p> #CUSTOMER_DOB_KEY </p>
                             </td>
-                            <td style="width: 400px;">
+                            <td style="width: 40%;">
                                 <p> <strong>Prelevarea probei, data și ora:</strong> </p>
                                 <p class="gray-color"> <strong>Date/time of sampling / Дата / время сбора</strong> </p>
                             </td>
@@ -81,14 +87,14 @@
                             </td>
                         </tr>
                         <tr>
-                            <td style="width: 300px;">
+                            <td style="width: 27%;">
                                 <p> <strong>Sex:</strong> </p>
                                 <p class="gray-color"> <strong>Sex / Пол</strong> </p>
                             </td>
-                            <td style="width: 100px;">
+                            <td style="width: 18%;">
                                 <p> #CUSTOMER_GENDER_KEY </p>
                             </td>
-                            <td style="width: 400px;">
+                            <td style="width: 40%;">
                                 <p> <strong>Înregistrarea probei în laborator, data / ora: </strong> </p>
                                 <p class="gray-color"> <strong>Time of simple received by laboratory / Время получения пробы в лабораторию</strong> </p>
                             </td>
@@ -97,14 +103,14 @@
                             </td>
                         </tr>
                         <tr>
-                            <td style="width: 300px;">
+                            <td style="width: 27%;">
                                 <p> <strong>CNP:</strong> </p>
                                 <p class="gray-color"> <strong>Personal no. / ИПН</strong> </p>
                             </td>
-                            <td style="width: 152px;">
+                            <td style="width: 18%;">
                                 <p> #CUSTOMER_PERSONAL_NUMBER_KEY </p>
                             </td>
-                            <td style="width: 400px;">
+                            <td style="width: 40%;">
                                 <p> <strong>Data efectuării examinărilor: </strong> </p>
                                 <p class="gray-color"> <strong>Examination date / Дата иследования</strong> </p>
                             </td>
@@ -113,10 +119,10 @@
                             </td>
                         </tr>
                         <tr>
-                            <td style="width: 300px;">
+                            <td style="width: 27%;">
                                 <span> <strong>e-mail:</strong> </span>
                             </td>
-                            <td style="width: 152px;">
+                            <td style="width: 18%;">
                                 <p> #CUSTOMER_EMAIL_KEY </p>
                             </td>
                             <td style="width: auto" colspan="2">
@@ -131,15 +137,8 @@
         </tr>
 
         <tr>
-            <td colspan="2" class="qr-code">
-                <img alt="QR Code" src="data:image/png;base64,#QRCODE_KEY" />
-            </td>
-        </tr>
-
-
-        <tr>
             <td colspan="2" class="notes">
-                <p>Examination date / Eșantion primar / Primary sample / Первичный образец: sânge / blood / кровь.</p>
+                <p>Eșantion primar / Primary sample / Первичный образец: sânge / blood / кровь.</p>
                 <p>Echipament / Equipment / Анализатор: #TEST_EQUIPMENT_ANALYZER_KEY</p>
                 <p>
                     <span> Metoda de investigare / Investigation method / Метод иследования: </span><b><span>CMIA</span></b>
@@ -154,15 +153,15 @@
                         <tr>
                             <td style="width: 50%;">
                                 <p> <strong>Investigație</strong> </p>
-                                <p class="gray-color"> <strong>Test / Название (показатель)</strong> </p>
+                                <span class="gray-color"> <strong>Test / Название (показатель)</strong> </span>
                             </td>
                             <td style="width: 25%;">
                                 <p> <strong>Rezultat </strong> </p>
-                                <p class="gray-color"> <strong>Result / Результат</strong> </p>
+                                <span class="gray-color"> <strong>Result / Результат</strong> </span>
                             </td>
                             <td style="width: 25%;">
                                 <p> <strong>Valori de referință </strong> </p>
-                                <p class="gray-color"> <strong>Reference range / Референсные значения</strong> </p>
+                                <span class="gray-color"> <strong>Reference range / Референсные значения</strong> </span>
                             </td>
                         </tr>
                     </tbody>
@@ -172,7 +171,7 @@
 
         <tr>
             <td colspan="2" class="other">
-                <p> <strong>Marcher serologic către COVID-19 / Serological marker to COVID-19 / Серологический маркер COVID-19</strong> </p>
+                <span> <strong>Marcher serologic către COVID-19 / Serological marker to COVID-19 / Серологический маркер COVID-19</strong> </span>
             </td>
         </tr>
 
@@ -184,12 +183,17 @@
                             <td style="width: 50%;">
                                 <p>
                                     SARS-CoV-2, IgG / RBD-S1 anticorpi neutralizanți /cantitativ
-                                    SARS-CoV-2, IgG / RBD-S1 netralizing antibodies / quantitative
+                                </p>
+                                <p>
+                                    SARS-CoV-2, IgG / RBD-S1 neutralizing antibodies / quantitative
+                                </p>
+                                <p>
                                     SARS-CoV-2, IgG / RBD-S1 нейтрализующие антитела / количественный
                                 </p>
                             </td>
+
                             <td style="width: 5%;">
-                                <p> <strong> xxx </strong> </p>
+                                <p> <span style="color: red; font-weight: bold"> #NEUTRALIZING_ANTIBODY_QUANTITY_KEY </span> </p>
                             </td>
                             <td style="width: 10%;">
                                 <p> <strong> AU/mL </strong> </p>
@@ -197,19 +201,26 @@
                             <td style="width: 10%;">
                                 <p> <strong>#TEST_RESULT_KEY</strong> </p>
                             </td>
-                            <td style="width: 12%;">
-                                <table class="table-without-border">
+
+                            <td colspan="2" style="width: 25%" class="table-without-border">
+                                <table class="antibody-reference-quantity">
                                     <tbody>
-                                        <tr><td><p> < 50,0 </p></td></tr>
-                                        <tr><td><p> > 50,0 </p></td></tr>
-                                    </tbody>
-                                </table>
-                            </td>
-                            <td style="width: 13%;">
-                                <table class="table-without-border">
-                                    <tbody>
-                                        <tr><td><p> <strong>negativ</strong> | negative | отртц </p></td></tr>
-                                        <tr><td><p> <strong>pozitiv</strong> | positive | положитл </p></td></tr>
+                                        <tr>
+                                            <td style="border-right: 0.5px solid gray !important"><p> < 50,0 </p></td>
+                                            <td>
+                                                <p><strong>negativ</strong></p>
+                                                <p>negative</p>
+                                                <p>отртц</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="border-right: 0.5px solid gray !important"><p> > 50,0 </p></td>
+                                            <td>
+                                                <p> <strong>pozitiv</strong> </p>
+                                                <p> positive </p>
+                                                <p> положитл </p>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </td>

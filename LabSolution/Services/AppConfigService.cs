@@ -47,17 +47,18 @@ namespace LabSolution.Services
             var objType = typeof(LabConfigOptions);
             var props = new List<PropertyInfo>(objType.GetProperties());
 
-            var keysToRetrieve = props.Select(x => x.Name.ToUpperInvariant()).ToList();
+            var keysToRetrieve = props.Select(x => x.Name.ToUpper()).ToList();
 
-            var configs = await _context.AppConfigs.Where(x => keysToRetrieve.Contains(x.Key.ToUpperInvariant()))
-                                    .ToDictionaryAsync(x => x.Key, x => x.Value);
+            var configs = await _context.AppConfigs.Where(x => keysToRetrieve.Contains(x.Key.ToUpper()))
+                                    .ToDictionaryAsync(x => x.Key.ToUpper(), x => x.Value);
 
             return new LabConfigOptions
             {
-                LabAddress = configs[nameof(LabConfigOptions.LabAddress)],
-                LabName = configs[nameof(LabConfigOptions.LabName)],
-                WebSiteName = configs[nameof(LabConfigOptions.WebSiteName)],
-                PhoneNumber = configs[nameof(LabConfigOptions.PhoneNumber)]
+                LabAddress = configs.ContainsKey(nameof(LabConfigOptions.LabAddress).ToUpper()) ? configs[nameof(LabConfigOptions.LabAddress).ToUpper()] : "",
+                LabName = configs.ContainsKey(nameof(LabConfigOptions.LabName).ToUpper()) ? configs[nameof(LabConfigOptions.LabName).ToUpper()] : "",
+                WebSiteAddress = configs.ContainsKey(nameof(LabConfigOptions.WebSiteAddress).ToUpper()) ? configs[nameof(LabConfigOptions.WebSiteAddress).ToUpper()] : "",
+                PhoneNumber = configs.ContainsKey(nameof(LabConfigOptions.PhoneNumber).ToUpper()) ? configs[nameof(LabConfigOptions.PhoneNumber).ToUpper()] : "",
+                TestEquipmentAnalyzer = configs.ContainsKey(nameof(LabConfigOptions.TestEquipmentAnalyzer).ToUpper()) ? configs[nameof(LabConfigOptions.TestEquipmentAnalyzer).ToUpper()] : ""
             };
         }
 
