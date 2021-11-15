@@ -32,6 +32,7 @@ namespace LabSolution.HttpModels
             {
                 var dateTimeString = $"{ScheduledDate} {ScheduledTime}";
                 DateTime.TryParse(dateTimeString, out var parsedDate);
+                DateTime.SpecifyKind(parsedDate, DateTimeKind.Local);
                 return parsedDate;
             }
         }

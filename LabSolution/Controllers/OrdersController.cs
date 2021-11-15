@@ -68,8 +68,8 @@ namespace LabSolution.Controllers
                     CustomerId = x.CustomerId,
                     Customer = CustomerDto.CreateDtoFromEntity(allSavedCustomers.Find(c => c.Id == x.CustomerId), isRootCustomer: x.ParentId == null),
                     ParentId = x.ParentId,
-                    PlacedAt = x.PlacedAt,
-                    Scheduled = x.Scheduled,
+                    PlacedAt = DateTime.SpecifyKind(x.PlacedAt, DateTimeKind.Local),
+                    Scheduled = DateTime.SpecifyKind(x.Scheduled, DateTimeKind.Local),
                     TestLanguage = (TestLanguage)x.TestLanguage,
                     TestType = (TestType)x.TestType
                 }));
@@ -165,9 +165,9 @@ namespace LabSolution.Controllers
 
             var labConfigs = await _appConfigService.GetLabConfigOptions();
 
-            var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf, labConfigs);
-
             var fileName = $"{Guid.NewGuid()}";
+
+            var pdfBytes = await _pdfReportProvider.CreatePdfReport(fileName, processedOrderForPdf, labConfigs);
 
             await _orderService.SavePdfBytes(processedOrderId, fileName, pdfBytes);
 
@@ -200,9 +200,10 @@ namespace LabSolution.Controllers
 
             var labConfigs = await _appConfigService.GetLabConfigOptions();
 
-            var pdfBytes = await _pdfReportProvider.CreatePdfReport(processedOrderForPdf, labConfigs);
-
             var fileName = $"{Guid.NewGuid()}";
+
+            var pdfBytes = await _pdfReportProvider.CreatePdfReport(fileName, processedOrderForPdf, labConfigs);
+
             var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"{fileName}.pdf");
 
             using (var fs = new FileStream(fullyQualifiedFilePath, FileMode.Create, FileAccess.Write))

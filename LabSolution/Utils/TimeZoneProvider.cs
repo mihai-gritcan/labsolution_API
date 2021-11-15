@@ -7,7 +7,9 @@ namespace LabSolution.Utils
     {
         public static DateTime ToBucharestTimeZone(this DateTime date)
         {
-            return TimeZoneInfo.ConvertTimeFromUtc(date, GetTimeZoneInfo());
+            DateTime dateTime = TimeZoneInfo.ConvertTimeFromUtc(date, GetTimeZoneInfo());
+            DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
+            return dateTime;
         }
 
         private static TimeZoneInfo GetTimeZoneInfo()
