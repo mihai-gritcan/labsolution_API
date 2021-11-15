@@ -11,7 +11,7 @@ namespace LabSolution.Utils
 {
     public interface IPdfReportProvider
     {
-        Task<byte[]> CreatePdfReport(ProcessedOrderForPdf processedOrderForPdf, LabConfigOptions configOptions);
+        Task<byte[]> CreatePdfReport(string fileName, ProcessedOrderForPdf processedOrderForPdf, LabConfigOptions configOptions);
     }
 
     public class PdfReportProvider: IPdfReportProvider
@@ -23,11 +23,11 @@ namespace LabSolution.Utils
             _converter = converter;
         }
 
-        public async Task<byte[]> CreatePdfReport(ProcessedOrderForPdf processedOrderForPdf, LabConfigOptions configOptions)
+        public async Task<byte[]> CreatePdfReport(string fileName, ProcessedOrderForPdf processedOrderForPdf, LabConfigOptions configOptions)
         {
             var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(processedOrderForPdf.NumericCode);
 
-            var path = $"{configOptions.WebSiteAddress}/result/{processedOrderForPdf.PdfName}";
+            var path = $"{configOptions.WebSiteAddress}/result/{fileName}";
 
             var qrCode = QRCodeProvider.GeneratQRCode(path);
 
