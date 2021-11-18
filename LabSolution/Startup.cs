@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using System.Text;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
@@ -45,6 +46,8 @@ namespace LabSolution
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IAppConfigService, AppConfigService>();
             services.AddSingleton<IPdfReportProvider, PdfReportProvider>();
+
+            services.AddSingleton(Log.Logger);
 
             services.AddDbContext<LabSolutionContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
@@ -101,6 +104,7 @@ namespace LabSolution
 
             app.UseHttpsRedirection();
             app.UseCors("EnableCORS");
+            app.UseSerilogRequestLogging();
 
             app.UseRouting();
 
