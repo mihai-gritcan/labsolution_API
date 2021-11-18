@@ -23,6 +23,8 @@ namespace LabSolution.Services
         Task<ProcessedOrderForPdf> GetProcessedOrderForPdf(int processedOrderId);
 
         Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, long? idnp);
+        Task DeleteOrder(int orderId);
+
         Task SavePdfBytes(int processedOrderId, string pdfName, byte[] pdfBytes);
         Task<List<ProcessedOrderToSetResultResponse>> GetOrdersToSetResult(DateTime date, string numericCode);
 
@@ -205,6 +207,7 @@ namespace LabSolution.Services
                     FirstName = x.CustomerOrder.Customer.FirstName,
                     LastName = x.CustomerOrder.Customer.LastName,
                     DateOfBirth = x.CustomerOrder.Customer.DateOfBirth,
+                    TestResult = (TestResult?)x.TestResult
                 }).OrderBy(x => x.ProcessedOrderId).ToListAsync();
         }
 
@@ -226,6 +229,21 @@ namespace LabSolution.Services
 
             _context.ProcessedOrders.Update(processedOrder);
 
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteOrder(int orderId)
+        {
+            var hasTicketEmitted = await _context.ProcessedOrders.AnyAsync(x => x.CustomerOrderId == orderId);
+            if (hasTicketEmitted)
+                throw new CustomException("Cannot remove an Order which has a ticket emitted.");
+
+            var orderEntity = await _context.CustomerOrders.FindAsync(orderId);
+
+            if (orderEntity == null)
+                throw new ResourceNotFoundException();
+
+            _context.CustomerOrders.Remove(orderEntity);
             await _context.SaveChangesAsync();
         }
     }

@@ -57,6 +57,7 @@ namespace LabSolution.HttpModels
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }
+        public TestResult? TestResult { get; set; }
     }
 
     public enum OrderStatus
