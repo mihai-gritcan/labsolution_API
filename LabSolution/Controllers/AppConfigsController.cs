@@ -1,8 +1,7 @@
 ﻿using LabSolution.Dtos;
-using LabSolution.Models;
 using LabSolution.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,7 +9,7 @@ namespace LabSolution.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AppConfigsController : ControllerBase
+    public class AppConfigsController : BaseApiController
     {
         private readonly IAppConfigService _appConfigService;
 
@@ -25,6 +24,7 @@ namespace LabSolution.Controllers
             return Ok(await _appConfigService.SaveConfigs(configs));
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetConfigs()
         {
