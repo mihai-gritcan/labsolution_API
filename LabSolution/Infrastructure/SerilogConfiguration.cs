@@ -14,7 +14,7 @@ namespace LabSolution.Infrastructure
         internal const int LOG_FLUSH_DELAY_MILISECONDS = 2000;
 
         const string SERILOG_DEFAULT_SELF_PATH_APPSETTINGS_KEY = "Serilog:DefaultSelfPath";
-        const string SERILOG_DEFAULT_SELF_PATH = "trueapi-self-log.txt";
+        const string SERILOG_DEFAULT_SELF_PATH = "labsolutionapi-self-log.txt";
 
         internal static void SetupLoggingConfiguration(HostBuilderContext context, ILoggingBuilder builder)
         {
