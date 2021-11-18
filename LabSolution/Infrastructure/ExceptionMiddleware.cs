@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using LabSolution.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
@@ -11,10 +13,13 @@ namespace LabSolution.Infrastructure
     {
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
-        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+        private readonly IConfiguration _configurationSettings;
+
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IConfiguration configurationSettings)
         {
             _next = next;
             _logger = logger;
+            _configurationSettings = configurationSettings;
         }
 
         public async Task InvokeAsync(HttpContext httpContext)
@@ -50,17 +55,25 @@ namespace LabSolution.Infrastructure
 
                 switch (exception)
                 {
+                    case ResourceNotFoundException:
+                        {
+                            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                            const string exceptionMessage = "Resource not found";
+                            response = JsonSerializer.Serialize(exceptionMessage, options);
+                            break;
+                        }
+                    case CustomException:
                     case Exception:
-                    {
-                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        var exceptionMessage = $"Oops. There is a problem on the server. Details: {exception.Message}"; // hide these details when go to PROD
-                        response = JsonSerializer.Serialize(exceptionMessage, options);
-                        break;
-                    }
+                        {
+                            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                            var exceptionMessage = $"An exception has been occured. {GetMessageDetails(exception)}";
+                            response = JsonSerializer.Serialize(exceptionMessage, options);
+                            break;
+                        }
                     default:
                     {
                         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        var exceptionMessage = $"Oops. There is a problem on the server. Details: {exception.Message}"; // hide these details when go to PROD
+                        var exceptionMessage = $"Oops. There is a problem on the server. {GetMessageDetails(exception)}";
                         response = JsonSerializer.Serialize(exceptionMessage, options);
                         break;
                     }
@@ -72,6 +85,12 @@ namespace LabSolution.Infrastructure
             {
                 _logger.LogCritical(ex, ex.Message);
             }
+        }
+
+        private object GetMessageDetails(Exception exception)
+        {
+            var showDetailedErrorInProduction = _configurationSettings["ShowDetailedErrorsInProd"].Equals("true", StringComparison.InvariantCultureIgnoreCase);
+            return showDetailedErrorInProduction ? $"Details: {exception.Message}" : "Please contact system administrator";
         }
     }
 }
