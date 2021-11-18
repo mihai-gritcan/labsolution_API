@@ -87,6 +87,14 @@ namespace LabSolution.Controllers
             return Ok(await _orderService.GetOrdersWithStatus(date, idnp));
         }
 
+        [HttpDelete("{orderId}")]
+        public async Task<IActionResult> DeleteOrder(int orderId)
+        {
+            await _orderService.DeleteOrder(orderId);
+
+            return NoContent();
+        }
+
         // reception updateOrder 
         [HttpPut("{orderId}")]
         public async Task<IActionResult> UpdateOrder(int orderId, UpdateOrderRequest updateOrderRequest)
@@ -94,14 +102,7 @@ namespace LabSolution.Controllers
             if (orderId != updateOrderRequest.Id)
                 return BadRequest();
 
-            try
-            {
-                await _orderService.UpdateOrder(updateOrderRequest);
-            }
-            catch (ResourceNotFoundException)
-            {
-                return NotFound();
-            }
+            await _orderService.UpdateOrder(updateOrderRequest);
 
             return NoContent();
         }
