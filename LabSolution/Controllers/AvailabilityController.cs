@@ -41,7 +41,9 @@ namespace LabSolution.Controllers
         {
             var structure = new DailyAvailableTimeSlotsResponse(date);
 
-            var iterator = LabDailyAvailabilityProvider.GetStartOfDay(date, _openingHoursOptions);
+            DateTime currentLocalTime = GetCurrentTimeNormalized();
+            
+            var iterator = date.Date == currentLocalTime.Date ? currentLocalTime : LabDailyAvailabilityProvider.GetStartOfDay(date, _openingHoursOptions);
 
             while (iterator < LabDailyAvailabilityProvider.GetEndOfDay(date, _openingHoursOptions))
             {
@@ -57,6 +59,17 @@ namespace LabSolution.Controllers
         {
             var placedOrdersCount = dailyOccupiedSlots.Count(x => x >= intervalStart && x < intervalEnd);
             return _openingHoursOptions.PersonsInInterval - placedOrdersCount;
+        }
+
+        private DateTime GetCurrentTimeNormalized()
+        {
+            DateTime currentLocalTime = DateTime.UtcNow.ToBucharestTimeZone();
+
+            while(currentLocalTime.Minute % 5 != 0)
+            {
+                currentLocalTime = currentLocalTime.AddMinutes(1);
+            }
+            return currentLocalTime;
         }
     }
 }
