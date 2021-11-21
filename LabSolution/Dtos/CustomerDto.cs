@@ -7,9 +7,6 @@ namespace LabSolution.Dtos
 {
     public class CustomerDto
     {
-        private const long MinPersonalNumberValue = 1;
-        private const long MaxPersonalNumberValue = long.MaxValue;
-
         public int Id { get; set; }
 
         [Required]
@@ -31,9 +28,8 @@ namespace LabSolution.Dtos
         [StringLength(50)]
         public string Passport { get; set; }
 
-        [Required]
-        [Range(MinPersonalNumberValue, MaxPersonalNumberValue)]
-        public long PersonalNumber { get; set; }
+        [StringLength(20)]
+        public string PersonalNumber { get; set; }
 
         [StringLength(50)]
         public string Phone { get; set; }
@@ -55,7 +51,7 @@ namespace LabSolution.Dtos
                 Gender = (Gender)entity.Gender,
                 Address = entity.Address,
                 Passport = entity.Passport,
-                PersonalNumber = long.Parse(entity.PersonalNumber),
+                PersonalNumber = entity.PersonalNumber,
                 Phone = entity.Phone,
                 Email = entity.Email,
                 IsRootCustomer = false
@@ -73,7 +69,7 @@ namespace LabSolution.Dtos
                 Gender = (Gender)entity.Gender,
                 Address = entity.Address,
                 Passport = entity.Passport,
-                PersonalNumber = long.Parse(entity.PersonalNumber),
+                PersonalNumber = entity.PersonalNumber,
                 Phone = entity.Phone,
                 Email = entity.Email,
                 IsRootCustomer = isRootCustomer
