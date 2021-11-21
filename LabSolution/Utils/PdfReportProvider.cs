@@ -94,7 +94,6 @@ namespace LabSolution.Utils
         private const string _testResultKey = "#TEST_RESULT_KEY";
         private const string _testResultCommentKey = "#TEST_RESULT_COMMENT_KEY";
         private const string _testEquipmentAnalyzerKey = "#TEST_EQUIPMENT_ANALYZER_KEY";
-        private const string _neutralizingAntibodyQuantityKey = "#NEUTRALIZING_ANTIBODY_QUANTITY_KEY";
 
         private static string IsVirusConfirmed(TestResult testResult, TestLanguage testLanguage)
         {
@@ -131,15 +130,14 @@ namespace LabSolution.Utils
                 .Replace(_customerEmailKey, processedOrderForPdf.Customer.Email ?? string.Empty)
 
                 .Replace(_orderProcessingDateTimeKey, processedOrderForPdf.ProcessedAt.ToString("dd/MM/yyyy HH:mm"))
-                .Replace(_orderReceivedInLabDateTimeKey, processedOrderForPdf.ProcessedAt.ToString("dd/MM/yyyy HH:mm"))
+                .Replace(_orderReceivedInLabDateTimeKey, ComputeOrderReceivedInLabTime(processedOrderForPdf.ProcessedAt).ToString("dd/MM/yyyy HH:mm"))
                 .Replace(_dateOfExaminationKey, processedOrderForPdf.OrderDate.ToString("dd/MM/yyyy"))
                 .Replace(_orderProcessedByKey, processedOrderForPdf.ProcessedBy)
 
                 .Replace(_sampleIdKey, processedOrderForPdf.OrderId.ToString())
-                .Replace(_testResultKey, processedOrderForPdf.TestResult.ToString())
+                .Replace(_testResultKey, GetTestResultText(processedOrderForPdf.TestType, processedOrderForPdf.TestLanguage, processedOrderForPdf.TestResult))
                 .Replace(_testResultCommentKey, IsVirusConfirmed(processedOrderForPdf.TestResult, processedOrderForPdf.TestLanguage))
-                .Replace(_testEquipmentAnalyzerKey, labConfigOptions.TestEquipmentAnalyzer)
-                .Replace(_neutralizingAntibodyQuantityKey, "xxx");
+                .Replace(_testEquipmentAnalyzerKey, labConfigOptions.TestEquipmentAnalyzer);
         }
 
         private static int CalculateCustomerAge(DateTime dateOfBirth)
@@ -151,6 +149,29 @@ namespace LabSolution.Utils
 
             return age;
         }
+
+        /// <summary> By requirements and order should be 15 minutes later than the DateTime when the sample was taken </summary>
+        private static DateTime ComputeOrderReceivedInLabTime(DateTime dateTime) => dateTime.AddMinutes(15);
+
+        private static string GetTestResultText(TestType testType, TestLanguage testLanguage, TestResult testResult)
+        {
+            var resultString = string.Empty;
+            switch (testType)
+            {
+                case TestType.Antigen:
+                case TestType.PCR:
+                    if (testLanguage == TestLanguage.Romanian)
+                        resultString = testResult == TestResult.Positive ? "Pozitiv" : "Negativ";
+                    else
+                        resultString = testResult.ToString();
+                    break;
+                case TestType.Antibody:
+                    resultString = testResult == TestResult.Positive ? "Pozitiv/Positive/ Положительный" : "Negativ/Negative/Отрицательный";
+                    break;
+            }
+
+            return resultString;
+        }
     }
 
     public static class TemplateLoader
@@ -161,7 +182,7 @@ namespace LabSolution.Utils
             switch (testType)
             {
                 case TestType.Antigen:
-                    templateName = $"testAntigen".AppendLanguageSuffix(testLanguage);
+                    templateName = "testAntigen".AppendLanguageSuffix(testLanguage);
                     break;
                 case TestType.PCR:
                     templateName = "testPcr".AppendLanguageSuffix(testLanguage);
