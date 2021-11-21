@@ -121,7 +121,7 @@ namespace LabSolution.Controllers
 
             return Ok(new ProcessedOrderResponse
             {
-                OrderId = savedProcessedOrder.Id,
+                ProcessedOrderId = savedProcessedOrder.Id,
                 NumericCode = numericCode7Digits,
                 Barcode = Convert.ToBase64String(barcode),
                 ProcessedAt = savedProcessedOrder.ProcessedAt,

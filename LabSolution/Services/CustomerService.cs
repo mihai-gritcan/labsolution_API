@@ -36,6 +36,7 @@ namespace LabSolution.Services
                 ).ToListAsync();
 
             var customersToAdd = new List<Customer>();
+            var matchedCustomers = new List<Customer>();
 
             foreach (var customer in customers)
             {
@@ -46,7 +47,10 @@ namespace LabSolution.Services
                     && x.DateOfBirth.Date == customer.DateOfBirth.Date);
 
                 if (customerEntity is not null)
+                {
+                    matchedCustomers.Add(customerEntity);
                     continue;
+                }
 
                 customerEntity = new Customer
                 {
@@ -65,11 +69,11 @@ namespace LabSolution.Services
 
             if (customersToAdd.Count > 0)
             {
-                await _context.Customers.AddRangeAsync(customersToAdd);
+                _context.Customers.AddRange(customersToAdd);
                 await _context.SaveChangesAsync();
             }
 
-            return existingCustomers.Union(customersToAdd).ToList();
+            return matchedCustomers.Union(customersToAdd).ToList();
         }
     }
 }

@@ -5,7 +5,6 @@ using System;
 namespace LabSolution.HttpModels
 {
     public class BaseOrder {
-        public int OrderId { get; set; }
         public CustomerDto Customer { get; set; }
         public TestType TestType { get; set; }
         public TestLanguage TestLanguage { get; set; }
@@ -13,6 +12,8 @@ namespace LabSolution.HttpModels
 
     public class CreatedOrdersResponse : BaseOrder
     {
+        public int OrderId { get; set; }
+
         public DateTime Scheduled { get; set; }
         public DateTime PlacedAt { get; set; }
         public int CustomerId { get; set; }
@@ -21,6 +22,7 @@ namespace LabSolution.HttpModels
 
     public class ProcessedOrderResponse : BaseOrder
     {
+        public int ProcessedOrderId { get; set; }
         public DateTime ProcessedAt { get; set; }
         public string NumericCode { get; set; }
         public string Barcode { get; set; }
@@ -28,6 +30,8 @@ namespace LabSolution.HttpModels
 
     public class ProcessedOrderForPdf : BaseOrder
     {
+        public int OrderId { get; set; }
+
         public DateTime OrderDate { get; set; }
         public TestResult TestResult { get; set; }
         public string NumericCode { get; set; }
@@ -38,6 +42,7 @@ namespace LabSolution.HttpModels
 
     public class OrderWithStatusResponse : BaseOrder
     {
+        public int OrderId { get; set; }
         public string NumericCode { get; set; }
         public int? ParentId { get; set; }
 
@@ -50,6 +55,7 @@ namespace LabSolution.HttpModels
 
     public class ProcessedOrderToSetResultResponse
     {
+        public int OrderId { get; set; }
         public int ProcessedOrderId { get; set; }
         public string NumericCode => ProcessedOrderId.ToString("D7");
         public DateTime ProcessedAt { get; set; }
