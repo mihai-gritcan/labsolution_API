@@ -82,7 +82,7 @@ namespace LabSolution.Services
                 }
             }
 
-            await _context.AppConfigs.AddRangeAsync(configsToAdd);
+            _context.AppConfigs.AddRange(configsToAdd);
             _context.UpdateRange(configsToUpdate);
 
             await _context.SaveChangesAsync();
