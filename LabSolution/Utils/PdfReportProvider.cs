@@ -124,7 +124,7 @@ namespace LabSolution.Utils
                 .Replace(_customerDOBKey, processedOrderForPdf.Customer.DateOfBirth.ToString("dd/MM/yyyy"))
                 .Replace(_customerAgeKey, CalculateCustomerAge(processedOrderForPdf.Customer.DateOfBirth).ToString())
                 .Replace(_customerGenderKey, processedOrderForPdf.Customer.Gender == Gender.Male ? "M" : "F")
-                .Replace(_customerPersonalNumberKey, processedOrderForPdf.Customer.PersonalNumber.ToString())
+                .Replace(_customerPersonalNumberKey, processedOrderForPdf.Customer.PersonalNumber)
                 .Replace(_customerPassportNumberKey, processedOrderForPdf.Customer.Passport ?? string.Empty)
                 .Replace(_customerPhoneKey, processedOrderForPdf.Customer.Phone ?? string.Empty)
                 .Replace(_customerAddressKey, processedOrderForPdf.Customer.Address ?? string.Empty)

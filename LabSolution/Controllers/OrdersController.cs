@@ -82,7 +82,7 @@ namespace LabSolution.Controllers
 
         // reception getOrders ByDate or idnp
         [HttpGet("{date}")]
-        public async Task<ActionResult<object>> GetOrders(DateTime date, [FromQuery] long? idnp)
+        public async Task<ActionResult<object>> GetOrders(DateTime date, [FromQuery] string idnp)
         {
             return Ok(await _orderService.GetOrdersWithStatus(date, idnp));
         }
