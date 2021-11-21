@@ -118,7 +118,7 @@ namespace LabSolution.Services
                 ordersToAdd.Add(customerOrder);
             }
 
-            await _context.AddRangeAsync(ordersToAdd);
+            _context.AddRange(ordersToAdd);
             await _context.SaveChangesAsync();
 
             return ordersToAdd;
