@@ -234,12 +234,17 @@ namespace LabSolution.Services
 
         public async Task DeleteOrder(int orderId)
         {
-            var hasTicketEmitted = await _context.ProcessedOrders.AnyAsync(x => x.CustomerOrderId == orderId);
-            if (hasTicketEmitted)
-                throw new CustomException("Cannot remove an Order which has a ticket emitted.");
+            var processedOrderWithTicketEmitted = await _context.ProcessedOrders.SingleOrDefaultAsync(x => x.CustomerOrderId == orderId);
+            if (processedOrderWithTicketEmitted is not null)
+            {
+                var hasPrintedTheResult = await _context.ProcessedOrderPdfs.AnyAsync(x => x.ProcessedOrderId == processedOrderWithTicketEmitted.Id);
+                if (hasPrintedTheResult)
+                    throw new CustomException("Cannot remove an Order which has a ticket emitted and the Result was printed as PDF. That action will produce corrupt data");
+
+                _context.ProcessedOrders.Remove(processedOrderWithTicketEmitted);
+            }
 
             var orderEntity = await _context.CustomerOrders.FindAsync(orderId);
-
             if (orderEntity == null)
                 throw new ResourceNotFoundException();
 
