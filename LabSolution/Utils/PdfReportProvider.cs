@@ -1,5 +1,6 @@
-﻿using LabSolution.HttpModels;
-using LabSolution.Infrastructure;
+﻿using LabSolution.Dtos;
+using LabSolution.Enums;
+using LabSolution.HttpModels;
 using System;
 using System.IO;
 using System.Text;
@@ -11,7 +12,7 @@ namespace LabSolution.Utils
 {
     public interface IPdfReportProvider
     {
-        Task<byte[]> CreatePdfReport(string fileName, ProcessedOrderForPdf processedOrderForPdf, LabConfigOptions configOptions);
+        Task<byte[]> CreatePdfReport(string fileName, ProcessedOrderForPdf processedOrderForPdf, LabConfigAddresses configOptions);
     }
 
     public class PdfReportProvider: IPdfReportProvider
@@ -23,7 +24,7 @@ namespace LabSolution.Utils
             _converter = converter;
         }
 
-        public async Task<byte[]> CreatePdfReport(string fileName, ProcessedOrderForPdf processedOrderForPdf, LabConfigOptions configOptions)
+        public async Task<byte[]> CreatePdfReport(string fileName, ProcessedOrderForPdf processedOrderForPdf, LabConfigAddresses configOptions)
         {
             var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(processedOrderForPdf.NumericCode);
 
@@ -105,7 +106,7 @@ namespace LabSolution.Utils
             };
         }
 
-        public static async Task<string> GetReportTemplate(ProcessedOrderForPdf processedOrderForPdf, byte[] barcode, byte[] qrcode, LabConfigOptions labConfigOptions)
+        public static async Task<string> GetReportTemplate(ProcessedOrderForPdf processedOrderForPdf, byte[] barcode, byte[] qrcode, LabConfigAddresses labConfigOptions)
         {
             var htmlTemplate = await TemplateLoader.GetDefaultTemplateHtml(processedOrderForPdf.TestLanguage, processedOrderForPdf.TestType);
             
@@ -158,15 +159,15 @@ namespace LabSolution.Utils
             var resultString = string.Empty;
             switch (testType)
             {
-                case TestType.Antigen:
                 case TestType.PCR:
                     if (testLanguage == TestLanguage.Romanian)
                         resultString = testResult == TestResult.Positive ? "Pozitiv" : "Negativ";
                     else
                         resultString = testResult.ToString();
                     break;
+                case TestType.Antigen:
                 case TestType.Antibody:
-                    resultString = testResult == TestResult.Positive ? "Pozitiv/Positive/ Положительный" : "Negativ/Negative/Отрицательный";
+                    resultString = testResult == TestResult.Positive ? "Pozitiv/Positive/Положительный" : "Negativ/Negative/Отрицательный";
                     break;
             }
 
@@ -182,7 +183,7 @@ namespace LabSolution.Utils
             switch (testType)
             {
                 case TestType.Antigen:
-                    templateName = "testAntigen".AppendLanguageSuffix(testLanguage);
+                    templateName = "testAntigenRo_En_Ru";
                     break;
                 case TestType.PCR:
                     templateName = "testPcr".AppendLanguageSuffix(testLanguage);

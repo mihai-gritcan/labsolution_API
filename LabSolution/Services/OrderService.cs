@@ -1,6 +1,6 @@
 ﻿using LabSolution.Dtos;
 using LabSolution.HttpModels;
-using LabSolution.Infrastructure;
+using LabSolution.Enums;
 using LabSolution.Models;
 using LabSolution.Utils;
 using Microsoft.EntityFrameworkCore;

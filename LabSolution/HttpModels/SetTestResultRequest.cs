@@ -1,4 +1,4 @@
-﻿using LabSolution.Infrastructure;
+﻿using LabSolution.Enums;
 
 namespace LabSolution.HttpModels
 {

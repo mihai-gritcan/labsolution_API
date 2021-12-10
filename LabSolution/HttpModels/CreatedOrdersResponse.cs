@@ -1,5 +1,5 @@
 ﻿using LabSolution.Dtos;
-using LabSolution.Infrastructure;
+using LabSolution.Enums;
 using System;
 
 namespace LabSolution.HttpModels

@@ -34,9 +34,6 @@ namespace LabSolution
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<LabConfigOptions>(options => Configuration.GetSection(nameof(LabConfigOptions)).Bind(options));
-            services.Configure<LabOpeningHoursOptions>(options => Configuration.GetSection(nameof(LabOpeningHoursOptions)).Bind(options));
-
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
             services.AddControllers();

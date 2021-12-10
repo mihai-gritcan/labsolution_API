@@ -2,7 +2,6 @@
 
 namespace LabSolution.Dtos
 {
-
     public class AppConfigDto
     {
         public int Id { get; set; }

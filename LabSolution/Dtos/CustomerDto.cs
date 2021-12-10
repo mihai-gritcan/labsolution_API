@@ -1,4 +1,4 @@
-﻿using LabSolution.Infrastructure;
+﻿using LabSolution.Enums;
 using LabSolution.Models;
 using System;
 using System.ComponentModel.DataAnnotations;

@@ -1,47 +1,34 @@
-﻿using LabSolution.Infrastructure;
-using Microsoft.Extensions.Configuration;
+﻿using LabSolution.Dtos;
 using System;
 
 namespace LabSolution.Utils
 {
     public static class LabDailyAvailabilityProvider
     {
-        private static LabOpeningHoursOptions OpeningHoursOptions = new LabOpeningHoursOptions();
+        private static DateTime StartOfDay(DateTime date, LabConfigOpeningHours openingHoursOptions) =>
+            new DateTime(date.Year, date.Month, date.Day, openingHoursOptions.StartDayHour, openingHoursOptions.StartDayMinutes, 0);
 
-        private static DateTime StartOfDay(DateTime date) =>
-            new DateTime(date.Year, date.Month, date.Day, OpeningHoursOptions.StartDayHour, OpeningHoursOptions.StartDayMinutes, 0);
+        private static DateTime EndOfDay(DateTime date, LabConfigOpeningHours openingHoursOptions) =>
+            new DateTime(date.Year, date.Month, date.Day, openingHoursOptions.EndDayHour, openingHoursOptions.EndDayMinutes, 0);
 
-        private static DateTime EndOfDay(DateTime date) =>
-            new DateTime(date.Year, date.Month, date.Day, OpeningHoursOptions.EndDayHour, OpeningHoursOptions.EndDayMinutes, 0);
-
-        public static DateTime GetStartOfDay(DateTime date, LabOpeningHoursOptions openingHoursOptions)
+        public static DateTime GetStartOfDay(DateTime date, LabConfigOpeningHours openingHoursOptions)
         {
-            OpeningHoursOptions = openingHoursOptions;
-            return StartOfDay(date);
+            return StartOfDay(date, openingHoursOptions);
         }
 
-        public static DateTime GetEndOfDay(DateTime date, LabOpeningHoursOptions openingHoursOptions)
+        public static DateTime GetEndOfDay(DateTime date, LabConfigOpeningHours openingHoursOptions)
         {
-            OpeningHoursOptions = openingHoursOptions;
-            return EndOfDay(date);
+            return EndOfDay(date, openingHoursOptions);
         }
 
-        public static bool IsWhenOfficeIsOpen(DateTime date)
+        public static bool IsWhenOfficeIsOpen(DateTime date, LabConfigOpeningHours openingHoursOptions)
         {
-            Startup.StaticConfig.GetSection("LabOpeningHoursOptions").Bind(OpeningHoursOptions, c => c.BindNonPublicProperties = true);
-
-            return IsWorkingDay(date) && date >= StartOfDay(date) && date < EndOfDay(date);
+            return IsWorkingDay(date, openingHoursOptions) && date >= StartOfDay(date, openingHoursOptions) && date < EndOfDay(date, openingHoursOptions);
         }
 
-        public static bool IsWorkingDay(DateTime date, LabOpeningHoursOptions openingHoursOptions)
+        public static bool IsWorkingDay(DateTime date, LabConfigOpeningHours openingHoursOptions)
         {
-            OpeningHoursOptions = openingHoursOptions;
-            return IsWorkingDay(date);
-        }
-
-        private static bool IsWorkingDay(DateTime date)
-        {
-            return OpeningHoursOptions.WorkingDays.Contains(date.DayOfWeek.ToString());
+            return openingHoursOptions.WorkingDays.Contains(date.DayOfWeek.ToString());
         }
     }
 }

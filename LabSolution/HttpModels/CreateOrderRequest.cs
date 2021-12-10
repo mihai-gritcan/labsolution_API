@@ -1,6 +1,5 @@
 ﻿using LabSolution.Dtos;
-using LabSolution.Infrastructure;
-using LabSolution.Utils;
+using LabSolution.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -45,9 +44,6 @@ namespace LabSolution.HttpModels
 
             if (!DateTime.TryParse(dateTimeString, out var parsedDate))
                 validationErrors.Add(new ValidationResult($"Invalid Date or Time Format '{dateTimeString}'", new List<string> { nameof(ScheduledDate) }));
-
-            if(!LabDailyAvailabilityProvider.IsWhenOfficeIsOpen(parsedDate))
-                validationErrors.Add(new ValidationResult($"The Lab is Closed on '{dateTimeString}'", new List<string> { nameof(ScheduledDate) }));
 
             if (Customers?.Count == 0)
                 validationErrors.Add(new ValidationResult($"{nameof(Customers)} cannot be null or empty", new List<string> { nameof(Customers) }));

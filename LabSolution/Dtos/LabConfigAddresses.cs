@@ -1,6 +1,6 @@
-﻿namespace LabSolution.Infrastructure
+﻿namespace LabSolution.Dtos
 {
-    public class LabConfigOptions
+    public class LabConfigAddresses
     {
         public string LabName { get; set; }
         public string LabAddress { get; set; }

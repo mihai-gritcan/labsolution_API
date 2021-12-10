@@ -1,4 +1,4 @@
-﻿namespace LabSolution.Infrastructure
+﻿namespace LabSolution.Enums
 {
     public enum TestType
     {

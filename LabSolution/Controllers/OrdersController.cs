@@ -1,6 +1,6 @@
 ﻿using LabSolution.Dtos;
 using LabSolution.HttpModels;
-using LabSolution.Infrastructure;
+using LabSolution.Enums;
 using LabSolution.Services;
 using LabSolution.Utils;
 using Microsoft.AspNetCore.Authorization;
@@ -54,6 +54,8 @@ namespace LabSolution.Controllers
 
         private async Task<IEnumerable<CreatedOrdersResponse>> SaveOrder(CreateOrderRequest createOrder)
         {
+            await CheckIsLabOpen(createOrder.ScheduledDateTime);
+
             var savedOrders = new List<CreatedOrdersResponse>();
 
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -80,6 +82,17 @@ namespace LabSolution.Controllers
             return savedOrders;
         }
 
+        private async Task CheckIsLabOpen(DateTime scheduledDateTime)
+        {
+            var labOpeningHours = await _appConfigService.GetLabConfigOpeningHours();
+
+            if (!LabDailyAvailabilityProvider.IsWhenOfficeIsOpen(scheduledDateTime, labOpeningHours))
+            {
+                var dateTimeString = scheduledDateTime.ToString("yyyy-MM-dd HH:mm");
+                throw new CustomException($"The Lab is Closed on '{dateTimeString}'");
+            }
+        }
+
         // reception getOrders ByDate or idnp
         [HttpGet("{date}")]
         public async Task<ActionResult<object>> GetOrders(DateTime date, [FromQuery] string idnp)
@@ -101,6 +114,8 @@ namespace LabSolution.Controllers
         {
             if (orderId != updateOrderRequest.Id)
                 return BadRequest();
+
+            await CheckIsLabOpen(updateOrderRequest.ScheduledDateTime);
 
             await _orderService.UpdateOrder(updateOrderRequest);
 
@@ -164,7 +179,7 @@ namespace LabSolution.Controllers
 
             var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
 
-            var labConfigs = await _appConfigService.GetLabConfigOptions();
+            var labConfigs = await _appConfigService.GetLabConfigAddresses();
 
             var fileName = $"{Guid.NewGuid()}";
 
@@ -199,7 +214,7 @@ namespace LabSolution.Controllers
                 }
             }
 
-            var labConfigs = await _appConfigService.GetLabConfigOptions();
+            var labConfigs = await _appConfigService.GetLabConfigAddresses();
 
             var fileName = $"{Guid.NewGuid()}";
 

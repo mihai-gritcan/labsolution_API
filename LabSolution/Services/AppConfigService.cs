@@ -6,13 +6,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace LabSolution.Services
 {
     public interface IAppConfigService
     {
         Task<List<AppConfigDto>> GetAppConfigurations();
-        Task<LabConfigOptions> GetLabConfigOptions();
+        Task<LabConfigAddresses> GetLabConfigAddresses();
+        Task<LabConfigOpeningHours> GetLabConfigOpeningHours();
         Task DeleteConfig(int id);
         Task<IEnumerable<AppConfigDto>> SaveConfigs(List<AppConfigDto> appConfigs);
     }
@@ -42,9 +44,9 @@ namespace LabSolution.Services
             return _context.AppConfigs.Select(x => new AppConfigDto { Id = x.Id, Key = x.Key, Value = x.Value }).ToListAsync();
         }
 
-        public async Task<LabConfigOptions> GetLabConfigOptions()
+        public async Task<LabConfigAddresses> GetLabConfigAddresses()
         {
-            var objType = typeof(LabConfigOptions);
+            var objType = typeof(LabConfigAddresses);
             var props = new List<PropertyInfo>(objType.GetProperties());
 
             var keysToRetrieve = props.Select(x => x.Name.ToUpper()).ToList();
@@ -52,13 +54,43 @@ namespace LabSolution.Services
             var configs = await _context.AppConfigs.Where(x => keysToRetrieve.Contains(x.Key.ToUpper()))
                                     .ToDictionaryAsync(x => x.Key.ToUpper(), x => x.Value);
 
-            return new LabConfigOptions
+            return new LabConfigAddresses
             {
-                LabAddress = configs.ContainsKey(nameof(LabConfigOptions.LabAddress).ToUpper()) ? configs[nameof(LabConfigOptions.LabAddress).ToUpper()] : "",
-                LabName = configs.ContainsKey(nameof(LabConfigOptions.LabName).ToUpper()) ? configs[nameof(LabConfigOptions.LabName).ToUpper()] : "",
-                WebSiteAddress = configs.ContainsKey(nameof(LabConfigOptions.WebSiteAddress).ToUpper()) ? configs[nameof(LabConfigOptions.WebSiteAddress).ToUpper()] : "",
-                PhoneNumber = configs.ContainsKey(nameof(LabConfigOptions.PhoneNumber).ToUpper()) ? configs[nameof(LabConfigOptions.PhoneNumber).ToUpper()] : "",
-                TestEquipmentAnalyzer = configs.ContainsKey(nameof(LabConfigOptions.TestEquipmentAnalyzer).ToUpper()) ? configs[nameof(LabConfigOptions.TestEquipmentAnalyzer).ToUpper()] : ""
+                LabAddress = configs.ContainsKey(nameof(LabConfigAddresses.LabAddress).ToUpper()) ? configs[nameof(LabConfigAddresses.LabAddress).ToUpper()] : "",
+                LabName = configs.ContainsKey(nameof(LabConfigAddresses.LabName).ToUpper()) ? configs[nameof(LabConfigAddresses.LabName).ToUpper()] : "",
+                WebSiteAddress = configs.ContainsKey(nameof(LabConfigAddresses.WebSiteAddress).ToUpper()) ? configs[nameof(LabConfigAddresses.WebSiteAddress).ToUpper()] : "",
+                PhoneNumber = configs.ContainsKey(nameof(LabConfigAddresses.PhoneNumber).ToUpper()) ? configs[nameof(LabConfigAddresses.PhoneNumber).ToUpper()] : "",
+                TestEquipmentAnalyzer = configs.ContainsKey(nameof(LabConfigAddresses.TestEquipmentAnalyzer).ToUpper()) ? configs[nameof(LabConfigAddresses.TestEquipmentAnalyzer).ToUpper()] : ""
+            };
+        }
+
+
+        public async Task<LabConfigOpeningHours> GetLabConfigOpeningHours()
+        {
+            const string defaultStartTime = "08:00";
+            const string defaultEndDayTime = "18:00";
+            const int defaultIntervalDurationMinutes = 10;
+            const int defaultPersonsInInterval = 2;
+            var defaultWorkingDays = new List<string> { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+
+            var objType = typeof(LabConfigOpeningHours);
+            var props = new List<PropertyInfo>(objType.GetProperties());
+
+            var keysToRetrieve = props.ConvertAll(x => x.Name.ToUpper());
+
+            var configs = await _context.AppConfigs.Where(x => keysToRetrieve.Contains(x.Key.ToUpper()))
+                                    .ToDictionaryAsync(x => x.Key.ToUpper(), x => x.Value);
+
+            return new LabConfigOpeningHours
+            {
+                StartDayTime = configs.ContainsKey(nameof(LabConfigOpeningHours.StartDayTime).ToUpper()) ? configs[nameof(LabConfigOpeningHours.StartDayTime).ToUpper()] : defaultStartTime,
+                EndDayTime = configs.ContainsKey(nameof(LabConfigOpeningHours.EndDayTime).ToUpper()) ? configs[nameof(LabConfigOpeningHours.EndDayTime).ToUpper()] : defaultEndDayTime,
+                IntervalDurationMinutes = configs.ContainsKey(nameof(LabConfigOpeningHours.IntervalDurationMinutes).ToUpper())
+                    ? int.Parse(configs[nameof(LabConfigOpeningHours.IntervalDurationMinutes).ToUpper()]) : defaultIntervalDurationMinutes,
+                PersonsInInterval = configs.ContainsKey(nameof(LabConfigOpeningHours.PersonsInInterval).ToUpper())
+                    ? int.Parse(configs[nameof(LabConfigOpeningHours.PersonsInInterval).ToUpper()]) : defaultPersonsInInterval,
+                WorkingDays = configs.ContainsKey(nameof(LabConfigOpeningHours.WorkingDays).ToUpper())
+                    ? JsonSerializer.Deserialize<List<string>>(configs[nameof(LabConfigOpeningHours.WorkingDays).ToUpper()]) : defaultWorkingDays
             };
         }
 

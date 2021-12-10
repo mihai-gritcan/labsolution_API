@@ -63,6 +63,11 @@ namespace LabSolution.Infrastructure
                             break;
                         }
                     case CustomException:
+                        {
+                            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                            response = JsonSerializer.Serialize(exception.Message, options);
+                            break;
+                        }
                     case Exception:
                         {
                             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;

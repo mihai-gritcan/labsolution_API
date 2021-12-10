@@ -15,9 +15,9 @@ namespace LabSolution.HttpModels
 
         public string ScheduledTime { get; set; }
 
-        public int TestType { get; set; } = (int)Infrastructure.TestType.Antigen;
+        public int TestType { get; set; } = (int)Enums.TestType.Antigen;
 
-        public int TestLanguage { get; set; } = (int)Infrastructure.TestLanguage.Romanian;
+        public int TestLanguage { get; set; } = (int)Enums.TestLanguage.Romanian;
 
         [JsonIgnore]
         public DateTime ScheduledDateTime
@@ -38,9 +38,6 @@ namespace LabSolution.HttpModels
 
             if (!DateTime.TryParse(dateTimeString, out var parsedDate))
                 validationErrors.Add(new ValidationResult($"Invalid Date or Time Format '{dateTimeString}'", new List<string> { nameof(ScheduledDate) }));
-
-            if (!LabDailyAvailabilityProvider.IsWhenOfficeIsOpen(parsedDate))
-                validationErrors.Add(new ValidationResult($"The Lab is Closed on '{dateTimeString}'", new List<string> { nameof(ScheduledDate) }));
 
             return validationErrors;
         }
