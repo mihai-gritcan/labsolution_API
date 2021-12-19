@@ -92,8 +92,15 @@ namespace LabSolution.Utils
 
 
         private const string _sampleIdKey = "#SAMPLE_ID_KEY";
-        private const string _testResultKey = "#TEST_RESULT_KEY";
-        private const string _testResultCommentKey = "#TEST_RESULT_COMMENT_KEY";
+
+        private const string _testResultKeyRo = "#TEST_RESULT_KEY_RO";
+        private const string _testResultKeyEn = "#TEST_RESULT_KEY_EN";
+        private const string _testResultKeyRu = "#TEST_RESULT_KEY_RU";
+
+        private const string _testResultCommentKeyRo = "#TEST_RESULT_COMMENT_KEY_RO";
+        private const string _testResultCommentKeyEn = "#TEST_RESULT_COMMENT_KEY_EN";
+        private const string _testResultCommentKeyRu = "#TEST_RESULT_COMMENT_KEY_RU";
+
         private const string _testEquipmentAnalyzerKey = "#TEST_EQUIPMENT_ANALYZER_KEY";
 
         private static string IsVirusConfirmed(TestResult testResult, TestLanguage testLanguage)
@@ -102,13 +109,14 @@ namespace LabSolution.Utils
             {
                 TestLanguage.Romanian => testResult == TestResult.Positive ? "prezența" : "absența",
                 TestLanguage.English => testResult == TestResult.Positive ? "presence" : "absence",
+                TestLanguage.Russian => testResult == TestResult.Positive ? "присутствие" : "отсутствие",
                 _ => testResult == TestResult.Positive ? "presence" : "absence",
             };
         }
 
         public static async Task<string> GetReportTemplate(ProcessedOrderForPdf processedOrderForPdf, byte[] barcode, byte[] qrcode, LabConfigAddresses labConfigOptions)
         {
-            var htmlTemplate = await TemplateLoader.GetDefaultTemplateHtml(processedOrderForPdf.TestLanguage, processedOrderForPdf.TestType);
+            var htmlTemplate = await TemplateLoader.GetDefaultTemplateHtml(processedOrderForPdf.TestType);
             
             return htmlTemplate
                 .Replace(_labNameKey, labConfigOptions.LabName)
@@ -136,8 +144,14 @@ namespace LabSolution.Utils
                 .Replace(_orderProcessedByKey, processedOrderForPdf.ProcessedBy)
 
                 .Replace(_sampleIdKey, processedOrderForPdf.OrderId.ToString())
-                .Replace(_testResultKey, GetTestResultText(processedOrderForPdf.TestType, processedOrderForPdf.TestLanguage, processedOrderForPdf.TestResult))
-                .Replace(_testResultCommentKey, IsVirusConfirmed(processedOrderForPdf.TestResult, processedOrderForPdf.TestLanguage))
+                .Replace(_testResultKeyRo, GetTestResultText(processedOrderForPdf.TestResult, TestLanguage.Romanian))
+                .Replace(_testResultKeyEn, GetTestResultText(processedOrderForPdf.TestResult, TestLanguage.English))
+                .Replace(_testResultKeyRu, GetTestResultText(processedOrderForPdf.TestResult, TestLanguage.Russian))
+
+                .Replace(_testResultCommentKeyRo, IsVirusConfirmed(processedOrderForPdf.TestResult, TestLanguage.Romanian))
+                .Replace(_testResultCommentKeyEn, IsVirusConfirmed(processedOrderForPdf.TestResult, TestLanguage.English))
+                .Replace(_testResultCommentKeyRu, IsVirusConfirmed(processedOrderForPdf.TestResult, TestLanguage.Russian))
+
                 .Replace(_testEquipmentAnalyzerKey, labConfigOptions.TestEquipmentAnalyzer);
         }
 
@@ -154,30 +168,21 @@ namespace LabSolution.Utils
         /// <summary> By requirements and order should be 15 minutes later than the DateTime when the sample was taken </summary>
         private static DateTime ComputeOrderReceivedInLabTime(DateTime dateTime) => dateTime.AddMinutes(15);
 
-        private static string GetTestResultText(TestType testType, TestLanguage testLanguage, TestResult testResult)
+        private static string GetTestResultText(TestResult testResult, TestLanguage testLanguage)
         {
-            var resultString = string.Empty;
-            switch (testType)
+            return testLanguage switch
             {
-                case TestType.PCR:
-                    if (testLanguage == TestLanguage.Romanian)
-                        resultString = testResult == TestResult.Positive ? "Pozitiv" : "Negativ";
-                    else
-                        resultString = testResult.ToString();
-                    break;
-                case TestType.Antigen:
-                case TestType.Antibody:
-                    resultString = testResult == TestResult.Positive ? "Pozitiv/Positive/Положительный" : "Negativ/Negative/Отрицательный";
-                    break;
-            }
-
-            return resultString;
+                TestLanguage.Romanian => testResult == TestResult.Positive ? "Pozitiv" : "Negativ",
+                TestLanguage.English => testResult == TestResult.Positive ? "Positive" : "Negative",
+                TestLanguage.Russian => testResult == TestResult.Positive ? "Положительный" : "Отрицательный",
+                _ => testResult == TestResult.Positive ? "Positive" : "Negative",
+            };
         }
     }
 
     public static class TemplateLoader
     {
-        public static async Task<string> GetDefaultTemplateHtml(TestLanguage testLanguage, TestType testType)
+        public static async Task<string> GetDefaultTemplateHtml(TestType testType)
         {
             var templateName = string.Empty;
             switch (testType)
@@ -186,7 +191,7 @@ namespace LabSolution.Utils
                     templateName = "testAntigenRo_En_Ru";
                     break;
                 case TestType.PCR:
-                    templateName = "testPcr".AppendLanguageSuffix(testLanguage);
+                    templateName = "testPCRRo_En_Ru";
                     break;
                 case TestType.Antibody:
                     templateName = "testAntibodyRo_En_Ru";
@@ -196,11 +201,6 @@ namespace LabSolution.Utils
             string path = Path.Combine(Directory.GetCurrentDirectory(), "assets", "Templates", $"{templateName}.html");
             using var streamReader = new StreamReader(path, Encoding.UTF8);
             return await streamReader.ReadToEndAsync();
-        }
-
-        private static string AppendLanguageSuffix(this string fileName, TestLanguage testLanguage)
-        {
-            return testLanguage == TestLanguage.Romanian ? $"{fileName}Ro" : $"{fileName}En";
         }
     }
 }

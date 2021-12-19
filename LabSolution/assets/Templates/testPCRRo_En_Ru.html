@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Rezultat test anticorpi</title>
+    <title>Rezultat test PCR</title>
     <link href="styles.css" rel="stylesheet" />
 </head>
 
@@ -22,16 +22,10 @@
         </tr>
 
         <tr>
-            <td colspan="2" class="qr-code">
-                <img alt="QR Code" src="data:image/png;base64,#QRCODE_KEY" />
-            </td>
-        </tr>
-
-        <tr>
-            <td colspan="2" style="text-align: center; height: 80px;">
+            <td colspan="2" style="text-align: center; height: 100px;">
                 <br />
-                <h3>MARKERII BOLILOR INFECȚIOASE (SEROLOGIE)</h3>
-                <h3 class="gray-color">INFECTIOUS DISEASES MARKERS / МАРКЕРЫ ИНФЕКЦИОННЫХ ЗАБОЛЕВАНИЙ</h3>
+                <h3>INVESTIGAȚII BIOLOGIE MOLECULARĂ</h3>
+                <h3 class="gray-color">PCR Molecular biology test | ПЦР Молекулярно-биологическое исследование</h3>
             </td>
         </tr>
 
@@ -162,12 +156,8 @@
         </tr>
 
         <tr>
-            <td colspan="2" class="notes">
-                <p>Eșantion primar <span class="gray-color">/ Primary sample / Первичный образец:</span> sânge <span class="gray-color">/ blood / кровь.</span></p>
-                <p>Echipament <span class="gray-color">/ Equipment / Анализатор:</span> #TEST_EQUIPMENT_ANALYZER_KEY</p>
-                <p>
-                    <span> Metoda de investigare <span class="gray-color">/ Investigation method / Метод иследования:</span> </span><b><span>CMIA</span></b>
-                </p>
+            <td colspan="2" class="qr-code">
+                <img alt="QR Code" src="data:image/png;base64,#QRCODE_KEY" />
             </td>
         </tr>
 
@@ -176,15 +166,15 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td style="width: 55%;">
-                                <p> <strong>Investigație</strong> </p>
+                            <td style="width: 58%;">
+                                <p> <strong>Parametru</strong> </p>
                                 <span class="gray-color"> <strong>Test / Название (показатель)</strong> </span>
                             </td>
                             <td style="width: 25%;">
                                 <p> <strong>Rezultat </strong> </p>
                                 <span class="gray-color"> <strong>Result / Результат</strong> </span>
                             </td>
-                            <td style="width: 20%;">
+                            <td style="width: 17%;">
                                 <p> <strong>Valori de referință </strong> </p>
                                 <span class="gray-color"> <strong>Reference range / Реф. значения</strong> </span>
                             </td>
@@ -194,9 +184,10 @@
             </td>
         </tr>
 
+
         <tr>
             <td colspan="2" class="other">
-                <span> <strong>Marker serologic către COVID-19 / Serological marker to COVID-19 / Серологический маркер COVID-19</strong> </span>
+                <p> <strong>COVID-19</strong> </p>
             </td>
         </tr>
 
@@ -205,42 +196,52 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td style="width: 55%;">
-                                <p>
-                                    SARS-CoV-2, IgG/IgM / RBD-S1 anticorpi neutralizanți / calitativ
-                                </p>
-                                <p class="gray-color">
-                                    SARS-CoV-2, IgG/IgM / RBD-S1 netralizing antibodies / qualitative
-                                </p>
-                                <p class="gray-color">
-                                    SARS-CoV-2, IgG/IgM / RBD-S1 нейтрализующие антитела / качественный
-                                </p>
+                            <td style="width: 58%;">
+                                <p>Ag SARS–CoV-2, COVID-19, în exudat nazofaringian (Ag, calitativ)</p>
+                                <p class="gray-color">SARS-CoV-2 Ag, COVID-19 (Ag, qualitative) in nasopharyngeal swab </p>
+                                <p class="gray-color">SARS-CoV-2 Ag, COVID-19 (Ag, качественный), мазок из зева и носа</p> 
                             </td>
-
                             <td style="width: 25%;">
-                                <p> <strong>#TEST_RESULT_KEY_RO</strong> </p>
+                                <p> <strong> #TEST_RESULT_KEY_RO </strong> </p>
                                 <p class="gray-color"> <strong> #TEST_RESULT_KEY_EN / #TEST_RESULT_KEY_RU </strong> </p>
                             </td>
+                            <td style="width: 17%;">
+                                <p> <strong>Negativ</strong> </p>
+                                <p class="gray-color"> Negative </p>
+                                <p class="gray-color"> Отрицательный </p>
+                            </td>
+                        </tr>
 
-                            <td style="width: 20%" class="table-without-border">
-                                <table class="antibody-reference-quantity">
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <p> <strong>Negativ</strong> </p>
-                                                <p class="gray-color"> Negative </p>
-                                                <p class="gray-color"> Отрицательный </p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <p> <strong>Pozitiv</strong> </p>
-                                                <p class="gray-color"> Positive </p>
-                                                <p class="gray-color"> Положительный </p>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                        <tr>
+                            <td colspan="4">
+                                <p> <strong>Metoda de investigare: Real Time PCR</strong> </p>
+                                <p class="gray-color">
+                                    Investigation method: Real Time PCR | Метод иследования: ПЦР в реальном времени
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <p> <strong>Interpretare: <span class="gray-color">Interpretation / Интерпретация:</span></strong> </p>
+                                <p>
+                                    Acest rezultat confirmă #TEST_RESULT_COMMENT_KEY_RO virusului SARS-CoV-2 / COVID 19 în exudat nazofaringean, la momentul prelevării materialului biologic
+                                </p>
+                                <p class="gray-color">
+                                    This result confirms the #TEST_RESULT_COMMENT_KEY_EN of SARS-CoV-2, COVID19 virus in nasopharyngeal exudate at the time of biological sampling.
+                                </p>
+                                <p class="gray-color">
+                                    Результат подтверждает #TEST_RESULT_COMMENT_KEY_RU вируса SARS-CoV-2, COVID-19 в носоглоточном мазке на момент забора биоматериала.
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <p>
+                                    <strong>IMPORTANT: </strong> <span class="gray-color"> Important / Важно</span>
+                                </p>
+                                <p>Acest buletin de analize medicale este dotat cu QR-code și este valabil fără ștampilă și semnătură, inclusiv și în format electronic. Pentru verificarea autenticității lui, vă rugăm să scanați QR codul.</p>
+                                <p class="gray-color">This laboratory report holds a QR code and is valid without stamp and signature, even electronic kind. To verify its authenticity, please scan the QR code.</p>
+                                <p class="gray-color">Этот лабораторный отчет включает QR-код и действителен без печати и подписи, в том числе и в электронном формате. Чтобы проверить его подлинность, отсканируйте QR-код.</p>
                             </td>
                         </tr>
                     </tbody>
@@ -248,33 +249,23 @@
             </td>
         </tr>
 
-        <tr>
-            <td colspan="2">
-                <p>
-                    Valorile de referință sunt indicate în conformitate cu instrucțiunea producătorului kitului de reactivi utilizați.
-                </p>
-                <p class="gray-color">
-                    The reference values are indicated according to the instruction of the manufacturer of the reagent kits used.
-                </p>
-                <p class="gray-color">
-                    Референсные значения указаны в соответствии с инструкциями производителя используемых наборов реагентов.
-                </p>
-            </td>
-        </tr>
 
         <tr>
             <td colspan="2" class="processors">
+                <br />
                 <br />
 
                 <table>
                     <tr>
                         <td style="width: 25%;">
                             <p><strong>Verificat și validat:</strong></p>
-                            <p class="gray-color"> Checked and approved by /</p>
-                            <p class="gray-color"> Проверено и утверждено</p>
+                            <p> Checked and approved by /</p>
+                            <p> Проверено и утверждено</p>
                         </td>
                         <td style="width: 75%;">
                             <p>Șef laborator, <strong> #ORDER_PROCESSED_BY_KEY </strong></p>
+                            <p class="gray-color">Head of Laboratory</p>
+                            <p class="gray-color">Заведующий лабораторией</p>
                         </td>
                     </tr>
                 </table>

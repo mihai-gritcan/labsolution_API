@@ -41,6 +41,9 @@
     <None Update="assets\Templates\styles.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="assets\Templates\testPCRRo_En_Ru.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="assets\Templates\testAntigenRo_En_Ru.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

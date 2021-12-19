@@ -35,15 +35,13 @@
                     <tbody>
                         <tr>
                             <td style="width: 20%;">
-                                <p> <strong>Nume:</strong> </p>
-                                <p class="gray-color"> <strong>Surname / Фамилия</strong> </p>
+                                <p> <strong>Nume:<span class="gray-color"> Surname / Фамилия</span></strong> </p>
                             </td>
                             <td style="width: 18%;">
                                 <p> #CUSTOMER_LAST_NAME_KEY </p>
                             </td>
                             <td style="width: 40%;">
-                                <p> <strong>ID proba:</strong> </p>
-                                <p class="gray-color"> <strong>Sample No. / Образец N</strong> </p>
+                                <p> <strong>ID proba: <span class="gray-color"> Sample No. / Образец N </span></strong> </p>
                             </td>
                             <td style="width: auto;">
                                 <p> #SAMPLE_ID_KEY </p>
@@ -51,16 +49,16 @@
                         </tr>
                         <tr>
                             <td style="width: 20%;">
-                                <p> <strong>Prenume:</strong> </p>
-                                <p class="gray-color"> <strong>Given name / Имя</strong> </p>
+                                <p> <strong>Prenume: <span class="gray-color"> Given name / Имя</span></strong> </p>
                             </td>
                             <td style="width: 18%;">
                                 <p> #CUSTOMER_FIRST_NAME_KEY </p>
                             </td>
                             <td style="width: 40%;">
-
+                                <p> <strong>Prelevarea probei, data și ora: <span class="gray-color"> Date/time of sampling / Дата/время отбора проб </span></strong> </p>
                             </td>
                             <td style="width: auto;">
+                                <p> #ORDER_PROCESSING_DATE_TIME </p>
                             </td>
                         </tr>
                         <tr>
@@ -72,22 +70,6 @@
                                 <p> #CUSTOMER_DOB_KEY </p>
                             </td>
                             <td style="width: 40%;">
-                                <p> <strong>Prelevarea probei, data și ora:</strong> </p>
-                                <p class="gray-color"> <strong>Date/time of sampling / Дата/время отбора проб</strong> </p>
-                            </td>
-                            <td style="width: auto;">
-                                <p> #ORDER_PROCESSING_DATE_TIME </p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 20%;">
-                                <p> <strong>Vârsta:</strong> </p>
-                                <p class="gray-color"> <strong>Age / Возраст</strong> </p>
-                            </td>
-                            <td style="width: 18%;">
-                                <p> #CUSTOMER_AGE_KEY </p>
-                            </td>
-                            <td style="width: 40%;">
                                 <p> <strong>Înregistrarea probei în laborator: </strong> </p>
                                 <p class="gray-color"> <strong>Time of sample received by laboratory / Время получения пробы в лаб.</strong> </p>
                             </td>
@@ -97,11 +79,10 @@
                         </tr>
                         <tr>
                             <td style="width: 20%;">
-                                <p> <strong>Sex:</strong> </p>
-                                <p class="gray-color"> <strong>Sex / Пол</strong> </p>
+                                <p> <strong>Vârsta: <span class="gray-color">Age / Возраст </span></strong> </p>
                             </td>
                             <td style="width: 18%;">
-                                <p> #CUSTOMER_GENDER_KEY </p>
+                                <p> #CUSTOMER_AGE_KEY </p>
                             </td>
                             <td style="width: 40%;">
                                 <p> <strong>Data efectuării examinărilor: </strong> </p>
@@ -113,13 +94,12 @@
                         </tr>
                         <tr>
                             <td style="width: 20%;">
-                                <p> <strong>CNP: <span class="gray-color">Personal code / ИПН</span></strong> </p>
-                                
+                                <p> <strong>Sex: <span class="gray-color"> Sex / Пол </span></strong> </p>
                             </td>
                             <td style="width: 18%;">
-                                <p> #CUSTOMER_PERSONAL_NUMBER_KEY </p>
+                                <p> #CUSTOMER_GENDER_KEY </p>
                             </td>
-                            <td style="width: auto" colspan="2" rowspan="3">
+                            <td style="width: auto" colspan="2" rowspan="4"> <!-- ROWSPAN = 4 -->
                                 <p class="barcode">
                                     <img alt="Barcode" src="data:image/png;base64,#BARCODE_KEY" />
                                 </p>
@@ -127,8 +107,15 @@
                         </tr>
                         <tr>
                             <td style="width: 20%;">
+                                <p> <strong>CNP: <span class="gray-color">Personal code / ИПН</span></strong> </p>
+                            </td>
+                            <td style="width: 18%;">
+                                <p> #CUSTOMER_PERSONAL_NUMBER_KEY </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 20%;">
                                 <p> <strong>Nr. pașaport: <span class="gray-color"> Passport / Паспорт </span></strong></p>
-                                
                             </td>
                             <td style="width: 18%;">
                                 <p> #CUSTOMER_PASSPORT_NUMBER_KEY </p>
@@ -144,16 +131,14 @@
                         </tr>
                         <tr>
                             <td style="width: 20%;">
-                                <p> <strong>Adresa:</strong> </p>
-                                <p class="gray-color"> <strong>Address / Адрес</strong> </p>
+                                <p> <strong>Adresa: <span class="gray-color"> Address / Адрес</span></strong> </p>
                             </td>
                             <td style="width: 18%;">
                                 <p> #CUSTOMER_ADDRESS_KEY </p>
                             </td>
-                            <td style="width: auto" colspan="2" rowspan="2">
+                            <td style="width: auto" colspan="2" rowspan="2"> <!-- ROWSPAN = 2 -->
                                 <p> <strong>Prelevarea probei, adresa:</strong> </p>
                                 <p class="gray-color"> <strong>Place of sampling / Место отбора проб </strong> </p>
-                                <br/>
                                 <p> #LAB_ADDRESS_KEY </p>
                             </td>
                         </tr>
@@ -182,17 +167,17 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td style="width: 53%;">
+                            <td style="width: 58%;">
                                 <p> <strong>Parametru</strong> </p>
                                 <span class="gray-color"> <strong>Test / Название (показатель)</strong> </span>
                             </td>
-                            <td style="width: 30%;">
+                            <td style="width: 25%;">
                                 <p> <strong>Rezultat </strong> </p>
                                 <span class="gray-color"> <strong>Result / Результат</strong> </span>
                             </td>
                             <td style="width: 17%;">
                                 <p> <strong>Valori de referință </strong> </p>
-                                <span class="gray-color"> <strong>Reference range / Референсные значения</strong> </span>
+                                <span class="gray-color"> <strong>Reference range / Реф. значения</strong> </span>
                             </td>
                         </tr>
                     </tbody>
@@ -212,18 +197,19 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td style="width: 53%;">
+                            <td style="width: 58%;">
                                 <p>Ag SARS–CoV-2, COVID-19, în exudat nazofaringian (Ag, calitativ)</p>
                                 <p class="gray-color">SARS-CoV-2 Ag, COVID-19 (Ag, qualitative) in nasopharyngeal swab </p>
-                                <p class="gray-color">SARS-CoV-2 Ag, COVID-19 (Ag, качественный), мазок из зева и носа</p> 
+                                <p class="gray-color">SARS-CoV-2 Ag, COVID-19 (Ag, качественный), мазок из зева и носа</p>
                             </td>
-                            <td style="width: 30%;">
-                                <p> <strong> #TEST_RESULT_KEY </strong> </p>
+                            <td style="width: 25%;">
+                                <p> <strong> #TEST_RESULT_KEY_RO </strong> </p>
+                                <p class="gray-color"> <strong> #TEST_RESULT_KEY_EN / #TEST_RESULT_KEY_RU </strong> </p>
                             </td>
                             <td style="width: 17%;">
                                 <p> <strong>Negativ</strong> </p>
-                                <p> Negative </p>
-                                <p> Отрицательный </p>
+                                <p class="gray-color"> Negative </p>
+                                <p class="gray-color"> Отрицательный </p>
                             </td>
                         </tr>
 
@@ -237,10 +223,6 @@
                         </tr>
                         <tr>
                             <td colspan="4">
-                                <!--<p> <strong>Comentariu:</strong> </p>
-                                <p>
-                                    Acest rezultat confirmă #TEST_RESULT_COMMENT_KEY virusului SARS-CoV-2 / COVID 19 în exudat nazofaringean, la momentul prelevării materialului biologic
-                                </p>-->
                                 <p>Producatorul kitului/ Manufacturer/ Производитель</p>
                                 <p>Sensibilitatea/ Sensitivity/ Чувствительность - 94%</p>
                                 <p>Specificitatea/ Specificity/ Специфичность - 99%</p>
