@@ -23,6 +23,8 @@ namespace LabSolution.Services
         Task<ProcessedOrderForPdf> GetProcessedOrderForPdf(int processedOrderId);
 
         Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, string idnp);
+        Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime startDate, DateTime endDate, TestType? testType = null);
+
         Task DeleteOrder(int orderId);
 
         Task SavePdfBytes(int processedOrderId, string pdfName, byte[] pdfBytes);
@@ -49,7 +51,23 @@ namespace LabSolution.Services
 
         public Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, string idnp)
         {
-            return _context.CustomerOrders.Where(x => x.Scheduled.Date == date && (idnp == null || x.Customer.PersonalNumber.Contains(idnp)))
+            return GetQueryableOrders()
+                .Where(x => x.OrderDate.Date == date && (idnp == null || x.Customer.PersonalNumber.Contains(idnp)))
+                .OrderBy(x => x.Status).ThenBy(x => x.OrderId)
+                .ToListAsync();
+        }
+
+        public Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime startDate, DateTime endDate, TestType? testType = null)
+        {
+            return GetQueryableOrders()
+                .Where(x => x.OrderDate.Date >= startDate && x.OrderDate.Date <= endDate && (testType == null || x.TestType == testType))
+                .OrderBy(x => x.Status).ThenBy(x => x.OrderId)
+                .ToListAsync();
+        }
+
+        public IQueryable<OrderWithStatusResponse> GetQueryableOrders()
+        {
+            return _context.CustomerOrders
                 .Include(x => x.Customer)
                 .Include(x => x.ProcessedOrder)
                 .Select(x => new OrderWithStatusResponse
@@ -65,8 +83,7 @@ namespace LabSolution.Services
                     NumericCode = x.ProcessedOrder == null ? null : x.ProcessedOrder.Id.ToString("D7"),
                     ProcessedOrderId = x.ProcessedOrder == null ? null : x.ProcessedOrder.Id
                 })
-                .OrderBy(x => x.Status).ThenBy(x => x.OrderId)
-                .ToListAsync();
+                .OrderBy(x => x.Status).ThenBy(x => x.OrderId);
         }
 
         public Task<ProcessedOrderForPdf> GetProcessedOrderForPdf(int processedOrderId)

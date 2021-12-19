@@ -100,6 +100,13 @@ namespace LabSolution.Controllers
             return Ok(await _orderService.GetOrdersWithStatus(date, idnp));
         }
 
+        // reception getOrders in range Date
+        [HttpGet]
+        public async Task<ActionResult<object>> GetOrders([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] TestType? type = null)
+        {
+            return Ok(await _orderService.GetOrdersWithStatus(start, end, type));
+        }
+
         [HttpDelete("{orderId}")]
         public async Task<IActionResult> DeleteOrder(int orderId)
         {
