@@ -31,7 +31,7 @@ namespace LabSolution.Controllers
 
         private readonly IEmailSender _emailSender;
 
-        private AppEmailNotificationConfig _appEmailNotificationConfig;
+        private readonly AppEmailNotificationConfig _appEmailNotificationConfig;
 
         public OrdersController(ICustomerService customerService, IOrderService orderService,
             IPdfReportProvider pdfReportProvider, ILogger<OrdersController> logger,
@@ -264,7 +264,7 @@ namespace LabSolution.Controllers
         {
             const string subject = "COVID-19 [ON-LINE booking]";
 
-            foreach (var item in createdOrders.Where(x => string.IsNullOrWhiteSpace(x.Customer.Email)))
+            foreach (var item in createdOrders.Where(x => !string.IsNullOrWhiteSpace(x.Customer.Email)))
             {
                 var fullName = $"{item.Customer.LastName} {item.Customer.FirstName}";
                 var content = $"{fullName}, Personal number: {item.Customer.PersonalNumber}. Reservation time: {item.Scheduled:yyyy-MM-dd HH:mm}. Address: {labConfigs.LabAddress}";
