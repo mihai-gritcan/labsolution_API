@@ -1,3 +1,4 @@
+using LabSolution.EmailService;
 using LabSolution.Infrastructure;
 using LabSolution.Models;
 using LabSolution.Services;
@@ -30,11 +31,14 @@ namespace LabSolution
 
         public static IConfiguration StaticConfig { get; private set; }
 
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            services.AddSingleton(Configuration.GetSection(nameof(EmailConfiguration)).Get<EmailConfiguration>());
+            services.AddSingleton(Configuration.GetSection(nameof(AppEmailNotificationConfig)).Get<AppEmailNotificationConfig>());
+
+            // services.Configure<EmailConfiguration>(options => Configuration.GetSection(nameof(EmailConfiguration)).Bind(options));
 
             services.AddControllers();
 
@@ -43,6 +47,7 @@ namespace LabSolution
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IAppConfigService, AppConfigService>();
             services.AddSingleton<IPdfReportProvider, PdfReportProvider>();
+            services.AddScoped<IEmailSender, EmailSender>();
 
             services.AddSingleton(Log.Logger);
 

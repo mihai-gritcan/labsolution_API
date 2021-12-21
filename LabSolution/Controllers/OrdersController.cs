@@ -12,6 +12,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
+using LabSolution.EmailService;
+using Microsoft.Extensions.Options;
 
 namespace LabSolution.Controllers
 {
@@ -27,14 +29,23 @@ namespace LabSolution.Controllers
 
         private readonly IAppConfigService _appConfigService;
 
+        private readonly IEmailSender _emailSender;
+
+        private AppEmailNotificationConfig _appEmailNotificationConfig;
+
         public OrdersController(ICustomerService customerService, IOrderService orderService,
-            IPdfReportProvider pdfReportProvider, ILogger<OrdersController> logger, IAppConfigService appConfigService)
+            IPdfReportProvider pdfReportProvider, ILogger<OrdersController> logger,
+            IAppConfigService appConfigService, IEmailSender emailSender,
+            IOptions<AppEmailNotificationConfig> options)
         {
             _customerService = customerService;
             _orderService = orderService;
             _pdfReportProvider = pdfReportProvider;
             _logger = logger;
             _appConfigService = appConfigService;
+            _emailSender = emailSender;
+
+            _appEmailNotificationConfig = options.Value;
         }
 
         // public order submit
@@ -42,55 +53,29 @@ namespace LabSolution.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest createOrder)
         {
-            return Ok(await SaveOrder(createOrder));
+            var savedOrders = await SaveOrder(createOrder);
+
+            if (_appEmailNotificationConfig.SendNotificationForOnlineBooking)
+            {
+                var labConfigs = await _appConfigService.GetLabConfigAddresses();
+                await NotifyOrdersCreated(savedOrders, labConfigs);
+            }
+
+            return Ok(savedOrders);
         }
 
         // reception order submit
         [HttpPost("elevated")]
         public async Task<ActionResult> CreateElevatedOrder([FromBody] CreateOrderRequest createOrder)
         {
-            return Ok(await SaveOrder(createOrder));
-        }
-
-        private async Task<IEnumerable<CreatedOrdersResponse>> SaveOrder(CreateOrderRequest createOrder)
-        {
-            await CheckIsLabOpen(createOrder.ScheduledDateTime);
-
-            var savedOrders = new List<CreatedOrdersResponse>();
-
-            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            var savedOrders = await SaveOrder(createOrder);
+            if (_appEmailNotificationConfig.SendNotificationForInHouseBooking)
             {
-                var allSavedCustomers = await _customerService.SaveCustomers(createOrder.Customers);
-
-                var addedOrders = await _orderService.SaveOrders(createOrder, allSavedCustomers);
-
-                savedOrders.AddRange(addedOrders.Select(x => new CreatedOrdersResponse
-                {
-                    OrderId = x.Id,
-                    CustomerId = x.CustomerId,
-                    Customer = CustomerDto.CreateDtoFromEntity(allSavedCustomers.Find(c => c.Id == x.CustomerId), isRootCustomer: x.ParentId == null),
-                    ParentId = x.ParentId,
-                    PlacedAt = DateTime.SpecifyKind(x.PlacedAt, DateTimeKind.Local),
-                    Scheduled = DateTime.SpecifyKind(x.Scheduled, DateTimeKind.Local),
-                    TestLanguage = (TestLanguage)x.TestLanguage,
-                    TestType = (TestType)x.TestType
-                }));
-
-                scope.Complete();
+                var labConfigs = await _appConfigService.GetLabConfigAddresses();
+                await NotifyOrdersCreated(savedOrders, labConfigs);
             }
 
-            return savedOrders;
-        }
-
-        private async Task CheckIsLabOpen(DateTime scheduledDateTime)
-        {
-            var labOpeningHours = await _appConfigService.GetLabConfigOpeningHours();
-
-            if (!LabDailyAvailabilityProvider.IsWhenOfficeIsOpen(scheduledDateTime, labOpeningHours))
-            {
-                var dateTimeString = scheduledDateTime.ToString("yyyy-MM-dd HH:mm");
-                throw new CustomException($"The Lab is Closed on '{dateTimeString}'");
-            }
+            return Ok(savedOrders);
         }
 
         // reception getOrders ByDate or idnp
@@ -238,6 +223,60 @@ namespace LabSolution.Controllers
 
             MemoryStream ms = new MemoryStream(pdfBytes);
             return new FileStreamResult(ms, "application/pdf");
+        }
+
+        private async Task<IEnumerable<CreatedOrdersResponse>> SaveOrder(CreateOrderRequest createOrder)
+        {
+            await CheckIsLabOpen(createOrder.ScheduledDateTime);
+
+            var savedOrders = new List<CreatedOrdersResponse>();
+
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var allSavedCustomers = await _customerService.SaveCustomers(createOrder.Customers);
+
+                var addedOrders = await _orderService.SaveOrders(createOrder, allSavedCustomers);
+
+                savedOrders.AddRange(addedOrders.Select(x => new CreatedOrdersResponse
+                {
+                    OrderId = x.Id,
+                    CustomerId = x.CustomerId,
+                    Customer = CustomerDto.CreateDtoFromEntity(allSavedCustomers.Find(c => c.Id == x.CustomerId), isRootCustomer: x.ParentId == null),
+                    ParentId = x.ParentId,
+                    PlacedAt = DateTime.SpecifyKind(x.PlacedAt, DateTimeKind.Local),
+                    Scheduled = DateTime.SpecifyKind(x.Scheduled, DateTimeKind.Local),
+                    TestLanguage = (TestLanguage)x.TestLanguage,
+                    TestType = (TestType)x.TestType
+                }));
+
+                scope.Complete();
+            }
+
+            return savedOrders;
+        }
+
+        private async Task NotifyOrdersCreated(IEnumerable<CreatedOrdersResponse> createdOrders, LabConfigAddresses labConfigs)
+        {
+            const string subject = "COVID-19 [ON-LINE booking]";
+
+            foreach (var item in createdOrders.Where(x => string.IsNullOrWhiteSpace(x.Customer.Email)))
+            {
+                var fullName = $"{item.Customer.LastName} {item.Customer.FirstName}";
+                var content = $"{fullName}, Personal number: {item.Customer.PersonalNumber}. Reservation time: {item.Scheduled:yyyy-MM-dd HH:mm}. Address: {labConfigs.LabAddress}";
+
+                await _emailSender.SendEmailAsync(new Message(new List<(string Name, string Address)> { (fullName, item.Customer.Email) }, subject, content));
+            }
+        }
+
+        private async Task CheckIsLabOpen(DateTime scheduledDateTime)
+        {
+            var labOpeningHours = await _appConfigService.GetLabConfigOpeningHours();
+
+            if (!LabDailyAvailabilityProvider.IsWhenOfficeIsOpen(scheduledDateTime, labOpeningHours))
+            {
+                var dateTimeString = scheduledDateTime.ToString("yyyy-MM-dd HH:mm");
+                throw new CustomException($"The Lab is Closed on '{dateTimeString}'");
+            }
         }
     }
 }
