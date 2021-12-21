@@ -25,7 +25,7 @@ namespace LabSolution.Services
         Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, string idnp);
         Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime startDate, DateTime endDate, TestType? testType = null);
 
-        Task DeleteOrder(int orderId);
+        Task DeleteOrder(int orderId, bool canRemovePdf);
 
         Task SavePdfBytes(int processedOrderId, string pdfName, byte[] pdfBytes);
         Task<List<ProcessedOrderToSetResultResponse>> GetOrdersToSetResult(DateTime date, string numericCode);
@@ -249,15 +249,19 @@ namespace LabSolution.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteOrder(int orderId)
+        public async Task DeleteOrder(int orderId, bool canRemovePdf)
         {
             var processedOrderWithTicketEmitted = await _context.ProcessedOrders.SingleOrDefaultAsync(x => x.CustomerOrderId == orderId);
             if (processedOrderWithTicketEmitted is not null)
             {
-                var hasPrintedTheResult = await _context.ProcessedOrderPdfs.AnyAsync(x => x.ProcessedOrderId == processedOrderWithTicketEmitted.Id);
-                if (hasPrintedTheResult)
-                    throw new CustomException("Cannot remove an Order which has a ticket emitted and the Result was printed as PDF. That action will produce corrupt data");
-
+                var orderWithGeneratedResult = await _context.ProcessedOrderPdfs.SingleOrDefaultAsync(x => x.ProcessedOrderId == processedOrderWithTicketEmitted.Id);
+                if (orderWithGeneratedResult is not null)
+                {
+                    if (canRemovePdf)
+                        _context.ProcessedOrderPdfs.Remove(orderWithGeneratedResult);
+                    else
+                        throw new CustomException("Cannot remove an Order which has a ticket emitted and the Result was generated as PDF. That action will produce corrupt data");
+                }
                 _context.ProcessedOrders.Remove(processedOrderWithTicketEmitted);
             }
 

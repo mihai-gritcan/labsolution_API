@@ -95,7 +95,10 @@ namespace LabSolution.Controllers
         [HttpDelete("{orderId}")]
         public async Task<IActionResult> DeleteOrder(int orderId)
         {
-            await _orderService.DeleteOrder(orderId);
+            var isSuperUserValue = User?.Claims.FirstOrDefault(x => x.Type.Equals(LabSolutionClaimsNames.UserIsSuperUser))?.Value;
+            var canRemovePdfs = isSuperUserValue?.Equals("true", StringComparison.InvariantCultureIgnoreCase) == true;
+
+            await _orderService.DeleteOrder(orderId, canRemovePdfs);
 
             return NoContent();
         }

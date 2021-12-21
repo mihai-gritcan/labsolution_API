@@ -10,6 +10,11 @@ using System.Text;
 
 namespace LabSolution.Services
 {
+    public static class LabSolutionClaimsNames
+    {
+        public const string UserIsSuperUser = "ls_uisu";
+    }
+
     public interface ITokenService
     {
         string CreateToken(AppUser appUser);
@@ -29,7 +34,8 @@ namespace LabSolution.Services
         public string CreateToken(AppUser appUser)
         {
             var claims = new List<Claim>{
-              new Claim(JwtRegisteredClaimNames.NameId, appUser.Username)
+              new Claim(JwtRegisteredClaimNames.NameId, appUser.Username),
+              new Claim(LabSolutionClaimsNames.UserIsSuperUser, appUser.IsSuperUser.ToString())
             };
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
