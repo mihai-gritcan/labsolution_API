@@ -60,7 +60,8 @@ namespace LabSolution.Services
                 LabName = configs.ContainsKey(nameof(LabConfigAddresses.LabName).ToUpper()) ? configs[nameof(LabConfigAddresses.LabName).ToUpper()] : "",
                 WebSiteAddress = configs.ContainsKey(nameof(LabConfigAddresses.WebSiteAddress).ToUpper()) ? configs[nameof(LabConfigAddresses.WebSiteAddress).ToUpper()] : "",
                 PhoneNumber = configs.ContainsKey(nameof(LabConfigAddresses.PhoneNumber).ToUpper()) ? configs[nameof(LabConfigAddresses.PhoneNumber).ToUpper()] : "",
-                TestEquipmentAnalyzer = configs.ContainsKey(nameof(LabConfigAddresses.TestEquipmentAnalyzer).ToUpper()) ? configs[nameof(LabConfigAddresses.TestEquipmentAnalyzer).ToUpper()] : ""
+                TestEquipmentAnalyzer = configs.ContainsKey(nameof(LabConfigAddresses.TestEquipmentAnalyzer).ToUpper()) ? configs[nameof(LabConfigAddresses.TestEquipmentAnalyzer).ToUpper()] : "",
+                DownloadPDFUrl = configs.ContainsKey(nameof(LabConfigAddresses.DownloadPDFUrl).ToUpper()) ? configs[nameof(LabConfigAddresses.DownloadPDFUrl).ToUpper()] : "",
             };
         }
 

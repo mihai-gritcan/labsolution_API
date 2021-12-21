@@ -28,7 +28,7 @@ namespace LabSolution.Utils
         {
             var barcode = BarcodeProvider.GenerateBarcodeFromNumericCode(processedOrderForPdf.NumericCode);
 
-            var path = $"{configOptions.WebSiteAddress}/result/{fileName}";
+            var path = $"{configOptions.DownloadPDFUrl}/{fileName}";
 
             var qrCode = QRCodeProvider.GeneratQRCode(path);
 
