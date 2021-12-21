@@ -38,8 +38,6 @@ namespace LabSolution
             services.AddSingleton(Configuration.GetSection(nameof(EmailConfiguration)).Get<EmailConfiguration>());
             services.AddSingleton(Configuration.GetSection(nameof(AppEmailNotificationConfig)).Get<AppEmailNotificationConfig>());
 
-            // services.Configure<EmailConfiguration>(options => Configuration.GetSection(nameof(EmailConfiguration)).Bind(options));
-
             services.AddControllers();
 
             services.AddScoped<ICustomerService, CustomerService>();
