@@ -27,12 +27,11 @@ namespace LabSolution.Services
 
         Task DeleteOrder(int orderId, bool canRemovePdf);
 
-        Task SavePdfBytes(int processedOrderId, string pdfName, byte[] pdfBytes);
+        Task SaveOrReplacePdfBytes(int processedOrderId, string pdfName, byte[] pdfBytes);
         Task<List<ProcessedOrderToSetResultResponse>> GetOrdersToSetResult(DateTime date, string numericCode);
 
         Task<ProcessedOrderPdf> GetPdfBytes(int processedOrderId);
         Task<ProcessedOrderPdf> GetPdfBytes(string pdfNameHex);
-        Task SetPdfName(int processedOrderId, string pdfName);
     }
 
     public class OrderService : IOrderService
@@ -180,6 +179,7 @@ namespace LabSolution.Services
             return processedOrder;
         }
 
+        // TODO: task#40 - return a ProcessedOrderForPdf object and drop GetProcessedOrderForPdf() method
         public async Task SetTestResult(int processedOrderId, TestResult testResult, string executorName, string verifierName, string validatorName)
         {
             var processedOrder = await _context.ProcessedOrders.SingleAsync(x => x.Id == processedOrderId);
@@ -194,7 +194,7 @@ namespace LabSolution.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task SavePdfBytes(int processedOrderId, string pdfName, byte[] pdfBytes)
+        public async Task SaveOrReplacePdfBytes(int processedOrderId, string pdfName, byte[] pdfBytes)
         {
             var processedOrderPdfEntity = new ProcessedOrderPdf
             {
@@ -203,13 +203,22 @@ namespace LabSolution.Services
                 PdfBytes = pdfBytes
             };
 
-            await _context.ProcessedOrderPdfs.AddAsync(processedOrderPdfEntity);
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                var existingPdf = await _context.ProcessedOrderPdfs.SingleOrDefaultAsync(x => x.ProcessedOrderId == processedOrderId);
+                if(existingPdf is not null)
+                    _context.ProcessedOrderPdfs.Remove(existingPdf);
 
-            var processedOrder = await _context.ProcessedOrders.SingleAsync(x => x.Id == processedOrderId);
-            processedOrder.PdfName = pdfName;
-            _context.ProcessedOrders.Update(processedOrder);
+                _context.ProcessedOrderPdfs.Add(processedOrderPdfEntity);
 
-            await _context.SaveChangesAsync();
+                var processedOrder = await _context.ProcessedOrders.SingleAsync(x => x.Id == processedOrderId);
+                processedOrder.PdfName = pdfName;
+                _context.ProcessedOrders.Update(processedOrder);
+
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+            }
         }
 
         public Task<List<ProcessedOrderToSetResultResponse>> GetOrdersToSetResult(DateTime date, string numericCode)
@@ -228,25 +237,18 @@ namespace LabSolution.Services
                 }).OrderBy(x => x.ProcessedOrderId).ToListAsync();
         }
 
-        public Task<ProcessedOrderPdf> GetPdfBytes(int processedOrderId)
+        public async Task<ProcessedOrderPdf> GetPdfBytes(int processedOrderId)
         {
-            return _context.ProcessedOrderPdfs.SingleOrDefaultAsync(x => x.ProcessedOrderId == processedOrderId);
+            var orderPdf = await _context.ProcessedOrderPdfs.SingleOrDefaultAsync(x => x.ProcessedOrderId == processedOrderId);
+            if (orderPdf == null)
+                throw new ResourceNotFoundException();
+
+            return orderPdf;
         }
 
         public Task<ProcessedOrderPdf> GetPdfBytes(string pdfNameHex)
         {
             return _context.ProcessedOrderPdfs.Include(x => x.ProcessedOrder).SingleOrDefaultAsync(x => x.ProcessedOrder.PdfName == pdfNameHex);
-        }
-
-        public async Task SetPdfName(int processedOrderId, string pdfName)
-        {
-            var processedOrder = await _context.ProcessedOrders.SingleAsync(x => x.Id == processedOrderId);
-
-            processedOrder.PdfName = pdfName;
-
-            _context.ProcessedOrders.Update(processedOrder);
-
-            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteOrder(int orderId, bool canRemovePdf)

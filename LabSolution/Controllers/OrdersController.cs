@@ -154,8 +154,31 @@ namespace LabSolution.Controllers
             if (processedOrderId != setResultRequest.ProcessedOrderId)
                 return BadRequest();
 
-            await _orderService.SetTestResult(setResultRequest.ProcessedOrderId, setResultRequest.TestResult, 
-                setResultRequest.ExecutorName, setResultRequest.VerifierName, setResultRequest.ValidatorName);
+            var labConfigs = await _appConfigService.GetLabConfigAddresses();
+            var fileName = $"{Guid.NewGuid()}";
+
+            ProcessedOrderForPdf processedOrderForPdf;
+            byte[] pdfBytes;
+
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                await _orderService.SetTestResult(setResultRequest.ProcessedOrderId, setResultRequest.TestResult,
+                    setResultRequest.ExecutorName, setResultRequest.VerifierName, setResultRequest.ValidatorName);
+
+                processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
+
+                pdfBytes = await _pdfReportProvider.CreatePdfReport(fileName, processedOrderForPdf, labConfigs);
+
+                await _orderService.SaveOrReplacePdfBytes(processedOrderForPdf.OrderId, fileName, pdfBytes);
+
+                scope.Complete();
+            }
+
+            if (pdfBytes is null)
+                return BadRequest("Something went wrong during PDF creation. Please retry");
+
+            if(_appEmailNotificationConfig.SendNotificationWhenTestIsCompleted && !string.IsNullOrWhiteSpace(processedOrderForPdf.Customer.Email))
+                await NotifyOrderCompleted(processedOrderForPdf, labConfigs, pdfBytes);
 
             return NoContent();
         }
@@ -166,69 +189,9 @@ namespace LabSolution.Controllers
         {
             var existingPdf = await _orderService.GetPdfBytes(processedOrderId);
 
-            if (existingPdf is not null)
-            {
-                MemoryStream stream = new MemoryStream(existingPdf.PdfBytes);
-                return new FileStreamResult(stream, "application/pdf");
-            }
-
-            var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
-
-            var labConfigs = await _appConfigService.GetLabConfigAddresses();
-
-            var fileName = $"{Guid.NewGuid()}";
-
-            var pdfBytes = await _pdfReportProvider.CreatePdfReport(fileName, processedOrderForPdf, labConfigs);
-
-            await _orderService.SavePdfBytes(processedOrderId, fileName, pdfBytes);
-
-            MemoryStream ms = new MemoryStream(pdfBytes);
-
-            return new FileStreamResult(ms, "application/pdf");
+            MemoryStream stream = new MemoryStream(existingPdf.PdfBytes);
+            return new FileStreamResult(stream, "application/pdf");
         }
-
-        [Obsolete("Azure Linux Plan doesn't allow to write on storage. Can re-try using the implementation on a paid hosting")]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        // reception getPdfResult by processedOrderId
-        [HttpGet("{processedOrderId}/pdfresult-file")]
-        public async Task<IActionResult> GetPdfResultStoreAsFile(int processedOrderId)
-        {
-            var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
-
-            var reportsResultDirectory = Path.Combine(Directory.GetCurrentDirectory(), "assets", "GeneratedReports");
-
-            if (!string.IsNullOrEmpty(processedOrderForPdf.PdfName))
-            {
-                string path = Path.Combine(reportsResultDirectory, $"{processedOrderForPdf.PdfName}.pdf");
-
-                if (System.IO.File.Exists(path))
-                {
-                    byte[] bytes = System.IO.File.ReadAllBytes(path);
-                    MemoryStream memoryStream = new MemoryStream(bytes);
-
-                    return new FileStreamResult(memoryStream, "application/pdf");
-                }
-            }
-
-            var labConfigs = await _appConfigService.GetLabConfigAddresses();
-
-            var fileName = $"{Guid.NewGuid()}";
-
-            var pdfBytes = await _pdfReportProvider.CreatePdfReport(fileName, processedOrderForPdf, labConfigs);
-
-            var fullyQualifiedFilePath = Path.Combine(reportsResultDirectory, $"{fileName}.pdf");
-
-            using (var fs = new FileStream(fullyQualifiedFilePath, FileMode.Create, FileAccess.Write))
-            {
-                await fs.WriteAsync(pdfBytes, 0, pdfBytes.Length);
-            }
-
-            await _orderService.SetPdfName(processedOrderId, fileName);
-
-            MemoryStream ms = new MemoryStream(pdfBytes);
-            return new FileStreamResult(ms, "application/pdf");
-        }
-
 
         private async Task<IEnumerable<CreatedOrdersResponse>> SaveOrder(CreateOrderRequest createOrder)
         {
@@ -271,6 +234,20 @@ namespace LabSolution.Controllers
 
                 await _emailSender.SendEmailAsync(new Message(new List<(string Name, string Address)> { (fullName, item.Customer.Email) }, subject, content));
             }
+        }
+
+        private async Task NotifyOrderCompleted(ProcessedOrderForPdf orderForPdf, LabConfigAddresses labConfigs, byte[] pdfBytes)
+        {
+            const string subject = "COVID-19 [Test result]";
+
+            var fullName = $"{orderForPdf.Customer.LastName} {orderForPdf.Customer.FirstName}";
+            var messageText = $"{fullName}, Order date: {orderForPdf.OrderDate:yyyy-MM-dd HH:mm}. Test is completed. Result: {orderForPdf.TestResult}";
+            var attachmentName = fullName.Replace(" ", "");
+            attachmentName = $"{attachmentName}_{orderForPdf.TestType}_{orderForPdf.OrderDate:yyyy-MM-dd}.pdf";
+
+            var message = new Message(new List<(string Name, string Address)> { (fullName, orderForPdf.Customer.Email) }, subject, messageText);
+
+            await _emailSender.SendEmailAsync(message, pdfBytes, attachmentName);
         }
 
         private async Task CheckIsLabOpen(DateTime scheduledDateTime)

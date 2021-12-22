@@ -7,6 +7,7 @@ namespace LabSolution.EmailService
     public interface IEmailSender
     {
         Task SendEmailAsync(Message message);
+        Task SendEmailAsync(Message message, byte[] attachment, string attachmentName);
     }
 
     public class EmailSender : IEmailSender
@@ -23,6 +24,12 @@ namespace LabSolution.EmailService
             await SendAsync(mailMessage);
         }
 
+        public async Task SendEmailAsync(Message message, byte[] attachment, string attachmentName)
+        {
+            var mailMessage = CreateEmailMessageWithAttachment(message, attachment, attachmentName);
+            await SendAsync(mailMessage);
+        }
+
         private MimeMessage CreateEmailMessage(Message message)
         {
             var emailMessage = new MimeMessage();
@@ -31,6 +38,20 @@ namespace LabSolution.EmailService
             emailMessage.Subject = message.Subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
 
+            return emailMessage;
+        }
+
+        private MimeMessage CreateEmailMessageWithAttachment(Message message, byte[] attachmentBytes, string attachmentName)
+        {
+            var emailMessage = new MimeMessage();
+            emailMessage.From.Add(new MailboxAddress(_emailConfig.FromName, _emailConfig.FromAddress));
+            emailMessage.To.AddRange(message.To);
+            emailMessage.Subject = message.Subject;
+
+            var builder = new BodyBuilder { TextBody = message.Content };
+            builder.Attachments.Add(attachmentName, attachmentBytes, ContentType.Parse(System.Net.Mime.MediaTypeNames.Application.Pdf));
+
+            emailMessage.Body = builder.ToMessageBody();
             return emailMessage;
         }
 
