@@ -162,7 +162,7 @@ namespace LabSolution.Controllers
 
         // reception getPdfResult by processedOrderId
         [HttpGet("{processedOrderId}/pdfresult-db")]
-        public async Task<IActionResult> GetPdfResultStoreInDb(int processedOrderId, [FromQuery]bool returnAsFile = false)
+        public async Task<IActionResult> GetPdfResultStoreInDb(int processedOrderId)
         {
             var existingPdf = await _orderService.GetPdfBytes(processedOrderId);
 
@@ -184,7 +184,7 @@ namespace LabSolution.Controllers
 
             MemoryStream ms = new MemoryStream(pdfBytes);
 
-            return !returnAsFile ? new FileStreamResult(ms, "application/pdf") : File(pdfBytes, "application/pdf", fileName);
+            return new FileStreamResult(ms, "application/pdf");
         }
 
         [Obsolete("Azure Linux Plan doesn't allow to write on storage. Can re-try using the implementation on a paid hosting")]
