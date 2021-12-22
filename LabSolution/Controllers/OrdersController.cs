@@ -157,22 +157,14 @@ namespace LabSolution.Controllers
             var labConfigs = await _appConfigService.GetLabConfigAddresses();
             var fileName = $"{Guid.NewGuid()}";
 
-            ProcessedOrderForPdf processedOrderForPdf;
-            byte[] pdfBytes;
+            await _orderService.SetTestResult(setResultRequest.ProcessedOrderId, setResultRequest.TestResult,
+                setResultRequest.ExecutorName, setResultRequest.VerifierName, setResultRequest.ValidatorName);
 
-            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-            {
-                await _orderService.SetTestResult(setResultRequest.ProcessedOrderId, setResultRequest.TestResult,
-                    setResultRequest.ExecutorName, setResultRequest.VerifierName, setResultRequest.ValidatorName);
+            var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
 
-                processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
+            var pdfBytes = await _pdfReportProvider.CreatePdfReport(fileName, processedOrderForPdf, labConfigs);
 
-                pdfBytes = await _pdfReportProvider.CreatePdfReport(fileName, processedOrderForPdf, labConfigs);
-
-                await _orderService.SaveOrReplacePdfBytes(processedOrderForPdf.OrderId, fileName, pdfBytes);
-
-                scope.Complete();
-            }
+            await _orderService.SaveOrReplacePdfBytes(processedOrderForPdf.OrderId, fileName, pdfBytes);
 
             if (pdfBytes is null)
                 return BadRequest("Something went wrong during PDF creation. Please retry");
