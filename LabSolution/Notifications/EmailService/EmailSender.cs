@@ -30,7 +30,7 @@ namespace LabSolution.Notifications.EmailService
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
 
-            var builder = new BodyBuilder { TextBody = message.Content };
+            var builder = new BodyBuilder { HtmlBody = message.Content };
 
             if(attachmentBytes is not null && attachmentName is not null)
                 builder.Attachments.Add(attachmentName, attachmentBytes, ContentType.Parse(System.Net.Mime.MediaTypeNames.Application.Pdf));
