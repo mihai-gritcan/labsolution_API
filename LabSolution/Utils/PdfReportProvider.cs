@@ -116,7 +116,7 @@ namespace LabSolution.Utils
 
         public static async Task<string> GetReportTemplate(ProcessedOrderForPdf processedOrderForPdf, byte[] barcode, byte[] qrcode, LabConfigAddresses labConfigOptions)
         {
-            var htmlTemplate = await TemplateLoader.GetDefaultTemplateHtml(processedOrderForPdf.TestType);
+            var htmlTemplate = await PdfTemplateLoader.GetDefaultTemplateHtml(processedOrderForPdf.TestType);
             
             return htmlTemplate
                 .Replace(_labNameKey, labConfigOptions.LabName)
@@ -180,7 +180,7 @@ namespace LabSolution.Utils
         }
     }
 
-    public static class TemplateLoader
+    public static class PdfTemplateLoader
     {
         public static async Task<string> GetDefaultTemplateHtml(TestType testType)
         {

@@ -1,6 +1,7 @@
-using LabSolution.EmailService;
+using LabSolution.Notifications.EmailService;
 using LabSolution.Infrastructure;
 using LabSolution.Models;
+using LabSolution.Notifications;
 using LabSolution.Services;
 using LabSolution.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -46,6 +47,7 @@ namespace LabSolution
             services.AddScoped<IAppConfigService, AppConfigService>();
             services.AddSingleton<IPdfReportProvider, PdfReportProvider>();
             services.AddScoped<IEmailSender, EmailSender>();
+            services.AddScoped<INotificationManager, NotificationManager>();
 
             services.AddSingleton(Log.Logger);
 
