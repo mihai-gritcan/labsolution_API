@@ -1,4 +1,4 @@
-﻿namespace LabSolution.EmailService
+﻿namespace LabSolution.Notifications
 {
     public class EmailConfiguration
     {

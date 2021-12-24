@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace LabSolution.Services
+namespace LabSolution.Infrastructure
 {
     [Serializable]
-    internal class CustomException : Exception
+    public class CustomException : Exception
     {
         public CustomException()
         {

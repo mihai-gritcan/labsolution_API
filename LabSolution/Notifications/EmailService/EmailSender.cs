@@ -2,12 +2,11 @@
 using MimeKit;
 using System.Threading.Tasks;
 
-namespace LabSolution.EmailService
+namespace LabSolution.Notifications.EmailService
 {
     public interface IEmailSender
     {
-        Task SendEmailAsync(Message message);
-        Task SendEmailAsync(Message message, byte[] attachment, string attachmentName);
+        Task SendEmailAsync(Message message, byte[] attachment = null, string attachmentName = null);
     }
 
     public class EmailSender : IEmailSender
@@ -18,30 +17,13 @@ namespace LabSolution.EmailService
             _emailConfig = emailConfig;
         }
 
-        public async Task SendEmailAsync(Message message)
+        public async Task SendEmailAsync(Message message, byte[] attachment = null, string attachmentName = null)
         {
-            var mailMessage = CreateEmailMessage(message);
+            var mailMessage = CreateEmailMessage(message, attachment, attachmentName);
             await SendAsync(mailMessage);
         }
 
-        public async Task SendEmailAsync(Message message, byte[] attachment, string attachmentName)
-        {
-            var mailMessage = CreateEmailMessageWithAttachment(message, attachment, attachmentName);
-            await SendAsync(mailMessage);
-        }
-
-        private MimeMessage CreateEmailMessage(Message message)
-        {
-            var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress(_emailConfig.FromName, _emailConfig.FromAddress));
-            emailMessage.To.AddRange(message.To);
-            emailMessage.Subject = message.Subject;
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
-
-            return emailMessage;
-        }
-
-        private MimeMessage CreateEmailMessageWithAttachment(Message message, byte[] attachmentBytes, string attachmentName)
+        private MimeMessage CreateEmailMessage(Message message, byte[] attachmentBytes = null, string attachmentName = null)
         {
             var emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress(_emailConfig.FromName, _emailConfig.FromAddress));
@@ -49,7 +31,9 @@ namespace LabSolution.EmailService
             emailMessage.Subject = message.Subject;
 
             var builder = new BodyBuilder { TextBody = message.Content };
-            builder.Attachments.Add(attachmentName, attachmentBytes, ContentType.Parse(System.Net.Mime.MediaTypeNames.Application.Pdf));
+
+            if(attachmentBytes is not null && attachmentName is not null)
+                builder.Attachments.Add(attachmentName, attachmentBytes, ContentType.Parse(System.Net.Mime.MediaTypeNames.Application.Pdf));
 
             emailMessage.Body = builder.ToMessageBody();
             return emailMessage;

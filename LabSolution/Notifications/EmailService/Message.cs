@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LabSolution.EmailService
+namespace LabSolution.Notifications.EmailService
 {
     public class Message
     {

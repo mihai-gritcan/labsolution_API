@@ -12,8 +12,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
-using LabSolution.EmailService;
+using LabSolution.Notifications;
 using Microsoft.Extensions.Options;
+using LabSolution.Infrastructure;
 
 namespace LabSolution.Controllers
 {
@@ -29,13 +30,13 @@ namespace LabSolution.Controllers
 
         private readonly IAppConfigService _appConfigService;
 
-        private readonly IEmailSender _emailSender;
+        private readonly INotificationManager _notificationManager;
 
         private readonly AppEmailNotificationConfig _appEmailNotificationConfig;
 
         public OrdersController(ICustomerService customerService, IOrderService orderService,
             IPdfReportProvider pdfReportProvider, ILogger<OrdersController> logger,
-            IAppConfigService appConfigService, IEmailSender emailSender,
+            IAppConfigService appConfigService, INotificationManager notificationManager,
             IOptions<AppEmailNotificationConfig> options)
         {
             _customerService = customerService;
@@ -43,7 +44,7 @@ namespace LabSolution.Controllers
             _pdfReportProvider = pdfReportProvider;
             _logger = logger;
             _appConfigService = appConfigService;
-            _emailSender = emailSender;
+            _notificationManager = notificationManager;
 
             _appEmailNotificationConfig = options.Value;
         }
@@ -58,7 +59,7 @@ namespace LabSolution.Controllers
             if (_appEmailNotificationConfig.SendNotificationForOnlineBooking)
             {
                 var labConfigs = await _appConfigService.GetLabConfigAddresses();
-                await NotifyOrdersCreated(savedOrders, labConfigs);
+                await _notificationManager.NotifyOrdersCreated(savedOrders, labConfigs);
             }
 
             return Ok(savedOrders);
@@ -72,7 +73,7 @@ namespace LabSolution.Controllers
             if (_appEmailNotificationConfig.SendNotificationForInHouseBooking)
             {
                 var labConfigs = await _appConfigService.GetLabConfigAddresses();
-                await NotifyOrdersCreated(savedOrders, labConfigs);
+                await _notificationManager.NotifyOrdersCreated(savedOrders, labConfigs);
             }
 
             return Ok(savedOrders);
@@ -170,7 +171,7 @@ namespace LabSolution.Controllers
                 return BadRequest("Something went wrong during PDF creation. Please retry");
 
             if(_appEmailNotificationConfig.SendNotificationWhenTestIsCompleted && !string.IsNullOrWhiteSpace(processedOrderForPdf.Customer.Email))
-                await NotifyOrderCompleted(processedOrderForPdf, labConfigs, pdfBytes);
+                await _notificationManager.NotifyOrderCompleted(processedOrderForPdf, labConfigs, pdfBytes);
 
             return NoContent();
         }
@@ -213,33 +214,6 @@ namespace LabSolution.Controllers
             }
 
             return savedOrders;
-        }
-
-        private async Task NotifyOrdersCreated(IEnumerable<CreatedOrdersResponse> createdOrders, LabConfigAddresses labConfigs)
-        {
-            const string subject = "COVID-19 [ON-LINE booking]";
-
-            foreach (var item in createdOrders.Where(x => !string.IsNullOrWhiteSpace(x.Customer.Email)))
-            {
-                var fullName = $"{item.Customer.LastName} {item.Customer.FirstName}";
-                var content = $"{fullName}, Personal number: {item.Customer.PersonalNumber}. Reservation time: {item.Scheduled:yyyy-MM-dd HH:mm}. Address: {labConfigs.LabAddress}";
-
-                await _emailSender.SendEmailAsync(new Message(new List<(string Name, string Address)> { (fullName, item.Customer.Email) }, subject, content));
-            }
-        }
-
-        private async Task NotifyOrderCompleted(ProcessedOrderForPdf orderForPdf, LabConfigAddresses labConfigs, byte[] pdfBytes)
-        {
-            const string subject = "COVID-19 [Test result]";
-
-            var fullName = $"{orderForPdf.Customer.LastName} {orderForPdf.Customer.FirstName}";
-            var messageText = $"{fullName}, Order date: {orderForPdf.OrderDate:yyyy-MM-dd HH:mm}. Test is completed. Result: {orderForPdf.TestResult}";
-            var attachmentName = fullName.Replace(" ", "");
-            attachmentName = $"{attachmentName}_{orderForPdf.TestType}_{orderForPdf.OrderDate:yyyy-MM-dd}.pdf";
-
-            var message = new Message(new List<(string Name, string Address)> { (fullName, orderForPdf.Customer.Email) }, subject, messageText);
-
-            await _emailSender.SendEmailAsync(message, pdfBytes, attachmentName);
         }
 
         private async Task CheckIsLabOpen(DateTime scheduledDateTime)
