@@ -22,7 +22,7 @@ namespace LabSolution.Controllers
         public async Task<IActionResult> GetCustomers([FromQuery] string idnp, [FromQuery] string firstName, [FromQuery] string lastName)
         {
             var queryableCustomers = _context.Customers.Select(x => x);
-            if (string.IsNullOrWhiteSpace(idnp))
+            if (!string.IsNullOrWhiteSpace(idnp))
                 queryableCustomers = queryableCustomers.Where(x => x.PersonalNumber.Contains(idnp));
 
             if(!string.IsNullOrWhiteSpace(firstName))
