@@ -54,14 +54,8 @@
     <None Update="assets\Templates\testAntigenRo_En_Ru.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="assets\Templates\testPcrEn.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="assets\Templates\testAntibodyRo_En_Ru.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="assets\Templates\testPcrRo.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="assets\testAntigenEn.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
