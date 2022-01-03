@@ -45,7 +45,11 @@ namespace LabSolution.Controllers
             DateTime currentLocalTime = GetCurrentTimeNormalized();
 
             DateTime iterator;
-            if (date.Date == currentLocalTime.Date)
+            if(date.Date < currentLocalTime.Date)
+            {
+                return structure;
+            }
+            else if (date.Date == currentLocalTime.Date)
             {
                 if (currentLocalTime > LabDailyAvailabilityProvider.GetStartOfDay(date, labOpeningHours))
                 {
