@@ -57,6 +57,20 @@ namespace LabSolution.Controllers
             customerEntity.Phone = customer.Phone;
             customerEntity.Email = customer.Email;
 
+            var existingSimilarByPersonalNumber = await _context.Customers.FirstOrDefaultAsync(x =>
+                !string.IsNullOrWhiteSpace(customerEntity.PersonalNumber) && x.PersonalNumber.ToUpper().Equals(customerEntity.PersonalNumber.ToUpper()));
+
+            if (existingSimilarByPersonalNumber is not null)
+                return BadRequest("There is already a customer registered with this Personal Number. Please use it instead.");
+
+            var existingSimilarByNameAndDoB = await _context.Customers.FirstOrDefaultAsync(x =>
+                x.FirstName.ToUpper().Equals(customerEntity.FirstName.ToUpper()) 
+                && x.LastName.ToUpper().Equals(customerEntity.LastName.ToUpper())
+                && x.DateOfBirth.Date == customerEntity.DateOfBirth.Date);
+
+            if (existingSimilarByNameAndDoB is not null)
+                return BadRequest("There is already a customer registered with this Name and Date Of Birth. Please use it instead.");
+
             _context.Customers.Update(customerEntity);
 
             try

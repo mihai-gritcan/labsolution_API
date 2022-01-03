@@ -38,11 +38,38 @@ namespace LabSolution.Services
             var customersToAdd = new List<Customer>();
             var matchedCustomers = new List<Customer>();
 
-            foreach (var customer in customers)
+            var customersWithPersonalNumber = customers.Where(x => !string.IsNullOrWhiteSpace(x.PersonalNumber)).ToHashSet();
+            var customersWithoutPersonalNumber = customers.Except(customersWithPersonalNumber).ToHashSet();
+
+            foreach (var item in customersWithPersonalNumber)
             {
-                var customerEntity = existingCustomers.SingleOrDefault(x =>
-                    x.PersonalNumber == customer.PersonalNumber
-                    && x.FirstName.Equals(customer.FirstName, System.StringComparison.InvariantCultureIgnoreCase)
+                var entity = existingCustomers.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.PersonalNumber) 
+                    && x.PersonalNumber.Equals(item.PersonalNumber, System.StringComparison.InvariantCultureIgnoreCase));
+                
+                if (entity is not null)
+                {
+                    matchedCustomers.Add(entity);
+                    continue;
+                }
+                entity = new Customer
+                {
+                    PersonalNumber = item.PersonalNumber,
+                    Passport = item.Passport,
+                    FirstName = item.FirstName,
+                    LastName = item.LastName,
+                    DateOfBirth = item.DateOfBirth,
+                    Email = item.Email,
+                    Address = item.Address,
+                    Gender = (int)item.Gender,
+                    Phone = item.Phone
+                };
+                customersToAdd.Add(entity);
+            }
+
+            foreach (var customer in customersWithoutPersonalNumber)
+            {
+                var customerEntity = existingCustomers.FirstOrDefault(x =>
+                    x.FirstName.Equals(customer.FirstName, System.StringComparison.InvariantCultureIgnoreCase)
                     && x.LastName.Equals(customer.LastName, System.StringComparison.InvariantCultureIgnoreCase)
                     && x.DateOfBirth.Date == customer.DateOfBirth.Date);
 
