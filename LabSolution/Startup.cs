@@ -37,7 +37,9 @@ namespace LabSolution
         {
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             services.AddSingleton(Configuration.GetSection(nameof(EmailConfiguration)).Get<EmailConfiguration>());
+
             services.Configure<AppEmailNotificationConfig>(options => Configuration.GetSection(nameof(AppEmailNotificationConfig)).Bind(options));
+            services.Configure<GovSyncConfiguration>(options => Configuration.GetSection(nameof(GovSyncConfiguration)).Bind(options));
 
             services.AddControllers();
 
