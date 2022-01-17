@@ -83,7 +83,7 @@ namespace LabSolution.Services
                     TestResult = x.ProcessedOrder == null ? null : (TestResult)x.ProcessedOrder.TestResult,
                     NumericCode = x.ProcessedOrder == null ? null : x.ProcessedOrder.Id.ToString("D7"),
                     ProcessedOrderId = x.ProcessedOrder == null ? null : x.ProcessedOrder.Id,
-                    IsSync = includeSyncState && x.ProcessedOrder.OrderSyncToGov != null
+                    IsSyncToGov = includeSyncState && x.ProcessedOrder.OrderSyncToGov != null
                 })
                 .OrderBy(x => x.Status).ThenBy(x => x.OrderId);
         }

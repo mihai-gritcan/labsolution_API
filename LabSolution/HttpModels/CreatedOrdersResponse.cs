@@ -51,7 +51,7 @@ namespace LabSolution.HttpModels
         public OrderStatus Status { get; set; }
         public TestResult? TestResult { get; set; }
         public int? ProcessedOrderId { get; internal set; }
-        public bool IsSync { get; internal set; }
+        public bool IsSyncToGov { get; internal set; }
     }
 
     public class ProcessedOrderToSetResultResponse
