@@ -194,7 +194,7 @@ namespace LabSolution.Controllers
 
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                var allSavedCustomers = await _customerService.SaveCustomers(createOrder.Customers);
+                var allSavedCustomers = await _customerService.CreateCustomers(createOrder.Customers);
 
                 var addedOrders = await _orderService.SaveOrders(createOrder, allSavedCustomers);
 

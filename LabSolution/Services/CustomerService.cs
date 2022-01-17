@@ -1,27 +1,32 @@
 ﻿using LabSolution.Dtos;
+using LabSolution.Infrastructure;
 using LabSolution.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
+using Microsoft.Extensions.Configuration;
 
 namespace LabSolution.Services
 {
     public interface ICustomerService
     {
-        Task<List<Customer>> SaveCustomers(List<CustomerDto> customers);
+        Task<List<Customer>> CreateCustomers(List<CustomerDto> customers);
     }
 
     public class CustomerService : ICustomerService
     {
         private readonly LabSolutionContext _context;
+        private readonly IConfiguration _appConfiguration;
 
-        public CustomerService(LabSolutionContext context)
+        public CustomerService(LabSolutionContext context, IConfiguration appConfiguration)
         {
             _context = context;
+            _appConfiguration = appConfiguration;
         }
 
-        public async Task<List<Customer>> SaveCustomers(List<CustomerDto> customers)
+        public async Task<List<Customer>> CreateCustomers(List<CustomerDto> customers)
         {
             var customersPersonalNumbers = customers.Select(x => x.PersonalNumber);
             var customersFirstNames = customers.Select(x => x.FirstName);
@@ -41,11 +46,16 @@ namespace LabSolution.Services
             var customersWithPersonalNumber = customers.Where(x => !string.IsNullOrWhiteSpace(x.PersonalNumber)).ToHashSet();
             var customersWithoutPersonalNumber = customers.Except(customersWithPersonalNumber).ToHashSet();
 
-            foreach (var item in customersWithPersonalNumber)
+            var denyMatchByPersonalNumberWithDifferentName = 
+                _appConfiguration["CustomerDenyMatchByPersonalNumberWithDifferentName"].Equals("true", StringComparison.InvariantCultureIgnoreCase);
+
+            foreach (var cust in customersWithPersonalNumber)
             {
-                var entity = existingCustomers.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.PersonalNumber) 
-                    && x.PersonalNumber.Equals(item.PersonalNumber, System.StringComparison.InvariantCultureIgnoreCase));
-                
+                CheckMatchByPersonalNumberWithDifferentName(existingCustomers, cust, denyMatchByPersonalNumberWithDifferentName);
+
+                var entity = existingCustomers.Find(x => !string.IsNullOrWhiteSpace(x.PersonalNumber)
+                    && x.PersonalNumber.Equals(cust.PersonalNumber, StringComparison.InvariantCultureIgnoreCase));
+
                 if (entity is not null)
                 {
                     matchedCustomers.Add(entity);
@@ -53,24 +63,24 @@ namespace LabSolution.Services
                 }
                 entity = new Customer
                 {
-                    PersonalNumber = item.PersonalNumber,
-                    Passport = item.Passport,
-                    FirstName = item.FirstName,
-                    LastName = item.LastName,
-                    DateOfBirth = item.DateOfBirth,
-                    Email = item.Email,
-                    Address = item.Address,
-                    Gender = (int)item.Gender,
-                    Phone = item.Phone
+                    PersonalNumber = cust.PersonalNumber,
+                    Passport = cust.Passport,
+                    FirstName = cust.FirstName,
+                    LastName = cust.LastName,
+                    DateOfBirth = cust.DateOfBirth,
+                    Email = cust.Email,
+                    Address = cust.Address,
+                    Gender = (int)cust.Gender,
+                    Phone = cust.Phone
                 };
                 customersToAdd.Add(entity);
             }
 
             foreach (var customer in customersWithoutPersonalNumber)
             {
-                var customerEntity = existingCustomers.FirstOrDefault(x =>
-                    x.FirstName.Equals(customer.FirstName, System.StringComparison.InvariantCultureIgnoreCase)
-                    && x.LastName.Equals(customer.LastName, System.StringComparison.InvariantCultureIgnoreCase)
+                var customerEntity = existingCustomers.Find(x =>
+                    x.FirstName.Equals(customer.FirstName, StringComparison.InvariantCultureIgnoreCase)
+                    && x.LastName.Equals(customer.LastName, StringComparison.InvariantCultureIgnoreCase)
                     && x.DateOfBirth.Date == customer.DateOfBirth.Date);
 
                 if (customerEntity is not null)
@@ -101,6 +111,21 @@ namespace LabSolution.Services
             }
 
             return matchedCustomers.Union(customersToAdd).ToList();
+        }
+
+        private static void CheckMatchByPersonalNumberWithDifferentName(List<Customer> existingCustomers, CustomerDto customerToUpdate, bool denyMatchByPersonalNumberWithDifferentName)
+        {
+            if (denyMatchByPersonalNumberWithDifferentName)
+            {
+                var isAnyWithSamePersonalNumberButDifferentName =
+                    !string.IsNullOrWhiteSpace(customerToUpdate.PersonalNumber)
+                    && existingCustomers.Any(x => x.PersonalNumber.Equals(customerToUpdate.PersonalNumber, StringComparison.InvariantCultureIgnoreCase)
+                                                && !x.FirstName.Equals(customerToUpdate.FirstName, StringComparison.InvariantCultureIgnoreCase)
+                                                && !x.LastName.Equals(customerToUpdate.LastName, StringComparison.InvariantCultureIgnoreCase));
+
+                if (isAnyWithSamePersonalNumberButDifferentName)
+                    throw new CustomException($"There is already someone with the Personal Number {customerToUpdate.PersonalNumber}, but with a different Name.");
+            }
         }
     }
 }
