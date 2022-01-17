@@ -27,5 +27,8 @@ namespace LabSolution.Models
 
         [InverseProperty("ProcessedOrder")]
         public virtual ProcessedOrderPdf ProcessedOrderPdf { get; set; }
+
+        [InverseProperty("ProcessedOrder")]
+        public virtual OrderSyncToGov OrderSyncToGov { get; set; }
     }
 }

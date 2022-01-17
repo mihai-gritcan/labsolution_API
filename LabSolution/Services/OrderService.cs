@@ -23,7 +23,7 @@ namespace LabSolution.Services
 
         Task<ProcessedOrderForPdf> GetProcessedOrderForPdf(int processedOrderId);
 
-        Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, string idnp);
+        Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, string idnp, bool includeSyncState);
         Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime startDate, DateTime endDate, TestType? testType = null);
 
         Task DeleteOrder(int orderId, bool canRemovePdf);
@@ -49,9 +49,9 @@ namespace LabSolution.Services
             return _context.CustomerOrders.Where(x => x.Scheduled.Date == date.Date).Select(x => x.Scheduled).ToListAsync();
         }
 
-        public Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, string idnp)
+        public Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, string idnp, bool includeSyncState)
         {
-            return GetQueryableOrders(idnp: idnp)
+            return GetQueryableOrders(idnp: idnp, includeSyncState: includeSyncState)
                 .Where(x => x.OrderDate.Date == date)
                 .OrderBy(x => x.Status).ThenBy(x => x.OrderId)
                 .ToListAsync();
@@ -65,11 +65,11 @@ namespace LabSolution.Services
                 .ToListAsync();
         }
 
-        private IQueryable<OrderWithStatusResponse> GetQueryableOrders(string idnp = null, TestType? testType = null)
+        private IQueryable<OrderWithStatusResponse> GetQueryableOrders(string idnp = null, TestType? testType = null, bool includeSyncState = false)
         {
             return _context.CustomerOrders
                 .Include(x => x.Customer)
-                .Include(x => x.ProcessedOrder)
+                .Include(x => x.ProcessedOrder).ThenInclude(x => x.OrderSyncToGov)
                 .Where(x => (idnp == null || x.Customer.PersonalNumber.Contains(idnp)) && (testType == null || x.TestType == (short)testType))
                 .Select(x => new OrderWithStatusResponse
                 {
@@ -82,7 +82,8 @@ namespace LabSolution.Services
                     Status = x.ProcessedOrder == null ? OrderStatus.Created : OrderStatus.Processed,
                     TestResult = x.ProcessedOrder == null ? null : (TestResult)x.ProcessedOrder.TestResult,
                     NumericCode = x.ProcessedOrder == null ? null : x.ProcessedOrder.Id.ToString("D7"),
-                    ProcessedOrderId = x.ProcessedOrder == null ? null : x.ProcessedOrder.Id                    
+                    ProcessedOrderId = x.ProcessedOrder == null ? null : x.ProcessedOrder.Id,
+                    IsSync = includeSyncState && x.ProcessedOrder.OrderSyncToGov != null
                 })
                 .OrderBy(x => x.Status).ThenBy(x => x.OrderId);
         }
