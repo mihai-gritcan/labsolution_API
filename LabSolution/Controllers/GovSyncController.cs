@@ -22,7 +22,7 @@ namespace LabSolution.Controllers
             _govSyncConfiguration = options.Value;
         }
 
-        [HttpPatch("sync-gov")]
+        [HttpPatch("sync")]
         public async Task<IActionResult> SyncOrdersToGov([FromBody] OrdersToSync ordersToSync)
         {
             if (!_govSyncConfiguration.IsSyncToGovEnabled)
