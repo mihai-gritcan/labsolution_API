@@ -57,19 +57,7 @@ namespace LabSolution
 
             services.AddDbContext<LabSolutionContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
-            //**********************************
-            //services.AddHttpClient();
-            services.AddHttpClient("GovSyncClient", config =>
-            {
-                config.BaseAddress = new Uri("https://localhost:5001/api/");
-                config.Timeout = new TimeSpan(0, 0, 30);
-                config.DefaultRequestHeaders.Clear();
-            });
-
             services.AddHttpClient<GovSyncClient>();
-            services.AddScoped<IHttpClientServiceImplementation, HttpClientFactoryService>();
-
-            //**********************************
 
             services.AddHealthChecks();
 

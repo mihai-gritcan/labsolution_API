@@ -7,7 +7,6 @@ using LabSolution.Infrastructure;
 using Microsoft.Extensions.Options;
 using LabSolution.HttpModels;
 using Microsoft.AspNetCore.Authorization;
-using LabSolution.Services;
 using LabSolution.Clients;
 
 namespace LabSolution.Controllers
@@ -19,29 +18,13 @@ namespace LabSolution.Controllers
         private readonly LabSolutionContext _context;
         private readonly GovSyncConfiguration _govSyncConfiguration;
 
-        private readonly IHttpClientServiceImplementation _httpClientService;
         private readonly GovSyncClient _govSyncClient;
 
-        public GovSyncController(LabSolutionContext context, IOptions<GovSyncConfiguration> options, IHttpClientServiceImplementation httpClientService, GovSyncClient govSyncClient)
+        public GovSyncController(LabSolutionContext context, IOptions<GovSyncConfiguration> options, GovSyncClient govSyncClient)
         {
             _context = context;
             _govSyncConfiguration = options.Value;
-            _httpClientService = httpClientService;
             _govSyncClient = govSyncClient;
-        }
-
-        [AllowAnonymous]
-        [HttpGet("1")]
-        public async Task<IActionResult> SimulateHttpCall1()
-        {
-            return Ok(await _httpClientService.Execute1());
-        }
-
-        [AllowAnonymous]
-        [HttpGet("2")]
-        public async Task<IActionResult> SimulateHttpCall2()
-        {
-            return Ok(await _httpClientService.Execute2());
         }
 
         [AllowAnonymous]
