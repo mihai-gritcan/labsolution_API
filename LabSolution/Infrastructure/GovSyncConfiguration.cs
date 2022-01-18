@@ -5,5 +5,6 @@
         public bool IsSyncToGovEnabled { get; set; }
         public string LaboratoryId { get; set; }
         public string LaboratoryOfficeId { get; set; }
+        public string ApiUrl { get; set; }
     }
 }

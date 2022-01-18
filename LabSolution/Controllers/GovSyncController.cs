@@ -3,9 +3,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LabSolution.Models;
-using System.Collections.Generic;
 using LabSolution.Infrastructure;
 using Microsoft.Extensions.Options;
+using LabSolution.HttpModels;
+using Microsoft.AspNetCore.Authorization;
+using LabSolution.Services;
+using LabSolution.Clients;
 
 namespace LabSolution.Controllers
 {
@@ -16,14 +19,40 @@ namespace LabSolution.Controllers
         private readonly LabSolutionContext _context;
         private readonly GovSyncConfiguration _govSyncConfiguration;
 
-        public GovSyncController(LabSolutionContext context, IOptions<GovSyncConfiguration> options)
+        private readonly IHttpClientServiceImplementation _httpClientService;
+        private readonly GovSyncClient _govSyncClient;
+
+        public GovSyncController(LabSolutionContext context, IOptions<GovSyncConfiguration> options, IHttpClientServiceImplementation httpClientService, GovSyncClient govSyncClient)
         {
             _context = context;
             _govSyncConfiguration = options.Value;
+            _httpClientService = httpClientService;
+            _govSyncClient = govSyncClient;
+        }
+
+        [AllowAnonymous]
+        [HttpGet("1")]
+        public async Task<IActionResult> SimulateHttpCall1()
+        {
+            return Ok(await _httpClientService.Execute1());
+        }
+
+        [AllowAnonymous]
+        [HttpGet("2")]
+        public async Task<IActionResult> SimulateHttpCall2()
+        {
+            return Ok(await _httpClientService.Execute2());
+        }
+
+        [AllowAnonymous]
+        [HttpGet("3")]
+        public async Task<IActionResult> SimulateHttpCall3()
+        {
+            return Ok(await _govSyncClient.GetCompanies());
         }
 
         [HttpPatch("sync")]
-        public async Task<IActionResult> SyncOrdersToGov([FromBody] OrdersToSync ordersToSync)
+        public async Task<IActionResult> SyncOrdersToGov([FromBody] OrdersToSyncRequest ordersToSync)
         {
             if (!_govSyncConfiguration.IsSyncToGovEnabled)
                 return BadRequest("Synchronization with Gov is not enabled. Please enable the option and retry");
@@ -44,8 +73,8 @@ namespace LabSolution.Controllers
                     },
                     Sample = new
                     {
-                        LaboratoryId = "LaboratoryId123", //  TODO: get it from MedTest
-                        LaboratoryOfficeId = "LaboratoryOfficeId123", //  TODO: get it from MedTest
+                        LaboratoryId = _govSyncConfiguration.LaboratoryId,
+                        LaboratoryOfficeId = _govSyncConfiguration.LaboratoryOfficeId,
                         LaboratoryTestNumber = x.Id,
                         SampleType = x.CustomerOrder.TestType,
                         SampleCollectionAt = x.ProcessedAt,
@@ -58,13 +87,6 @@ namespace LabSolution.Controllers
             // TODO: call HttpClient to send the orders to Government
 
             return NoContent();
-
         }
-    }
-
-    public class OrdersToSync
-    {
-        /// <summary> The list of Processed OrdersIds to be synched with Gov </summary>
-        public List<int> ProcessedOrderIds { get; set; }
     }
 }

@@ -17,6 +17,8 @@ using Serilog;
 using System.Text;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
+using System;
+using LabSolution.Clients;
 
 namespace LabSolution
 {
@@ -54,6 +56,20 @@ namespace LabSolution
             services.AddSingleton(Log.Logger);
 
             services.AddDbContext<LabSolutionContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+
+            //**********************************
+            //services.AddHttpClient();
+            services.AddHttpClient("GovSyncClient", config =>
+            {
+                config.BaseAddress = new Uri("https://localhost:5001/api/");
+                config.Timeout = new TimeSpan(0, 0, 30);
+                config.DefaultRequestHeaders.Clear();
+            });
+
+            services.AddHttpClient<GovSyncClient>();
+            services.AddScoped<IHttpClientServiceImplementation, HttpClientFactoryService>();
+
+            //**********************************
 
             services.AddHealthChecks();
 
@@ -128,7 +144,7 @@ namespace LabSolution
         private static void EnableSwagger(IApplicationBuilder app)
         {
             app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SmallHrApi v1"));
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "LabSolutionApi"));
         }
     }
 }
