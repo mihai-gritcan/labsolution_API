@@ -79,7 +79,6 @@ namespace LabSolution.Controllers
             return Ok(savedOrders);
         }
 
-        [AllowAnonymous]
         // reception getOrders ByDate or idnp (can include Gov sync state data)
         [HttpGet("{date}")]
         public async Task<ActionResult<object>> GetOrders(DateTime date, [FromQuery] string idnp, [FromQuery] bool includeSyncState = false)

@@ -6,7 +6,6 @@ using LabSolution.Models;
 using LabSolution.Infrastructure;
 using Microsoft.Extensions.Options;
 using LabSolution.HttpModels;
-using Microsoft.AspNetCore.Authorization;
 using LabSolution.GovSync;
 using LabSolution.Enums;
 using System.Collections.Generic;
@@ -31,7 +30,6 @@ namespace LabSolution.Controllers
             _govSyncClient = govSyncClient;
         }
 
-        [AllowAnonymous]
         [HttpPatch("sync")]
         public async Task<IActionResult> SyncOrdersToGov([FromBody] OrdersToSyncRequest ordersToSync)
         {
