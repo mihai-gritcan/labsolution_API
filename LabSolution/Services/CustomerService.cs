@@ -119,7 +119,8 @@ namespace LabSolution.Services
             {
                 var isAnyWithSamePersonalNumberButDifferentName =
                     !string.IsNullOrWhiteSpace(customerToUpdate.PersonalNumber)
-                    && existingCustomers.Any(x => x.PersonalNumber.Equals(customerToUpdate.PersonalNumber, StringComparison.InvariantCultureIgnoreCase)
+                    && existingCustomers.Any(x => x.PersonalNumber != null
+                                                && x.PersonalNumber.Equals(customerToUpdate.PersonalNumber, StringComparison.InvariantCultureIgnoreCase)
                                                 && !x.FirstName.Equals(customerToUpdate.FirstName, StringComparison.InvariantCultureIgnoreCase)
                                                 && !x.LastName.Equals(customerToUpdate.LastName, StringComparison.InvariantCultureIgnoreCase));
 
