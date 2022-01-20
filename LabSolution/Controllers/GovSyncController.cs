@@ -7,7 +7,11 @@ using LabSolution.Infrastructure;
 using Microsoft.Extensions.Options;
 using LabSolution.HttpModels;
 using Microsoft.AspNetCore.Authorization;
-using LabSolution.Clients;
+using LabSolution.GovSync;
+using LabSolution.Enums;
+using System.Collections.Generic;
+using LabSolution.Utils;
+using System;
 
 namespace LabSolution.Controllers
 {
@@ -28,48 +32,69 @@ namespace LabSolution.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("3")]
-        public async Task<IActionResult> SimulateHttpCall3()
-        {
-            return Ok(await _govSyncClient.GetCompanies());
-        }
-
         [HttpPatch("sync")]
         public async Task<IActionResult> SyncOrdersToGov([FromBody] OrdersToSyncRequest ordersToSync)
         {
             if (!_govSyncConfiguration.IsSyncToGovEnabled)
                 return BadRequest("Synchronization with Gov is not enabled. Please enable the option and retry");
 
-            var ordersFromDb = await _context.ProcessedOrders.Where(x => ordersToSync.ProcessedOrderIds.Contains(x.Id))
+            var orders = await _context.ProcessedOrders.Where(x => ordersToSync.ProcessedOrderIds.Contains(x.Id))
                 .Include(x => x.CustomerOrder).ThenInclude(x => x.Customer)
-                .Select(x => new
+                .Select(x => new TestPushModel
                 {
-                    Customer = new {
+                    PersonInfo = new PersonInfoModel {
                         IsResident = true, // TODO: get it from MedTest
-                        x.CustomerOrder.Customer.PersonalNumber,
-                        x.CustomerOrder.Customer.FirstName,
-                        x.CustomerOrder.Customer.LastName,
-                        x.CustomerOrder.Customer.DateOfBirth,
-                        x.CustomerOrder.Customer.Passport,
-                        x.CustomerOrder.Customer.Gender,
-                        x.CustomerOrder.Customer.Address
+                        IdentityNumber = x.CustomerOrder.Customer.PersonalNumber,
+                        FirstName = x.CustomerOrder.Customer.FirstName,
+                        LastName = x.CustomerOrder.Customer.LastName,
+                        BirthDay = x.CustomerOrder.Customer.DateOfBirth,
+                        PhoneNumber = x.CustomerOrder.Customer.Phone,
+                        Gender = x.CustomerOrder.Customer.Gender == (int)Gender.Male ? "Male" : "Female",
+                        Address = new AddressModel { Municipality = x.CustomerOrder.Customer.Address },
+                        WorkingInfo = new WorkingInfoModel { Position = string.Empty }
                     },
-                    Sample = new
+                    SampleInfo = new SampleInfoModel
                     {
                         LaboratoryId = _govSyncConfiguration.LaboratoryId,
                         LaboratoryOfficeId = _govSyncConfiguration.LaboratoryOfficeId,
-                        LaboratoryTestNumber = x.Id,
-                        SampleType = x.CustomerOrder.TestType,
+                        LaboratoryTestNumber = x.Id.ToString("D7"),
+                        SampleType = x.CustomerOrder.TestType == (short)TestType.PCR ? "PCR" : "AntiGen",
                         SampleCollectionAt = x.ProcessedAt,
-                        SampleResult = x.TestResult
+                        SampleResult = x.TestResult == (int)TestResult.Positive ? "Positive" : "Negative",
+                        TestDeviceIdentifier = GetTestDeviceIdentifier((TestType)x.CustomerOrder.TestType)
                     },
+                    VaccinationInfo = new VaccinationInfoModel(),
                     CaseStartDate = x.ProcessedAt // should be the Start of a Positive test or the Date when the sample was collected
                 })
                 .ToListAsync();
 
-            // TODO: call HttpClient to send the orders to Government
+            var syncResult = await _govSyncClient.SendTestResults(orders);
 
-            return NoContent();
+            await SaveSynchedOrders(syncResult.SynchedItems);
+
+            return Accepted(syncResult);
+        }
+
+        // TODO: get it from MedTest
+        private static string GetTestDeviceIdentifier(TestType testType)
+        {
+            // Ex: Pentru dispozitivul "SD BIOSENSOR Inc, STANDARD F COVID-19 Ag FIA", câmpul se va completa cu valoarea "344"
+            return testType == TestType.Antigen ? "344" : null;
+        }
+
+        private async Task SaveSynchedOrders(List<TestPushModel> synchedTests)
+        {
+            var date = DateTime.UtcNow.ToBucharestTimeZone();
+            var entitiesToSave = synchedTests.Select(x => new OrderSyncToGov
+            {
+                DateSynched = date,
+                ProcessedOrderId = int.Parse(x.SampleInfo.LaboratoryTestNumber),
+                TestResultSyncStatus = x.SampleInfo.SampleResult == nameof(TestResult.Positive)
+            });
+
+            _context.OrdersSyncToGov.AddRange(entitiesToSave);
+            await _context.SaveChangesAsync();
         }
     }
+
 }

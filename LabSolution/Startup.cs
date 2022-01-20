@@ -17,8 +17,7 @@ using Serilog;
 using System.Text;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
-using System;
-using LabSolution.Clients;
+using LabSolution.GovSync;
 
 namespace LabSolution
 {
