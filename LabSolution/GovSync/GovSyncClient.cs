@@ -39,7 +39,7 @@ namespace LabSolution.GovSync
 				}
 				catch (HttpRequestException ex)
 				{
-					syncResult.UnsynchedItems.Add(item, ex.Message);
+					syncResult.UnsynchedItems.Add(new KeyValuePair<TestPushModel, string>(item, ex.Message));
 				}
 			}
 			return syncResult;

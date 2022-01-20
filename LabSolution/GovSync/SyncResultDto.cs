@@ -7,9 +7,9 @@ namespace LabSolution.GovSync
         public SyncResultDto()
         {
             SynchedItems = new List<TestPushModel>();
-            UnsynchedItems = new Dictionary<TestPushModel, string>();
+            UnsynchedItems = new List<KeyValuePair<TestPushModel, string>>();
         }
         public List<TestPushModel> SynchedItems { get; set; }
-        public Dictionary<TestPushModel, string> UnsynchedItems { get; set; }
+        public List<KeyValuePair<TestPushModel, string>> UnsynchedItems { get; set; }
     }
 }
