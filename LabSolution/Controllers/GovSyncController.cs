@@ -70,7 +70,7 @@ namespace LabSolution.Controllers
 
             await SaveSynchedOrders(syncResult.SynchedItems);
 
-            return Accepted(syncResult);
+            return Accepted(new SyncResponse(syncResult));
         }
 
         // TODO: get it from MedTest
@@ -95,4 +95,15 @@ namespace LabSolution.Controllers
         }
     }
 
+    public record SyncResponse
+    {
+        public SyncResponse(SyncResultDto syncResult)
+        {
+            SynchedItems = syncResult.SynchedItems.ConvertAll(x => int.Parse(x.SampleInfo.LaboratoryTestNumber));
+            UnsynchedItems = syncResult.UnsynchedItems.ConvertAll(x => new KeyValuePair<int, string>(int.Parse(x.Key.SampleInfo.LaboratoryTestNumber), x.Value));
+        }
+
+        public List<int> SynchedItems { get; set; }
+        public List<KeyValuePair<int, string>> UnsynchedItems { get; set; }
+    }
 }
