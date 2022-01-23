@@ -33,17 +33,28 @@ namespace LabSolution.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCustomers([FromQuery] string idnp, [FromQuery] string firstName, [FromQuery] string lastName)
+        public async Task<IActionResult> GetCustomers([FromQuery] string idnp, [FromQuery] string firstName, [FromQuery] string lastName, 
+            [FromQuery] string passport, [FromQuery] string email, [FromQuery] string phone)
         {
             var queryableCustomers = _context.Customers.Where(x => !x.IsSoftDelete).Select(x => x);
+            
             if (!string.IsNullOrWhiteSpace(idnp))
-                queryableCustomers = queryableCustomers.Where(x => x.PersonalNumber.Contains(idnp));
+                queryableCustomers = queryableCustomers.Where(x => x.PersonalNumber.ToUpper().Contains(idnp.ToUpper()));
 
             if(!string.IsNullOrWhiteSpace(firstName))
-                queryableCustomers = queryableCustomers.Where(x => x.FirstName.Contains(firstName) || x.LastName.Contains(firstName));
+                queryableCustomers = queryableCustomers.Where(x => x.FirstName.ToUpper().Contains(firstName.ToUpper()) || x.LastName.ToUpper().Contains(firstName.ToUpper()));
 
             if (!string.IsNullOrWhiteSpace(lastName))
-                queryableCustomers = queryableCustomers.Where(x => x.LastName.Contains(lastName) || x.FirstName.Contains(lastName));
+                queryableCustomers = queryableCustomers.Where(x => x.LastName.ToUpper().Contains(lastName.ToUpper()) || x.FirstName.ToUpper().Contains(lastName.ToUpper()));
+
+            if (!string.IsNullOrWhiteSpace(passport))
+                queryableCustomers = queryableCustomers.Where(x => x.Passport.ToUpper().Contains(passport.ToUpper()));
+
+            if (!string.IsNullOrWhiteSpace(email))
+                queryableCustomers = queryableCustomers.Where(x => x.Email.ToUpper().Contains(email.ToUpper()));
+            
+            if (!string.IsNullOrWhiteSpace(phone))
+                queryableCustomers = queryableCustomers.Where(x => x.Phone.ToUpper().Contains(phone.ToUpper()));
 
             return Ok(await queryableCustomers.Select(x => CustomerDto.CreateDtoFromEntity(x)).ToListAsync());
         }
