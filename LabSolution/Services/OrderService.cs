@@ -260,6 +260,10 @@ namespace LabSolution.Services
             if (processedOrderWithTicketEmitted is not null)
             {
                 var orderWithGeneratedResult = await _context.ProcessedOrderPdfs.SingleOrDefaultAsync(x => x.ProcessedOrderId == processedOrderWithTicketEmitted.Id);
+                var wasSynchedWithGov = await _context.OrdersSyncToGov.AnyAsync(x => x.ProcessedOrderId == processedOrderWithTicketEmitted.Id);
+                if(wasSynchedWithGov)
+                    throw new CustomException("Cannot remove an Order which was synchronized with Gov platform");
+
                 if (orderWithGeneratedResult is not null)
                 {
                     if (canRemovePdf)
