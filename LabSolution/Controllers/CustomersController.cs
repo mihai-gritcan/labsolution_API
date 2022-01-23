@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LabSolution.Models;
 using LabSolution.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LabSolution.Controllers
 {
@@ -18,10 +19,23 @@ namespace LabSolution.Controllers
             _context = context;
         }
 
+        [HttpDelete("{customerId}")]
+        public async Task<IActionResult> SoftDeleteCustomer(int customerId)
+        {
+            var customer = await _context.Customers.FindAsync(customerId);
+            if (customer is null)
+                return NotFound("Resource not found");
+
+            customer.IsSoftDelete = true;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetCustomers([FromQuery] string idnp, [FromQuery] string firstName, [FromQuery] string lastName)
         {
-            var queryableCustomers = _context.Customers.Select(x => x);
+            var queryableCustomers = _context.Customers.Where(x => !x.IsSoftDelete).Select(x => x);
             if (!string.IsNullOrWhiteSpace(idnp))
                 queryableCustomers = queryableCustomers.Where(x => x.PersonalNumber.Contains(idnp));
 

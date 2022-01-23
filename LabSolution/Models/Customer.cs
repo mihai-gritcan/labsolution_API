@@ -35,6 +35,8 @@ namespace LabSolution.Models
         [StringLength(80)]
         public string Email { get; set; }
 
+        public bool IsSoftDelete { get; internal set; }
+
         [InverseProperty(nameof(CustomerOrder.Customer))]
         public virtual ICollection<CustomerOrder> CustomerOrders { get; set; }
     }
