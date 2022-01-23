@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LabSolution.Models;
 using LabSolution.Dtos;
-using Microsoft.AspNetCore.Authorization;
 
 namespace LabSolution.Controllers
 {
@@ -22,7 +21,7 @@ namespace LabSolution.Controllers
         [HttpDelete("{customerId}")]
         public async Task<IActionResult> SoftDeleteCustomer(int customerId)
         {
-            var customer = await _context.Customers.FindAsync(customerId);
+            var customer = await _context.Customers.FirstOrDefaultAsync(x => !x.IsSoftDelete && x.Id == customerId);
             if (customer is null)
                 return NotFound("Resource not found");
 
@@ -71,7 +70,9 @@ namespace LabSolution.Controllers
 
         private async Task<IActionResult> UpdateCustomer(int id, CustomerDto customer)
         {
-            var customerEntity = await _context.Customers.FindAsync(customer.Id);
+            var queryableCustomers = _context.Customers.Where(x => !x.IsSoftDelete);
+
+            var customerEntity = await queryableCustomers.FirstOrDefaultAsync(x => x.Id == customer.Id);
             if (customerEntity is null)
                 return NotFound();
 
@@ -85,13 +86,13 @@ namespace LabSolution.Controllers
             customerEntity.Phone = customer.Phone;
             customerEntity.Email = customer.Email;
 
-            var existingSimilarByPersonalNumber = await _context.Customers.FirstOrDefaultAsync(x => x.Id != customerEntity.Id &&
+            var existingSimilarByPersonalNumber = await queryableCustomers.FirstOrDefaultAsync(x => x.Id != customerEntity.Id &&
                 !string.IsNullOrWhiteSpace(customerEntity.PersonalNumber) && x.PersonalNumber.ToUpper().Equals(customerEntity.PersonalNumber.ToUpper()));
 
             if (existingSimilarByPersonalNumber is not null)
                 return BadRequest("There is already a customer registered with this Personal Number");
 
-            var existingSimilarByNameAndDoB = await _context.Customers.FirstOrDefaultAsync(x =>
+            var existingSimilarByNameAndDoB = await queryableCustomers.FirstOrDefaultAsync(x =>
                 x.Id != customerEntity.Id
                 && x.FirstName.ToUpper().Equals(customerEntity.FirstName.ToUpper())
                 && x.LastName.ToUpper().Equals(customerEntity.LastName.ToUpper())
@@ -119,7 +120,7 @@ namespace LabSolution.Controllers
 
         private Task<bool> CustomerExists(int id)
         {
-            return _context.Customers.AnyAsync(e => e.Id == id);
+            return _context.Customers.AnyAsync(e => !e.IsSoftDelete && e.Id == id);
         }
     }
 }

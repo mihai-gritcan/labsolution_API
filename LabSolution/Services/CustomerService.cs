@@ -33,7 +33,9 @@ namespace LabSolution.Services
             var customersLastNames = customers.Select(x => x.LastName);
             var customersDOBs = customers.Select(x => x.DateOfBirth.Date);
 
-            var existingCustomers = await _context.Customers.Where(x =>
+            var queryableCustomers = _context.Customers.Where(x => !x.IsSoftDelete);
+
+            var existingCustomers = await queryableCustomers.Where(x =>
                     customersPersonalNumbers.Contains(x.PersonalNumber)
                     || customersFirstNames.Contains(x.FirstName)
                     || customersLastNames.Contains(x.LastName)
@@ -115,18 +117,16 @@ namespace LabSolution.Services
 
         private static void CheckMatchByPersonalNumberWithDifferentName(List<Customer> existingCustomers, CustomerDto customerToUpdate, bool denyMatchByPersonalNumberWithDifferentName)
         {
-            if (denyMatchByPersonalNumberWithDifferentName)
-            {
-                var isAnyWithSamePersonalNumberButDifferentName =
-                    !string.IsNullOrWhiteSpace(customerToUpdate.PersonalNumber)
-                    && existingCustomers.Any(x => x.PersonalNumber != null
-                                                && x.PersonalNumber.Equals(customerToUpdate.PersonalNumber, StringComparison.InvariantCultureIgnoreCase)
-                                                && !x.FirstName.Equals(customerToUpdate.FirstName, StringComparison.InvariantCultureIgnoreCase)
-                                                && !x.LastName.Equals(customerToUpdate.LastName, StringComparison.InvariantCultureIgnoreCase));
+            if (!denyMatchByPersonalNumberWithDifferentName) return;
 
-                if (isAnyWithSamePersonalNumberButDifferentName)
-                    throw new CustomException($"There is already someone with the Personal Number {customerToUpdate.PersonalNumber}, but with a different Name.");
-            }
+            var isAnyWithSamePersonalNumberButDifferentName =
+                !string.IsNullOrWhiteSpace(customerToUpdate.PersonalNumber)
+                && existingCustomers.Any(x => x.PersonalNumber?.Equals(customerToUpdate.PersonalNumber, StringComparison.InvariantCultureIgnoreCase) == true
+                                            && !x.FirstName.Equals(customerToUpdate.FirstName, StringComparison.InvariantCultureIgnoreCase)
+                                            && !x.LastName.Equals(customerToUpdate.LastName, StringComparison.InvariantCultureIgnoreCase));
+
+            if (isAnyWithSamePersonalNumberButDifferentName)
+                throw new CustomException($"There is already someone with the Personal Number {customerToUpdate.PersonalNumber}, but with a different Name.");
         }
     }
 }
