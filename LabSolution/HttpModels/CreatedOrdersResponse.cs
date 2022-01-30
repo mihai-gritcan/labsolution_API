@@ -34,6 +34,7 @@ namespace LabSolution.HttpModels
 
         public DateTime OrderDate { get; set; }
         public TestResult TestResult { get; set; }
+        public decimal? ResultQtyUnits { get; set; }
         public string NumericCode { get; set; }
         public DateTime ProcessedAt { get; internal set; }
         public string ProcessedBy { get; internal set; }

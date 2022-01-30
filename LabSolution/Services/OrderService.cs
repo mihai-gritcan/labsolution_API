@@ -162,7 +162,7 @@ namespace LabSolution.Services
 
         public async Task<ProcessedOrderForPdf> SetTestResult(int processedOrderId, TestResult testResult, string executorName, string verifierName, string validatorName, decimal? resultQtyUnits)
         {
-            var processedOrder = await _context.ProcessedOrders.SingleAsync(x => x.Id == processedOrderId);
+            var processedOrder = await _context.ProcessedOrders.Include(x => x.CustomerOrder).ThenInclude(x => x.Customer).SingleAsync(x => x.Id == processedOrderId);
 
             processedOrder.TestResult = (int)testResult;
             processedOrder.ProcessedBy = executorName;
@@ -174,24 +174,20 @@ namespace LabSolution.Services
 
             await _context.SaveChangesAsync();
 
-            return CreateProcessedOrderForPdfDto(processedOrder);
-        }
-
-        private static ProcessedOrderForPdf CreateProcessedOrderForPdfDto(ProcessedOrder x)
-        {
-            return  new ProcessedOrderForPdf
-                {
-                    OrderId = x.Id,
-                    TestResult = (TestResult)x.TestResult,
-                    OrderDate = x.CustomerOrder.Scheduled,
-                    ProcessedAt = x.ProcessedAt,
-                    ProcessedBy = x.ProcessedBy,
-                    TestType = (TestType)x.CustomerOrder.TestType,
-                    TestLanguage = (TestLanguage)x.CustomerOrder.TestLanguage,
-                    Customer = CustomerDto.CreateDtoFromEntity(x.CustomerOrder.Customer, x.CustomerOrder.ParentId == null),
-                    NumericCode = x.Id.ToString("D7"),
-                    PdfName = x.PdfName
-                };
+            return new ProcessedOrderForPdf
+            {
+                OrderId = processedOrder.Id,
+                TestResult = (TestResult)processedOrder.TestResult,
+                ResultQtyUnits = processedOrder.ResultQtyUnits,
+                OrderDate = processedOrder.CustomerOrder.Scheduled,
+                ProcessedAt = processedOrder.ProcessedAt,
+                ProcessedBy = processedOrder.ProcessedBy,
+                TestType = (TestType)processedOrder.CustomerOrder.TestType,
+                TestLanguage = (TestLanguage)processedOrder.CustomerOrder.TestLanguage,
+                Customer = CustomerDto.CreateDtoFromEntity(processedOrder.CustomerOrder.Customer, processedOrder.CustomerOrder.ParentId == null),
+                NumericCode = processedOrder.Id.ToString("D7"),
+                PdfName = processedOrder.PdfName
+            };
         }
 
         public async Task SaveOrReplacePdfBytes(int processedOrderId, string pdfName, byte[] pdfBytes)

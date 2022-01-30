@@ -164,39 +164,12 @@
         <tr>
             <td colspan="2" class="notes">
                 <p>Eșantion primar <span class="gray-color">/ Primary sample / Первичный образец:</span> sânge <span class="gray-color">/ blood / кровь.</span></p>
-                <p>Echipament <span class="gray-color">/ Equipment / Анализатор:</span> #TEST_EQUIPMENT_ANALYZER_KEY</p>
-                <p>
-                    <span> Metoda de investigare <span class="gray-color">/ Investigation method / Метод иследования:</span> </span><b><span>CMIA</span></b>
-                </p>
-            </td>
-        </tr>
-
-        <tr>
-            <td colspan="2" class="parameters">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td style="width: 55%;">
-                                <p> <strong>Investigație</strong> </p>
-                                <span class="gray-color"> <strong>Test / Название (показатель)</strong> </span>
-                            </td>
-                            <td style="width: 25%;">
-                                <p> <strong>Rezultat </strong> </p>
-                                <span class="gray-color"> <strong>Result / Результат</strong> </span>
-                            </td>
-                            <td style="width: 20%;">
-                                <p> <strong>Valori de referință </strong> </p>
-                                <span class="gray-color"> <strong>Reference range / Реф. значения</strong> </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
             </td>
         </tr>
 
         <tr>
             <td colspan="2" class="other">
-                <span> <strong>Marker serologic către COVID-19 / Serological marker to COVID-19 / Серологический маркер COVID-19</strong> </span>
+                <span> <strong>Markeri / Markers / Маркеры </strong> </span>
             </td>
         </tr>
 
@@ -205,38 +178,80 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td style="width: 55%;">
+                            <td style="width: 50%;">
+                                <p> <strong>Investigație (Analiză)/ eșantion</strong> </p>
+                                <p class="gray-color"> <strong>Test (Analysis)/ sample</strong> </p>
+                                <p class="gray-color"> <strong>Исследование (анализ)/ образец</strong> </p>
+                            </td>
+                            <td style="width: 9%;">
+                                <p> <strong>Metoda</strong> </p>
+                                <p class="gray-color"> <strong>Method</strong> </p>
+                                <p class="gray-color"> <strong>Метод</strong> </p>
+                            </td>
+                            <td style="width: 10%;">
+                                <p> <strong>Rezultat </strong> </p>
+                                <p class="gray-color"> <strong>Result</strong> </p>
+                                <p class="gray-color"> <strong>Результат</strong> </p>
+                            </td>
+                            <td style="width: 9%;">
+                                <p> <strong>Unități </strong> </p>
+                                <p class="gray-color"> <strong>Units</strong> </p>
+                                <p class="gray-color"> <strong>Единицы </strong> </p>
+                            </td>
+                            <td style="width: 22%;">
+                                <p> <strong>Interval de referință </strong> </p>
+                                <p class="gray-color"> <strong>Reference interval</strong> </p>
+                                <p class="gray-color"> <strong>Референсный интервал</strong> </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="width: 50%; text-align: left">
                                 <p>
-                                    SARS-CoV-2, IgG/IgM / RBD-S1 anticorpi neutralizanți / calitativ
+                                    Anti-SARS-CoV-2, IgG/RBD-S1, anticorpi neutralizanți (test cantitativ) /ser
                                 </p>
                                 <p class="gray-color">
-                                    SARS-CoV-2, IgG/IgM / RBD-S1 netralizing antibodies / qualitative
+                                    Anti-SARS-CoV-2, IgG/RBD-S1, neutralizing antibodies (quantitative test) /serum
                                 </p>
                                 <p class="gray-color">
-                                    SARS-CoV-2, IgG/IgM / RBD-S1 нейтрализующие антитела / качественный
+                                    Anti-SARS-CoV-2, IgG/RBD-S1, нейтрализующие антитела (количественный тест) /сыворотка
                                 </p>
                             </td>
 
-                            <td style="width: 25%;">
-                                <p> <strong>#TEST_RESULT_KEY_RO</strong> </p>
-                                <p class="gray-color"> <strong> #TEST_RESULT_KEY_EN / #TEST_RESULT_KEY_RU </strong> </p>
+                            <td style="width: 9%;">
+                                <p>ELISA</p>
                             </td>
 
-                            <td style="width: 20%" class="table-without-border">
-                                <table class="antibody-reference-quantity">
+                            <td style="width: 10%;">
+                                <p> <strong>#TEST_RESULT_ANTIBODY_QTY_UNITS_KEY</strong> </p>
+                            </td>
+
+                            <td style="width: 9%;">
+                                <p> IU/ml </p>
+                            </td>
+
+                            <td style="width: 22%" class="table-without-border">
+                                <table>
                                     <tbody>
                                         <tr>
                                             <td>
-                                                <p> <strong>Negativ</strong> </p>
-                                                <p class="gray-color"> Negative </p>
-                                                <p class="gray-color"> Отрицательный </p>
+                                                <p> <strong>< 16 - negativ</strong> </p>
+                                                <p class="gray-color"> negative </p>
+                                                <p class="gray-color"> отрицательный </p>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
-                                                <p> <strong>Pozitiv</strong> </p>
-                                                <p class="gray-color"> Positive </p>
-                                                <p class="gray-color"> Положительный </p>
+                                                <p> <strong>16 - 20 - echivoc</strong> </p>
+                                                <p class="gray-color"> equivocal </p>
+                                                <p class="gray-color"> нейтральный </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <p> <strong>> 20 - pozitiv</strong></p>
+                                                <p class="gray-color"> positive</p>
+                                                <p class="gray-color"> положительный</p>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -245,20 +260,6 @@
                         </tr>
                     </tbody>
                 </table>
-            </td>
-        </tr>
-
-        <tr>
-            <td colspan="2">
-                <p>
-                    Valorile de referință sunt indicate în conformitate cu instrucțiunea producătorului kitului de reactivi utilizați.
-                </p>
-                <p class="gray-color">
-                    The reference values are indicated according to the instruction of the manufacturer of the reagent kits used.
-                </p>
-                <p class="gray-color">
-                    Референсные значения указаны в соответствии с инструкциями производителя используемых наборов реагентов.
-                </p>
             </td>
         </tr>
 
