@@ -158,10 +158,8 @@ namespace LabSolution.Controllers
             var labConfigs = await _appConfigService.GetLabConfigAddresses();
             var fileName = $"{Guid.NewGuid()}";
 
-            await _orderService.SetTestResult(setResultRequest.ProcessedOrderId, setResultRequest.TestResult,
-                setResultRequest.ExecutorName, setResultRequest.VerifierName, setResultRequest.ValidatorName);
-
-            var processedOrderForPdf = await _orderService.GetProcessedOrderForPdf(processedOrderId);
+            var processedOrderForPdf = await _orderService.SetTestResult(setResultRequest.ProcessedOrderId, setResultRequest.TestResult,
+                setResultRequest.ExecutorName, setResultRequest.VerifierName, setResultRequest.ValidatorName, setResultRequest.AntibodyUnits);
 
             var pdfBytes = await _pdfReportProvider.CreatePdfReport(fileName, processedOrderForPdf, labConfigs);
 
