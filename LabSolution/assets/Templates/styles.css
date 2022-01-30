@@ -78,10 +78,6 @@ table {
 .other {
 }
 
-.other-details {
-    text-align: center;
-}
-
 .other-details p {
     margin: 0;
 }
@@ -102,6 +98,6 @@ table {
     width: 100%;
 }
 
-.antibody-reference-quantity {
+.antibody-results {
     text-align: center;
 }

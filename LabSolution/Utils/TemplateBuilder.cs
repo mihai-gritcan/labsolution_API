@@ -52,17 +52,6 @@ namespace LabSolution.Utils
         private const string _testResultCommentKeyEn = "#TEST_RESULT_COMMENT_KEY_EN";
         private const string _testResultCommentKeyRu = "#TEST_RESULT_COMMENT_KEY_RU";
 
-        private static string IsVirusConfirmed(TestResult testResult, TestLanguage testLanguage)
-        {
-            return testLanguage switch
-            {
-                TestLanguage.Romanian => testResult == TestResult.Positive ? "prezența" : "absența",
-                TestLanguage.English => testResult == TestResult.Positive ? "presence" : "absence",
-                TestLanguage.Russian => testResult == TestResult.Positive ? "присутствие" : "отсутствие",
-                _ => testResult == TestResult.Positive ? "presence" : "absence",
-            };
-        }
-
         // TODO: #56 Use StringBuilder instead of string.Replace
         public static async Task<string> GetReportTemplate(ProcessedOrderForPdf processedOrderForPdf, byte[] barcode, byte[] qrcode, LabConfigAddresses labConfigOptions)
         {
@@ -100,18 +89,15 @@ namespace LabSolution.Utils
 
         private static string AppendTestResult(string htmlTemplate, ProcessedOrderForPdf processedOrderForPdf)
         {
-            htmlTemplate = htmlTemplate
-                .Replace(_testResultKeyRo, GetTestResultText(processedOrderForPdf.TestResult, TestLanguage.Romanian))
-                .Replace(_testResultKeyEn, GetTestResultText(processedOrderForPdf.TestResult, TestLanguage.English))
-                .Replace(_testResultKeyRu, GetTestResultText(processedOrderForPdf.TestResult, TestLanguage.Russian))
-                .Replace(_testResultCommentKeyRo, IsVirusConfirmed(processedOrderForPdf.TestResult, TestLanguage.Romanian))
-                .Replace(_testResultCommentKeyEn, IsVirusConfirmed(processedOrderForPdf.TestResult, TestLanguage.English))
-                .Replace(_testResultCommentKeyRu, IsVirusConfirmed(processedOrderForPdf.TestResult, TestLanguage.Russian));
-
-            if (processedOrderForPdf.TestType == TestType.Antibody)
-                htmlTemplate = htmlTemplate.Replace(_testResultAntibodyQtyUnitsKey, processedOrderForPdf.ResultQtyUnits?.ToString());
-
-            return htmlTemplate;
+            return processedOrderForPdf.TestType == TestType.Antibody
+                ? htmlTemplate.Replace(_testResultAntibodyQtyUnitsKey, processedOrderForPdf.ResultQtyUnits?.ToString())
+                : htmlTemplate
+                    .Replace(_testResultKeyRo, GetTestResultText(processedOrderForPdf.TestResult, TestLanguage.Romanian))
+                    .Replace(_testResultKeyEn, GetTestResultText(processedOrderForPdf.TestResult, TestLanguage.English))
+                    .Replace(_testResultKeyRu, GetTestResultText(processedOrderForPdf.TestResult, TestLanguage.Russian))
+                    .Replace(_testResultCommentKeyRo, IsVirusConfirmed(processedOrderForPdf.TestResult, TestLanguage.Romanian))
+                    .Replace(_testResultCommentKeyEn, IsVirusConfirmed(processedOrderForPdf.TestResult, TestLanguage.English))
+                    .Replace(_testResultCommentKeyRu, IsVirusConfirmed(processedOrderForPdf.TestResult, TestLanguage.Russian));
         }
 
         private static int CalculateCustomerAge(DateTime dateOfBirth)
@@ -135,6 +121,17 @@ namespace LabSolution.Utils
                 TestLanguage.English => testResult == TestResult.Positive ? "Positive" : "Negative",
                 TestLanguage.Russian => testResult == TestResult.Positive ? "Положительный" : "Отрицательный",
                 _ => testResult == TestResult.Positive ? "Positive" : "Negative",
+            };
+        }
+
+        private static string IsVirusConfirmed(TestResult testResult, TestLanguage testLanguage)
+        {
+            return testLanguage switch
+            {
+                TestLanguage.Romanian => testResult == TestResult.Positive ? "prezența" : "absența",
+                TestLanguage.English => testResult == TestResult.Positive ? "presence" : "absence",
+                TestLanguage.Russian => testResult == TestResult.Positive ? "присутствие" : "отсутствие",
+                _ => testResult == TestResult.Positive ? "presence" : "absence",
             };
         }
     }
