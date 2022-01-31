@@ -11,6 +11,7 @@ using LabSolution.Enums;
 using System.Collections.Generic;
 using LabSolution.Utils;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace LabSolution.Controllers
 {
@@ -23,11 +24,36 @@ namespace LabSolution.Controllers
 
         private readonly GovSyncClient _govSyncClient;
 
-        public GovSyncController(LabSolutionContext context, IOptions<GovSyncConfiguration> options, GovSyncClient govSyncClient)
+        private readonly ILogger<GovSyncController> _logger;
+
+        public GovSyncController(LabSolutionContext context, IOptions<GovSyncConfiguration> options, GovSyncClient govSyncClient, ILogger<GovSyncController> logger)
         {
             _context = context;
             _govSyncConfiguration = options.Value;
             _govSyncClient = govSyncClient;
+
+            _logger = logger;
+        }
+
+        // TODO: #54 - Move this method into a CronJob process
+        private async Task RemovePdfsOlderThanXDays()
+        {
+            // silent execute this action without throwing (when finish implementing #54 get rid of silency)
+            try
+            {
+                var numberOfDays = Startup.StaticConfig["RemovePdfsOlderThanDays"];
+                var days = int.Parse(numberOfDays);
+
+                var today = DateTime.UtcNow.Date.ToBucharestTimeZone();
+                var checkPointDate = today.AddDays(-1 * days);
+
+                _context.ProcessedOrderPdfs.RemoveRange(_context.ProcessedOrderPdfs.Where(x => x.DateCreated.Date < checkPointDate));
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
         }
 
         [HttpPatch("sync")]
@@ -69,6 +95,8 @@ namespace LabSolution.Controllers
             var syncResult = await _govSyncClient.SendTestResults(orders);
 
             await SaveSynchedOrders(syncResult.SynchedItems);
+
+            await RemovePdfsOlderThanXDays();
 
             return Accepted(new SyncResponse(syncResult));
         }
