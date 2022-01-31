@@ -91,7 +91,7 @@ namespace LabSolution.Controllers
         {
             EnsureSuperUserPerformsTheAction();
 
-            var appUsers = await _context.AppUsers.Select(x => new AppUserResponse
+            var appUsers = await _context.AppUsers.Where(x => !x.IsDevAdmin).Select(x => new AppUserResponse
             {
                 Id = x.Id,
                 Username = x.Username,
