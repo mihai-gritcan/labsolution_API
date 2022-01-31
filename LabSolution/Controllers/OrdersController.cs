@@ -1,20 +1,20 @@
 ﻿using LabSolution.Dtos;
-using LabSolution.HttpModels;
 using LabSolution.Enums;
+using LabSolution.HttpModels;
+using LabSolution.Infrastructure;
+using LabSolution.Notifications;
 using LabSolution.Services;
 using LabSolution.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
-using LabSolution.Notifications;
-using Microsoft.Extensions.Options;
-using LabSolution.Infrastructure;
 
 namespace LabSolution.Controllers
 {
@@ -52,7 +52,7 @@ namespace LabSolution.Controllers
         // public order submit
         [AllowAnonymous]
         [HttpPost]
-        public async Task<ActionResult> CreateOrder([FromBody] CreateOrderRequest createOrder)
+        public async Task<ActionResult<IEnumerable<CreatedOrdersResponse>>> CreateOrder([FromBody] CreateOrderRequest createOrder)
         {
             var savedOrders = await SaveOrder(createOrder);
 
@@ -67,7 +67,7 @@ namespace LabSolution.Controllers
 
         // reception order submit
         [HttpPost("elevated")]
-        public async Task<ActionResult> CreateElevatedOrder([FromBody] CreateOrderRequest createOrder)
+        public async Task<ActionResult<IEnumerable<CreatedOrdersResponse>>> CreateElevatedOrder([FromBody] CreateOrderRequest createOrder)
         {
             var savedOrders = await SaveOrder(createOrder);
             if (_appEmailNotificationConfig.SendNotificationForInHouseBooking)
@@ -81,14 +81,14 @@ namespace LabSolution.Controllers
 
         // reception getOrders ByDate or idnp (can include Gov sync state data)
         [HttpGet("{date}")]
-        public async Task<ActionResult<object>> GetOrders(DateTime date, [FromQuery] string idnp, [FromQuery] bool includeSyncState = false)
+        public async Task<ActionResult<List<OrderWithStatusResponse>>> GetOrders(DateTime date, [FromQuery] string idnp, [FromQuery] bool includeSyncState = false)
         {
             return Ok(await _orderService.GetOrdersWithStatus(date, idnp, includeSyncState));
         }
 
         // reception getOrders in range Date
         [HttpGet]
-        public async Task<ActionResult<object>> GetOrders([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] TestType? type = null)
+        public async Task<ActionResult<List<OrderWithStatusResponse>>> GetOrders([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] TestType? type = null)
         {
             return Ok(await _orderService.GetOrdersWithStatus(start, end, type));
         }
@@ -143,7 +143,7 @@ namespace LabSolution.Controllers
         }
 
         [HttpGet("{date}/processed")]
-        public async Task<IActionResult> GetOrdersToSetResult(DateTime date, [FromQuery] string numericCode)
+        public async Task<ActionResult<List<ProcessedOrderToSetResultResponse>>> GetOrdersToSetResult(DateTime date, [FromQuery] string numericCode)
         {
             return Ok(await _orderService.GetOrdersToSetResult(date, numericCode));
         }

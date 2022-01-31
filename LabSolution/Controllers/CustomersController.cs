@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LabSolution.Models;
 using LabSolution.Dtos;
+using System.Collections.Generic;
 
 namespace LabSolution.Controllers
 {
@@ -32,7 +33,7 @@ namespace LabSolution.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCustomers([FromQuery] string idnp, [FromQuery] string firstName, [FromQuery] string lastName, 
+        public async Task<ActionResult<List<CustomerDto>>> GetCustomers([FromQuery] string idnp, [FromQuery] string firstName, [FromQuery] string lastName, 
             [FromQuery] string passport, [FromQuery] string email, [FromQuery] string phone)
         {
             var queryableCustomers = _context.Customers.Where(x => !x.IsSoftDelete).Select(x => x);

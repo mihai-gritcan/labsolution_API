@@ -31,7 +31,7 @@ namespace LabSolution.Controllers
         }
 
         [HttpPatch("sync")]
-        public async Task<IActionResult> SyncOrdersToGov([FromBody] OrdersToSyncRequest ordersToSync)
+        public async Task<ActionResult<SyncResponse>> SyncOrdersToGov([FromBody] OrdersToSyncRequest ordersToSync)
         {
             if (!_govSyncConfiguration.IsSyncToGovEnabled)
                 return BadRequest("Synchronization with Gov is not enabled. Please enable the option and retry");

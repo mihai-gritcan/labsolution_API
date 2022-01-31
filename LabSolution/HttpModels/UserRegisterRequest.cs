@@ -7,6 +7,7 @@ namespace LabSolution.HttpModels
     {
         [Required]
         [StringLength(50)]
+        [RegularExpression("^[a-zA-Z0-9_]*$")]
         public string Username { get; set; }
 
         /// <summary>

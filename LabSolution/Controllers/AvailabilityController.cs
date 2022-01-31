@@ -26,7 +26,7 @@ namespace LabSolution.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult> GetAvailableTimeSlots([FromQuery] DailySlotsAvailabilityRequest dailySlotsAvailabilityRequest)
+        public async Task<ActionResult<DailyAvailableTimeSlotsResponse>> GetAvailableTimeSlots([FromQuery] DailySlotsAvailabilityRequest dailySlotsAvailabilityRequest)
         {
             var labOpeningHours = await _appConfigService.GetLabConfigOpeningHours();
 
@@ -75,13 +75,13 @@ namespace LabSolution.Controllers
             return structure;
         }
 
-        private int GetNumberOfAvaliableSlotsPerInterval(DateTime intervalStart, DateTime intervalEnd, List<DateTime> dailyOccupiedSlots, LabConfigOpeningHours labOpeningHours)
+        private static int GetNumberOfAvaliableSlotsPerInterval(DateTime intervalStart, DateTime intervalEnd, List<DateTime> dailyOccupiedSlots, LabConfigOpeningHours labOpeningHours)
         {
             var placedOrdersCount = dailyOccupiedSlots.Count(x => x >= intervalStart && x < intervalEnd);
             return labOpeningHours.PersonsInInterval - placedOrdersCount;
         }
 
-        private DateTime GetCurrentTimeNormalized()
+        private static DateTime GetCurrentTimeNormalized()
         {
             DateTime currentLocalTime = DateTime.UtcNow.ToBucharestTimeZone();
 
