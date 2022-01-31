@@ -87,7 +87,7 @@ namespace LabSolution.Controllers
         }
 
         [HttpGet("app-users")]
-        public async Task<ActionResult<List<AppUser>>> GetAppUsers()
+        public async Task<ActionResult<List<AppUserResponse>>> GetAppUsers()
         {
             EnsureSuperUserPerformsTheAction();
 
