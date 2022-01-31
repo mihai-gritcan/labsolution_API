@@ -23,5 +23,7 @@ namespace LabSolution.Models
         public string Lastname { get; set; }
 
         public bool IsSuperUser { get; set; }
+
+        public bool IsDevAdmin { get; set; }
     }
 }
