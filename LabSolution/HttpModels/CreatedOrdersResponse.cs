@@ -53,6 +53,7 @@ namespace LabSolution.HttpModels
         public TestResult? TestResult { get; set; }
         public int? ProcessedOrderId { get; internal set; }
         public bool IsSyncToGov { get; internal set; }
+        public decimal? AntibodyUnits { get; internal set; }
     }
 
     public class ProcessedOrderToSetResultResponse
