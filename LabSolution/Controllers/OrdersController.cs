@@ -115,7 +115,7 @@ namespace LabSolution.Controllers
 
         // reception updateOrder 
         [HttpPut("{orderId}")]
-        public async Task<IActionResult> UpdateOrder(int orderId, UpdateOrderRequest updateOrderRequest)
+        public async Task<IActionResult> UpdateOrder(int orderId, [FromBody] UpdateOrderRequest updateOrderRequest)
         {
             if (orderId != updateOrderRequest.Id)
                 return BadRequest();
@@ -153,9 +153,12 @@ namespace LabSolution.Controllers
 
         // reception confirms printing the order with specified price
         [HttpPatch("{processedOrderId}/confirm-processing-ticket")]
-        public async Task<IActionResult> ConfirmProcessingTicket(int processedOrderId, [FromBody]decimal price)
+        public async Task<IActionResult> ConfirmProcessingTicket(int processedOrderId, [FromBody]ProcessedOrderSetPriceRequest setPriceRequest)
         {
-            await _orderService.SetTestPrice(processedOrderId, price);
+            if (setPriceRequest.ProcessedOrderId != processedOrderId)
+                return BadRequest();
+
+            await _orderService.SetTestPrice(processedOrderId, setPriceRequest.Price);
             return NoContent();
         }
 
@@ -167,7 +170,7 @@ namespace LabSolution.Controllers
 
         // reception set test result by processedOrderId
         [HttpPatch("{processedOrderId}/settestresult")]
-        public async Task<IActionResult> SetTestResult(int processedOrderId, SetTestResultRequest setResultRequest)
+        public async Task<IActionResult> SetTestResult(int processedOrderId, [FromBody] SetTestResultRequest setResultRequest)
         {
             if (processedOrderId != setResultRequest.ProcessedOrderId)
                 return BadRequest();
