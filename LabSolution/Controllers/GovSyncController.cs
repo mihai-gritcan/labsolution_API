@@ -62,13 +62,15 @@ namespace LabSolution.Controllers
             if (!_govSyncConfiguration.IsSyncToGovEnabled)
                 return BadRequest("Synchronization with Gov is not enabled. Please enable the option and retry");
 
+            const string nonExistentPersonalNumber = "-";
+
             var orders = await _context.ProcessedOrders.Where(x => ordersToSync.ProcessedOrderIds.Contains(x.Id))
                 .Include(x => x.CustomerOrder).ThenInclude(x => x.Customer)
                 .Select(x => new TestPushModel
                 {
                     PersonInfo = new PersonInfoModel {
                         IsResident = true, // TODO: get it from MedTest
-                        IdentityNumber = x.CustomerOrder.Customer.PersonalNumber,
+                        IdentityNumber = !string.IsNullOrWhiteSpace(x.CustomerOrder.Customer.PersonalNumber) ? x.CustomerOrder.Customer.PersonalNumber : nonExistentPersonalNumber,
                         FirstName = x.CustomerOrder.Customer.FirstName,
                         LastName = x.CustomerOrder.Customer.LastName,
                         BirthDay = x.CustomerOrder.Customer.DateOfBirth,

@@ -92,7 +92,7 @@ namespace LabSolution.Controllers
         {
             return Ok(await _orderService.GetOrdersWithStatus(start, end, type));
         }
-        
+
         // reception getPriceStatistics in range Date
         [HttpGet("price-statistics")]
         public async Task<ActionResult<PriceStatisticsDto>> GetPriceStatistics([FromQuery][Required] DateTime start, [FromQuery][Required] DateTime end)
