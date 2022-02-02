@@ -5,7 +5,6 @@ using LabSolution.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -69,6 +68,7 @@ namespace LabSolution.Controllers
                 Username = userRegisterRequest.Username.ToLower(),
                 Firstname = userRegisterRequest.Firstname,
                 Lastname = userRegisterRequest.Lastname,
+                IsIpRestricted = userRegisterRequest.IsIpRestricted,
                 PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userRegisterRequest.Password)),
                 PasswordSalt = hmac.Key
             };
