@@ -118,7 +118,7 @@ namespace LabSolution.Controllers
             return NoContent();
         }
 
-        // reception start printing the command confirmation
+        // reception wants to print the order
         [HttpPatch("{orderId}/processing-ticket")]
         public async Task<ActionResult<ProcessedOrderResponse>> GetProcessingTicket(int orderId)
         {
@@ -140,6 +140,14 @@ namespace LabSolution.Controllers
                 TestType = (TestType)orderDetails.TestType,
                 Customer = CustomerDto.CreateDtoFromEntity(orderDetails.Customer, orderDetails.ParentId == null)
             });
+        }
+
+        // reception confirms printing the order with specified price
+        [HttpPatch("{processedOrderId}/confirm-processing-ticket")]
+        public async Task<IActionResult> ConfirmProcessingTicket(int processedOrderId, [FromBody]decimal price)
+        {
+            await _orderService.SetTestPrice(processedOrderId, price);
+            return NoContent();
         }
 
         [HttpGet("{date}/processed")]

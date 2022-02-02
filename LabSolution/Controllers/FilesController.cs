@@ -28,9 +28,7 @@ namespace LabSolution.Controllers
         {
             var existingPdf = await _orderService.GetPdfBytes(pdfNameHex);
 
-            if (existingPdf is null) return NotFound("Can't locate the requested PDF");
-
-            MemoryStream stream = new MemoryStream(existingPdf.PdfBytes);
+            var stream = new MemoryStream(existingPdf.PdfBytes);
             return new FileStreamResult(stream, "application/pdf");
         }
     }

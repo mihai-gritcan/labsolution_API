@@ -18,8 +18,10 @@ namespace LabSolution.Services
         Task<List<DateTime>> GetOccupiedTimeSlots(DateTime date);
         Task<CustomerOrder> GetOrderDetails(int createdOrderId);
         Task UpdateOrder(UpdateOrderRequest updateOrderRequest);
+
         Task<ProcessedOrder> CreateOrUpdateProcessedOrder(int orderId);
         Task<ProcessedOrderForPdf> SetTestResult(int processedOrderId, TestResult testResult, string executorName, string verifierName, string validatorName, decimal? qtyUnits);
+        Task SetTestPrice(int processedOrderId, decimal price);
 
         Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, string idnp, bool includeSyncState);
         Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime startDate, DateTime endDate, TestType? testType = null);
@@ -44,12 +46,13 @@ namespace LabSolution.Services
 
         public Task<List<DateTime>> GetOccupiedTimeSlots(DateTime date)
         {
-            return _context.CustomerOrders.Where(x => x.Scheduled.Date == date.Date).Select(x => x.Scheduled).ToListAsync();
+            return _context.CustomerOrders.Where(x => x.Scheduled.Date == date.Date).AsNoTracking().Select(x => x.Scheduled).ToListAsync();
         }
 
         public Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, string idnp, bool includeSyncState)
         {
             return GetQueryableOrders(idnp: idnp, includeSyncState: includeSyncState)
+                .AsNoTracking()
                 .Where(x => x.OrderDate.Date == date)
                 .OrderBy(x => x.Status).ThenBy(x => x.OrderId)
                 .ToListAsync();
@@ -58,6 +61,7 @@ namespace LabSolution.Services
         public Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime startDate, DateTime endDate, TestType? testType = null)
         {
             return GetQueryableOrders(testType: testType)
+                .AsNoTracking()
                 .Where(x => x.OrderDate.Date >= startDate && x.OrderDate.Date <= endDate)
                 .OrderBy(x => x.Status).ThenBy(x => x.OrderId)
                 .ToListAsync();
@@ -161,15 +165,17 @@ namespace LabSolution.Services
             return processedOrder;
         }
 
-        public async Task<ProcessedOrderForPdf> SetTestResult(int processedOrderId, TestResult testResult, string executorName, string verifierName, string validatorName, decimal? resultQtyUnits)
+        public async Task<ProcessedOrderForPdf> SetTestResult(int processedOrderId, TestResult testResult, string executorName, string verifierName, string validatorName, decimal? qtyUnits)
         {
             var processedOrder = await _context.ProcessedOrders.Include(x => x.CustomerOrder).ThenInclude(x => x.Customer).SingleAsync(x => x.Id == processedOrderId);
+            if (processedOrder is null)
+                throw new ResourceNotFoundException();
 
             processedOrder.TestResult = (int)testResult;
             processedOrder.ProcessedBy = executorName;
             processedOrder.CheckedBy = verifierName;
             processedOrder.ValidatedBy = validatorName;
-            processedOrder.ResultQtyUnits = resultQtyUnits;
+            processedOrder.ResultQtyUnits = qtyUnits;
 
             _context.ProcessedOrders.Update(processedOrder);
 
@@ -189,6 +195,16 @@ namespace LabSolution.Services
                 NumericCode = processedOrder.Id.ToString("D7"),
                 PdfName = processedOrder.PdfName
             };
+        }
+
+        public async Task SetTestPrice(int processedOrderId, decimal price)
+        {
+            var processedOrder = await _context.ProcessedOrders.FindAsync(processedOrderId);
+            if (processedOrder is null)
+                throw new ResourceNotFoundException();
+
+            processedOrder.ConfirmedPrice = price;
+            await _context.SaveChangesAsync();
         }
 
         public async Task SaveOrReplacePdfBytes(int processedOrderId, string pdfName, byte[] pdfBytes)
@@ -231,21 +247,22 @@ namespace LabSolution.Services
                     LastName = x.CustomerOrder.Customer.LastName,
                     DateOfBirth = x.CustomerOrder.Customer.DateOfBirth,
                     TestResult = (TestResult?)x.TestResult
-                }).OrderBy(x => x.ProcessedOrderId).ToListAsync();
+                }).OrderBy(x => x.ProcessedOrderId)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<ProcessedOrderPdf> GetPdfBytes(int processedOrderId)
         {
             var orderPdf = await _context.ProcessedOrderPdfs.SingleOrDefaultAsync(x => x.ProcessedOrderId == processedOrderId);
-            if (orderPdf == null)
-                throw new ResourceNotFoundException();
 
-            return orderPdf;
+            return orderPdf ?? throw new ResourceNotFoundException();
         }
 
-        public Task<ProcessedOrderPdf> GetPdfBytes(string pdfNameHex)
+        public async Task<ProcessedOrderPdf> GetPdfBytes(string pdfNameHex)
         {
-            return _context.ProcessedOrderPdfs.Include(x => x.ProcessedOrder).SingleOrDefaultAsync(x => x.ProcessedOrder.PdfName == pdfNameHex);
+            var pdfBytes = await _context.ProcessedOrderPdfs.Include(x => x.ProcessedOrder).SingleOrDefaultAsync(x => x.ProcessedOrder.PdfName == pdfNameHex);
+            return pdfBytes ?? throw new ResourceNotFoundException();
         }
 
         public async Task DeleteOrder(int orderId, bool canRemovePdf)
