@@ -32,6 +32,8 @@ namespace LabSolution.HttpModels
         [StringLength(50)]
         public string Lastname { get; set; }
 
+        public bool IsIpRestricted { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationErrors = new List<ValidationResult>();

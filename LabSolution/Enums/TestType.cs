@@ -4,6 +4,8 @@
     {
         Antigen = 1,
         PCR = 2,
-        Antibody = 3
+        AntibodyNeutralizing = 3,
+        Antibody = 4,
+        PCRExpress = 5
     }
 }
