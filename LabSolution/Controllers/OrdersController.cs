@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -88,9 +88,18 @@ namespace LabSolution.Controllers
 
         // reception getOrders in range Date
         [HttpGet]
-        public async Task<ActionResult<List<OrderWithStatusResponse>>> GetOrders([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] TestType? type = null)
+        public async Task<ActionResult<List<OrderWithStatusResponse>>> GetOrders([FromQuery][Required] DateTime start, [FromQuery][Required] DateTime end, [FromQuery] TestType? type = null)
         {
             return Ok(await _orderService.GetOrdersWithStatus(start, end, type));
+        }
+        
+        // reception getPriceStatistics in range Date
+        [HttpGet("price-statistics")]
+        public async Task<ActionResult<PriceStatisticsDto>> GetPriceStatistics([FromQuery][Required] DateTime start, [FromQuery][Required] DateTime end)
+        {
+            EnsureSuperUserPerformsTheAction();
+
+            return Ok(await _orderService.GetPriceStatistics(start, end));
         }
 
         [HttpDelete("{orderId}")]
@@ -180,16 +189,6 @@ namespace LabSolution.Controllers
                 await _notificationManager.NotifyOrderCompleted(processedOrderForPdf, labConfigs, pdfBytes);
 
             return NoContent();
-        }
-
-        // reception getPdfResult by processedOrderId
-        [HttpGet("{processedOrderId}/pdfresult-db")]
-        public async Task<IActionResult> GetPdfResultStoreInDb(int processedOrderId)
-        {
-            var existingPdf = await _orderService.GetPdfBytes(processedOrderId);
-
-            MemoryStream stream = new MemoryStream(existingPdf.PdfBytes);
-            return new FileStreamResult(stream, "application/pdf");
         }
 
         private async Task<IEnumerable<CreatedOrdersResponse>> SaveOrder(CreateOrderRequest createOrder)

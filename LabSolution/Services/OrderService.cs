@@ -25,6 +25,7 @@ namespace LabSolution.Services
 
         Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime date, string idnp, bool includeSyncState);
         Task<List<OrderWithStatusResponse>> GetOrdersWithStatus(DateTime startDate, DateTime endDate, TestType? testType = null);
+        Task<List<PriceStatisticsDto>> GetPriceStatistics(DateTime start, DateTime end);
 
         Task DeleteOrder(int orderId, bool canRemovePdf);
 
@@ -65,6 +66,27 @@ namespace LabSolution.Services
                 .Where(x => x.OrderDate.Date >= startDate && x.OrderDate.Date <= endDate)
                 .OrderBy(x => x.Status).ThenBy(x => x.OrderId)
                 .ToListAsync();
+        }
+
+        public async Task<List<PriceStatisticsDto>> GetPriceStatistics(DateTime start, DateTime end)
+        {
+            var processedOrders = await _context.ProcessedOrders.Include(x => x.CustomerOrder)
+                .Where(x => x.ProcessedAt.Date >= start.Date && x.ProcessedAt.Date <= end)
+                .Select(x => new { x.ConfirmedPrice, x.CustomerOrder.TestType, x.ProcessedAt })
+                .AsNoTracking()
+                .ToListAsync();
+
+            return processedOrders.GroupBy(x => x.ProcessedAt.Date)
+                .Select(date => new PriceStatisticsDto
+                {
+                    Date = date.Key,
+                    TestStats = date.GroupBy(type => type.TestType).Select(x => new TestStats
+                    {
+                        Type = x.Key,
+                        DailyCount = x.Count(),
+                        DailyAmount = x.Sum(y => y.ConfirmedPrice ?? 0)
+                    }).ToList()
+                }).ToList();
         }
 
         private IQueryable<OrderWithStatusResponse> GetQueryableOrders(string idnp = null, TestType? testType = null, bool includeSyncState = false)

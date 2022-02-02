@@ -31,5 +31,15 @@ namespace LabSolution.Controllers
             var stream = new MemoryStream(existingPdf.PdfBytes);
             return new FileStreamResult(stream, "application/pdf");
         }
+
+        // reception getPdfResult by processedOrderId
+        [HttpGet("{processedOrderId}/pdfresult")]
+        public async Task<IActionResult> GetPdfResultStoreInDb(int processedOrderId)
+        {
+            var existingPdf = await _orderService.GetPdfBytes(processedOrderId);
+
+            var stream = new MemoryStream(existingPdf.PdfBytes);
+            return new FileStreamResult(stream, "application/pdf");
+        }
     }
 }

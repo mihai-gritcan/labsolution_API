@@ -180,15 +180,6 @@ namespace LabSolution.Controllers
         {
             return _context.AppUsers.AnyAsync(x => x.Username == username.ToLower());
         }
-
-        private void EnsureSuperUserPerformsTheAction()
-        {
-            var isSuperUserValue = User?.Claims.FirstOrDefault(x => x.Type.Equals(LabSolutionClaimsNames.UserIsSuperUser))?.Value;
-            var canManageUsers = isSuperUserValue?.Equals("true", StringComparison.InvariantCultureIgnoreCase) == true;
-
-            if (!canManageUsers)
-                throw new CustomException("This user doens't have the rights to manage app users");
-        }
     }
 
     public record AppUserResponse
