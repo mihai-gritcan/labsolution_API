@@ -25,5 +25,7 @@ namespace LabSolution.Models
         public bool IsSuperUser { get; set; }
 
         public bool IsDevAdmin { get; set; }
+
+        public bool IsIpRestricted { get; set; }
     }
 }

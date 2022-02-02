@@ -7,5 +7,6 @@
         public string Firstname { get; internal set; }
         public string Lastname { get; internal set; }
         public bool IsSuperUser { get; internal set; }
+        public bool IsIpRestricted { get; internal set; }
     }
 }

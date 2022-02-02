@@ -82,7 +82,8 @@ namespace LabSolution.Controllers
                 Token = _tokenService.CreateToken(user),
                 Firstname = user.Firstname,
                 Lastname = user.Lastname,
-                IsSuperUser = user.IsSuperUser
+                IsSuperUser = user.IsSuperUser,
+                IsIpRestricted = user.IsIpRestricted
             };
         }
 
@@ -97,7 +98,8 @@ namespace LabSolution.Controllers
                 Username = x.Username,
                 Firstname = x.Firstname,
                 Lastname = x.Lastname,
-                IsSuperUser = x.IsSuperUser
+                IsSuperUser = x.IsSuperUser,
+                IsIpRestricted = x.IsIpRestricted
             }).ToListAsync();
 
             return Ok(appUsers);
@@ -133,6 +135,7 @@ namespace LabSolution.Controllers
             user.Firstname = updateAppUserRequest.Firstname ?? user.Firstname;
             user.Lastname = updateAppUserRequest.Lastname ?? user.Lastname;
             user.Username = updateAppUserRequest.Username?.ToLower() ?? user.Username;
+            user.IsIpRestricted = updateAppUserRequest.IsIpRestricted;
 
             _context.AppUsers.Update(user);
             await _context.SaveChangesAsync();
@@ -195,6 +198,7 @@ namespace LabSolution.Controllers
         public string Firstname { get; set; }
         public string Lastname { get; set; }
         public bool IsSuperUser { get; set; }
+        public bool IsIpRestricted { get; internal set; }
     }
 
     public class UpdateAppUserRequest
@@ -207,6 +211,7 @@ namespace LabSolution.Controllers
         [StringLength(50)]
         [RegularExpression("^[a-zA-Z0-9_]*$")]
         public string Username { get; set; }
+        public bool IsIpRestricted { get; set; }
     }
 
     public class ChangeAppUserPasswordRequest : IValidatableObject
