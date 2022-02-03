@@ -73,9 +73,13 @@ namespace LabSolution.Utils
                     templateName = "testAntigenRo_En_Ru";
                     break;
                 case TestType.PCR:
+                case TestType.PCRExpress:
                     templateName = "testPCRRo_En_Ru";
                     break;
                 case TestType.AntibodyNeutralizing:
+                    templateName = "testAntibodyNeutralizingRo_En_Ru";
+                    break;
+                case TestType.Antibody:
                     templateName = "testAntibodyRo_En_Ru";
                     break;
             }

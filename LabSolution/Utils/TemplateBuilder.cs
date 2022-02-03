@@ -89,7 +89,7 @@ namespace LabSolution.Utils
 
         private static string AppendTestResult(string htmlTemplate, ProcessedOrderForPdf processedOrderForPdf)
         {
-            return processedOrderForPdf.TestType == TestType.AntibodyNeutralizing
+            return processedOrderForPdf.TestType == TestType.AntibodyNeutralizing || processedOrderForPdf.TestType == TestType.Antibody
                 ? htmlTemplate.Replace(_testResultAntibodyQtyUnitsKey, processedOrderForPdf.ResultQtyUnits?.ToString())
                 : htmlTemplate
                     .Replace(_testResultKeyRo, GetTestResultText(processedOrderForPdf.TestResult, TestLanguage.Romanian))

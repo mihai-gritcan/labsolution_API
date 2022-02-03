@@ -64,7 +64,9 @@ namespace LabSolution.Controllers
 
             const string nonExistentPersonalNumber = "-";
 
-            var orders = await _context.ProcessedOrders.Where(x => ordersToSync.ProcessedOrderIds.Contains(x.Id))
+            var orders = await _context.ProcessedOrders.Include(x => x.CustomerOrder)
+                .Where(x => ordersToSync.ProcessedOrderIds.Contains(x.Id)
+                        && (x.CustomerOrder.TestType == (short)TestType.Antigen || x.CustomerOrder.TestType == (short)TestType.PCR || x.CustomerOrder.TestType == (short)TestType.PCRExpress)) // Gov supports only PCR and Antigen tests
                 .Include(x => x.CustomerOrder).ThenInclude(x => x.Customer)
                 .Select(x => new TestPushModel
                 {
@@ -84,7 +86,7 @@ namespace LabSolution.Controllers
                         LaboratoryId = _govSyncConfiguration.LaboratoryId,
                         LaboratoryOfficeId = _govSyncConfiguration.LaboratoryOfficeId,
                         LaboratoryTestNumber = x.Id.ToString("D7"),
-                        SampleType = x.CustomerOrder.TestType == (short)TestType.PCR ? "PCR" : "AntiGen",
+                        SampleType = x.CustomerOrder.TestType == (short)TestType.PCR || x.CustomerOrder.TestType == (short)TestType.PCRExpress ? "PCR" : "AntiGen",
                         SampleCollectionAt = x.ProcessedAt,
                         SampleResult = x.TestResult == (int)TestResult.Positive ? "Positive" : "Negative",
                         TestDeviceIdentifier = GetTestDeviceIdentifier((TestType)x.CustomerOrder.TestType)
@@ -103,11 +105,10 @@ namespace LabSolution.Controllers
             return Accepted(new SyncResponse(syncResult));
         }
 
-        // TODO: get it from MedTest
-        private static string GetTestDeviceIdentifier(TestType testType)
+        private string GetTestDeviceIdentifier(TestType testType)
         {
             // Ex: Pentru dispozitivul "SD BIOSENSOR Inc, STANDARD F COVID-19 Ag FIA", câmpul se va completa cu valoarea "344"
-            return testType == TestType.Antigen ? "344" : null;
+            return testType == TestType.Antigen ? _govSyncConfiguration.LaboratoryAntigenDeviceIdentifier : null;
         }
 
         private async Task SaveSynchedOrders(List<TestPushModel> synchedTests)

@@ -86,7 +86,9 @@ namespace LabSolution.Services
                         DailyCount = x.Count(),
                         DailyAmount = x.Sum(y => y.ConfirmedPrice ?? 0)
                     }).ToList()
-                }).ToList();
+                })
+                .OrderBy(x => x.Date)
+                .ToList();
         }
 
         private IQueryable<OrderWithStatusResponse> GetQueryableOrders(string idnp = null, TestType? testType = null, bool includeSyncState = false)
