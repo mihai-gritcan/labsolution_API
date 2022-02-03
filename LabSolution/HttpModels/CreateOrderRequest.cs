@@ -54,6 +54,10 @@ namespace LabSolution.HttpModels
             if (Customers.GroupBy(x => x.PersonalNumber).Count() != Customers.Count)
                 validationErrors.Add(new ValidationResult("There are customers with duplicated Personal numbers. Ensure ach Customer has it's own personal number set.", new List<string> { nameof(Customers) }));
 
+            var selectedTestType = (int)TestType;
+            if (!Enum.IsDefined(typeof(TestType), selectedTestType))
+                validationErrors.Add(new ValidationResult("Invalid Test Type selected", new List<string> { nameof(TestType) }));
+
             return validationErrors;
         }
     }
