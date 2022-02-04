@@ -17,6 +17,7 @@ namespace LabSolution.Models
         public int? TestResult { get; set; }
         public decimal? ResultQtyUnits { get; internal set; }
         public decimal? ConfirmedPrice { get; internal set; }
+        public DateTime LastProcessingDate { get; internal set; }
 
         [ForeignKey(nameof(CustomerOrderId))]
         [InverseProperty("ProcessedOrder")]

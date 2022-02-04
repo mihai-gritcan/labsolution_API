@@ -171,12 +171,13 @@ namespace LabSolution.Services
             {
                 CustomerOrderId = orderId,
                 ProcessedAt = DateTime.UtcNow.ToBucharestTimeZone(),
+                LastProcessingDate = DateTime.UtcNow.ToBucharestTimeZone(),
                 PrintCount = 1
             };
 
             if(processedOrder.Id > 0)
             {
-                processedOrder.ProcessedAt = DateTime.UtcNow.ToBucharestTimeZone();
+                processedOrder.LastProcessingDate = DateTime.UtcNow.ToBucharestTimeZone();
                 processedOrder.PrintCount++;
             }
             else
