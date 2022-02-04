@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using LabSolution.Utils;
 using System;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LabSolution.Controllers
 {
@@ -55,7 +56,6 @@ namespace LabSolution.Controllers
                 _logger.LogError(ex.Message);
             }
         }
-
         [HttpPatch("sync")]
         public async Task<ActionResult<SyncResponse>> SyncOrdersToGov([FromBody] OrdersToSyncRequest ordersToSync)
         {
@@ -89,7 +89,7 @@ namespace LabSolution.Controllers
                         SampleType = x.CustomerOrder.TestType == (short)TestType.PCR || x.CustomerOrder.TestType == (short)TestType.PCRExpress ? "PCR" : "AntiGen",
                         SampleCollectionAt = x.ProcessedAt,
                         SampleResult = x.TestResult == (int)TestResult.Positive ? "Positive" : "Negative",
-                        TestDeviceIdentifier = GetTestDeviceIdentifier((TestType)x.CustomerOrder.TestType)
+                        TestDeviceIdentifier = x.CustomerOrder.TestType == (short)TestType.Antigen ? _govSyncConfiguration.LaboratoryAntigenDeviceIdentifier : null // Ex: Pentru dispozitivul "SD BIOSENSOR Inc, STANDARD F COVID-19 Ag FIA", câmpul se va completa cu valoarea "344"
                     },
                     VaccinationInfo = new VaccinationInfoModel(),
                     CaseStartDate = x.ProcessedAt // should be the Start of a Positive test or the Date when the sample was collected
@@ -103,12 +103,6 @@ namespace LabSolution.Controllers
             await RemovePdfsOlderThanXDays();
 
             return Accepted(new SyncResponse(syncResult));
-        }
-
-        private string GetTestDeviceIdentifier(TestType testType)
-        {
-            // Ex: Pentru dispozitivul "SD BIOSENSOR Inc, STANDARD F COVID-19 Ag FIA", câmpul se va completa cu valoarea "344"
-            return testType == TestType.Antigen ? _govSyncConfiguration.LaboratoryAntigenDeviceIdentifier : null;
         }
 
         private async Task SaveSynchedOrders(List<TestPushModel> synchedTests)
