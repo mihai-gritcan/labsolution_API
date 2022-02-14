@@ -13,6 +13,7 @@ namespace LabSolution.Models
         public int Id { get; set; }
 
         [Required]
+        [StringLength(10)]
         public string DayOfWeek { get; set; }
         [Required]
         public TimeSpan OpenTime { get; set; }
