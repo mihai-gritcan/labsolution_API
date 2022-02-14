@@ -228,7 +228,7 @@ namespace LabSolution.Controllers
         {
             var openingHours = await _appConfigService.GetOpeningHours();
 
-            if (!LabDailyAvailabilityProvider.IsWhenOfficeIsOpen2(scheduledDateTime, openingHours))
+            if (!LabDailyAvailabilityProvider.IsWhenOfficeIsOpen(scheduledDateTime, openingHours))
             {
                 var dateTimeString = scheduledDateTime.ToString("yyyy-MM-dd HH:mm");
                 throw new CustomException($"The Lab is Closed on '{dateTimeString}'");

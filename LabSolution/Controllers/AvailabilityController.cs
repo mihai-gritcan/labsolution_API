@@ -31,7 +31,7 @@ namespace LabSolution.Controllers
             var labConfigPersonsAndIntervals = await _appConfigService.GetLabConfigPersonsAndIntervals();
             var openingHours = await _appConfigService.GetOpeningHours();
 
-            if (!LabDailyAvailabilityProvider.IsWorkingDay2(dailySlotsAvailabilityRequest.Date, openingHours))
+            if (!LabDailyAvailabilityProvider.IsWorkingDay(dailySlotsAvailabilityRequest.Date, openingHours))
                 return Ok(new DailyAvailableTimeSlotsResponse(dailySlotsAvailabilityRequest.Date));
 
             var placedOrders = await _orderService.GetOccupiedTimeSlots(dailySlotsAvailabilityRequest.Date);
@@ -50,15 +50,15 @@ namespace LabSolution.Controllers
             DateTime iterator;
             if (date.Date == currentLocalTime.Date)
             {
-                var startOfDay = LabDailyAvailabilityProvider.GetStartOfDay2(date, openingHours);
+                var startOfDay = LabDailyAvailabilityProvider.GetStartOfDay(date, openingHours);
                 iterator = currentLocalTime > startOfDay ? currentLocalTime : startOfDay;
             }
             else
             {
-                iterator = LabDailyAvailabilityProvider.GetStartOfDay2(date, openingHours);
+                iterator = LabDailyAvailabilityProvider.GetStartOfDay(date, openingHours);
             }
 
-            while (iterator < LabDailyAvailabilityProvider.GetEndOfDay2(date, openingHours))
+            while (iterator < LabDailyAvailabilityProvider.GetEndOfDay(date, openingHours))
             {
                 var nextIntervalStart = iterator.AddMinutes(labConfig.IntervalDurationMinutes);
                 var numberOfSlots = GetNumberOfAvaliableSlotsPerInterval(iterator, nextIntervalStart, occupiedSlots, labConfig.PersonsInInterval);
