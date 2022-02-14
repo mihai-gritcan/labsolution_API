@@ -121,7 +121,7 @@ namespace LabSolution.Controllers
                 return BadRequest();
 
             await CheckIsLabOpen(updateOrderRequest.ScheduledDateTime);
-
+            
             await _orderService.UpdateOrder(updateOrderRequest);
 
             return NoContent();
@@ -226,9 +226,9 @@ namespace LabSolution.Controllers
 
         private async Task CheckIsLabOpen(DateTime scheduledDateTime)
         {
-            var labOpeningHours = await _appConfigService.GetLabConfigOpeningHours();
+            var openingHours = await _appConfigService.GetOpeningHours();
 
-            if (!LabDailyAvailabilityProvider.IsWhenOfficeIsOpen(scheduledDateTime, labOpeningHours))
+            if (!LabDailyAvailabilityProvider.IsWhenOfficeIsOpen2(scheduledDateTime, openingHours))
             {
                 var dateTimeString = scheduledDateTime.ToString("yyyy-MM-dd HH:mm");
                 throw new CustomException($"The Lab is Closed on '{dateTimeString}'");

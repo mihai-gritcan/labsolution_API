@@ -28,57 +28,51 @@ namespace LabSolution.Controllers
         [HttpGet]
         public async Task<ActionResult<DailyAvailableTimeSlotsResponse>> GetAvailableTimeSlots([FromQuery] DailySlotsAvailabilityRequest dailySlotsAvailabilityRequest)
         {
-            var labOpeningHours = await _appConfigService.GetLabConfigOpeningHours();
+            var labConfigPersonsAndIntervals = await _appConfigService.GetLabConfigPersonsAndIntervals();
+            var openingHours = await _appConfigService.GetOpeningHours();
 
-            if (!LabDailyAvailabilityProvider.IsWorkingDay(dailySlotsAvailabilityRequest.Date, labOpeningHours))
+            if (!LabDailyAvailabilityProvider.IsWorkingDay2(dailySlotsAvailabilityRequest.Date, openingHours))
                 return Ok(new DailyAvailableTimeSlotsResponse(dailySlotsAvailabilityRequest.Date));
 
             var placedOrders = await _orderService.GetOccupiedTimeSlots(dailySlotsAvailabilityRequest.Date);
 
-            return Ok(BuildDailyStructure(dailySlotsAvailabilityRequest.Date, placedOrders, labOpeningHours));
+            return Ok(BuildDailyStructure(dailySlotsAvailabilityRequest.Date, placedOrders, openingHours, labConfigPersonsAndIntervals));
         }
 
-        private DailyAvailableTimeSlotsResponse BuildDailyStructure(DateTime date, List<DateTime> occupiedSlots, LabConfigOpeningHours labOpeningHours)
+        private DailyAvailableTimeSlotsResponse BuildDailyStructure(DateTime date, List<DateTime> occupiedSlots, List<OpeningHoursDto> openingHours, LabConfigPersonsAndIntervals labConfig)
         {
             var structure = new DailyAvailableTimeSlotsResponse(date);
 
             DateTime currentLocalTime = GetCurrentTimeNormalized();
 
+            if (date.Date < currentLocalTime.Date) return structure;
+
             DateTime iterator;
-            if(date.Date < currentLocalTime.Date)
+            if (date.Date == currentLocalTime.Date)
             {
-                return structure;
-            }
-            else if (date.Date == currentLocalTime.Date)
-            {
-                if (currentLocalTime > LabDailyAvailabilityProvider.GetStartOfDay(date, labOpeningHours))
-                {
-                    iterator = currentLocalTime;
-                }
-                else
-                {
-                    iterator = LabDailyAvailabilityProvider.GetStartOfDay(date, labOpeningHours);
-                }
+                var startOfDay = LabDailyAvailabilityProvider.GetStartOfDay2(date, openingHours);
+                iterator = currentLocalTime > startOfDay ? currentLocalTime : startOfDay;
             }
             else
             {
-                iterator = LabDailyAvailabilityProvider.GetStartOfDay(date, labOpeningHours);
+                iterator = LabDailyAvailabilityProvider.GetStartOfDay2(date, openingHours);
             }
 
-            while (iterator < LabDailyAvailabilityProvider.GetEndOfDay(date, labOpeningHours))
+            while (iterator < LabDailyAvailabilityProvider.GetEndOfDay2(date, openingHours))
             {
-                var nextIntervalStart = iterator.AddMinutes(labOpeningHours.IntervalDurationMinutes);
-                structure.AvailableSlots.Add(new DailyAvailableTimeSlotsResponse.TimeSlot(iterator, GetNumberOfAvaliableSlotsPerInterval(iterator, nextIntervalStart, occupiedSlots, labOpeningHours)));
+                var nextIntervalStart = iterator.AddMinutes(labConfig.IntervalDurationMinutes);
+                var numberOfSlots = GetNumberOfAvaliableSlotsPerInterval(iterator, nextIntervalStart, occupiedSlots, labConfig.PersonsInInterval);
+                structure.AvailableSlots.Add(new DailyAvailableTimeSlotsResponse.TimeSlot(iterator, numberOfSlots));
                 iterator = nextIntervalStart;
             }
 
             return structure;
         }
 
-        private static int GetNumberOfAvaliableSlotsPerInterval(DateTime intervalStart, DateTime intervalEnd, List<DateTime> dailyOccupiedSlots, LabConfigOpeningHours labOpeningHours)
+        private static int GetNumberOfAvaliableSlotsPerInterval(DateTime intervalStart, DateTime intervalEnd, List<DateTime> dailyOccupiedSlots, int acceptedPersonsInInterval)
         {
             var placedOrdersCount = dailyOccupiedSlots.Count(x => x >= intervalStart && x < intervalEnd);
-            return labOpeningHours.PersonsInInterval - placedOrdersCount;
+            return acceptedPersonsInInterval - placedOrdersCount > 0 ? acceptedPersonsInInterval - placedOrdersCount : 0;
         }
 
         private static DateTime GetCurrentTimeNormalized()

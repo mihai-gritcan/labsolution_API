@@ -6,19 +6,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Text.Json;
 using System;
-using LabSolution.Utils;
 
 namespace LabSolution.Services
 {
     public interface IAppConfigService
     {
-        Task<List<AppConfigDto>> GetAppConfigurations();
-        Task<LabConfigAddresses> GetLabConfigAddresses();
-        Task<LabConfigOpeningHours> GetLabConfigOpeningHours();
+        Task<List<AppConfigDto>> GetAppConfigs();
         Task DeleteConfig(int id);
         Task<IEnumerable<AppConfigDto>> SaveConfigs(List<AppConfigDto> appConfigs);
+
+        Task<LabConfigAddresses> GetLabConfigAddresses();
+        Task<LabConfigPersonsAndIntervals> GetLabConfigPersonsAndIntervals();
 
         Task<List<OpeningHoursDto>> GetOpeningHours();
         Task<IEnumerable<OpeningHoursDto>> SaveOpeningHours(List<OpeningHoursDto> openingHours);
@@ -45,7 +44,7 @@ namespace LabSolution.Services
             await _context.SaveChangesAsync();
         }
 
-        public Task<List<AppConfigDto>> GetAppConfigurations()
+        public Task<List<AppConfigDto>> GetAppConfigs()
         {
             return _context.AppConfigs.Select(x => new AppConfigDto { Id = x.Id, Key = x.Key, Value = x.Value }).ToListAsync();
         }
@@ -72,15 +71,12 @@ namespace LabSolution.Services
         }
 
 
-        public async Task<LabConfigOpeningHours> GetLabConfigOpeningHours()
+        public async Task<LabConfigPersonsAndIntervals> GetLabConfigPersonsAndIntervals()
         {
-            const string defaultStartTime = "08:00";
-            const string defaultEndDayTime = "18:00";
             const int defaultIntervalDurationMinutes = 10;
             const int defaultPersonsInInterval = 2;
-            var defaultWorkingDays = new List<string> { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
 
-            var objType = typeof(LabConfigOpeningHours);
+            var objType = typeof(LabConfigPersonsAndIntervals);
             var props = new List<PropertyInfo>(objType.GetProperties());
 
             var keysToRetrieve = props.ConvertAll(x => x.Name.ToUpper());
@@ -88,16 +84,12 @@ namespace LabSolution.Services
             var configs = await _context.AppConfigs.Where(x => keysToRetrieve.Contains(x.Key.ToUpper()))
                                     .ToDictionaryAsync(x => x.Key.ToUpper(), x => x.Value);
 
-            return new LabConfigOpeningHours
+            return new LabConfigPersonsAndIntervals
             {
-                StartDayTime = configs.ContainsKey(nameof(LabConfigOpeningHours.StartDayTime).ToUpper()) ? configs[nameof(LabConfigOpeningHours.StartDayTime).ToUpper()] : defaultStartTime,
-                EndDayTime = configs.ContainsKey(nameof(LabConfigOpeningHours.EndDayTime).ToUpper()) ? configs[nameof(LabConfigOpeningHours.EndDayTime).ToUpper()] : defaultEndDayTime,
-                IntervalDurationMinutes = configs.ContainsKey(nameof(LabConfigOpeningHours.IntervalDurationMinutes).ToUpper())
-                    ? int.Parse(configs[nameof(LabConfigOpeningHours.IntervalDurationMinutes).ToUpper()]) : defaultIntervalDurationMinutes,
-                PersonsInInterval = configs.ContainsKey(nameof(LabConfigOpeningHours.PersonsInInterval).ToUpper())
-                    ? int.Parse(configs[nameof(LabConfigOpeningHours.PersonsInInterval).ToUpper()]) : defaultPersonsInInterval,
-                WorkingDays = configs.ContainsKey(nameof(LabConfigOpeningHours.WorkingDays).ToUpper())
-                    ? JsonSerializer.Deserialize<List<string>>(configs[nameof(LabConfigOpeningHours.WorkingDays).ToUpper()]) : defaultWorkingDays
+                IntervalDurationMinutes = configs.ContainsKey(nameof(LabConfigPersonsAndIntervals.IntervalDurationMinutes).ToUpper())
+                    ? int.Parse(configs[nameof(LabConfigPersonsAndIntervals.IntervalDurationMinutes).ToUpper()]) : defaultIntervalDurationMinutes,
+                PersonsInInterval = configs.ContainsKey(nameof(LabConfigPersonsAndIntervals.PersonsInInterval).ToUpper())
+                    ? int.Parse(configs[nameof(LabConfigPersonsAndIntervals.PersonsInInterval).ToUpper()]) : defaultPersonsInInterval,
             };
         }
 

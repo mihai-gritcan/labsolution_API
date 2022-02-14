@@ -28,7 +28,7 @@ namespace LabSolution.Controllers
         [HttpGet]
         public async Task<ActionResult<List<AppConfigDto>>> GetConfigs()
         {
-            return Ok(await _appConfigService.GetAppConfigurations());
+            return Ok(await _appConfigService.GetAppConfigs());
         }
 
         [HttpDelete("{id}")]
@@ -39,21 +39,18 @@ namespace LabSolution.Controllers
             return NoContent();
         }
 
-        [AllowAnonymous]
         [HttpGet("opening-hours")]
         public async Task<ActionResult<List<OpeningHoursDto>>> GetOpeningHours()
         {
             return Ok(await _appConfigService.GetOpeningHours());
         }
 
-        [AllowAnonymous]
         [HttpPost("opening-hours")]
         public async Task<IActionResult> SaveOpeningHours([FromBody] List<OpeningHoursDto> openingHours)
         {
             return Ok(await _appConfigService.SaveOpeningHours(openingHours));
         }
 
-        [AllowAnonymous]
         [HttpDelete("opening-hours/{id}")]
         public async Task<IActionResult> DeleteOpeningHours(int id)
         {

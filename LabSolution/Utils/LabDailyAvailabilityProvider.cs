@@ -1,34 +1,51 @@
 ﻿using LabSolution.Dtos;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace LabSolution.Utils
 {
     public static class LabDailyAvailabilityProvider
     {
-        private static DateTime StartOfDay(DateTime date, LabConfigOpeningHours openingHoursOptions) =>
-            new DateTime(date.Year, date.Month, date.Day, openingHoursOptions.StartDayHour, openingHoursOptions.StartDayMinutes, 0);
-
-        private static DateTime EndOfDay(DateTime date, LabConfigOpeningHours openingHoursOptions) =>
-            new DateTime(date.Year, date.Month, date.Day, openingHoursOptions.EndDayHour, openingHoursOptions.EndDayMinutes, 0);
-
-        public static DateTime GetStartOfDay(DateTime date, LabConfigOpeningHours openingHoursOptions)
+        public static bool IsWhenOfficeIsOpen2(DateTime date, List<OpeningHoursDto> openingHours)
         {
-            return StartOfDay(date, openingHoursOptions);
+            var match = openingHours.Find(x => x.DayOfWeek.Equals(date.DayOfWeek.ToString(), StringComparison.InvariantCultureIgnoreCase));
+            if (match is null) return false;
+
+            return IsWorkingDay2(date, openingHours) && date >= StartOfDay2(date, match) && date < EndOfDay2(date, match);
         }
 
-        public static DateTime GetEndOfDay(DateTime date, LabConfigOpeningHours openingHoursOptions)
+        public static bool IsWorkingDay2(DateTime date, List<OpeningHoursDto> openingHours)
         {
-            return EndOfDay(date, openingHoursOptions);
+            return openingHours.Select(x => x.DayOfWeek).Contains(date.DayOfWeek.ToString());
         }
 
-        public static bool IsWhenOfficeIsOpen(DateTime date, LabConfigOpeningHours openingHoursOptions)
+        private static DateTime StartOfDay2(DateTime date, OpeningHoursDto openingHoursDto)
         {
-            return IsWorkingDay(date, openingHoursOptions) && date >= StartOfDay(date, openingHoursOptions) && date < EndOfDay(date, openingHoursOptions);
+            var d = new DateTime(date.Year, date.Month, date.Day);
+            var x = d.Date + openingHoursDto.OpenTime;
+            return d.Date + openingHoursDto.OpenTime;
         }
 
-        public static bool IsWorkingDay(DateTime date, LabConfigOpeningHours openingHoursOptions)
+        private static DateTime EndOfDay2(DateTime date, OpeningHoursDto openingHoursDto)
         {
-            return openingHoursOptions.WorkingDays.Contains(date.DayOfWeek.ToString());
+            var d = new DateTime(date.Year, date.Month, date.Day);
+            var y = d.Date + openingHoursDto.CloseTime;
+            return d.Date + openingHoursDto.CloseTime;
         }
+
+        public static DateTime GetStartOfDay2(DateTime date, List<OpeningHoursDto> openingHours)
+        {
+            var match = openingHours.Find(x => x.DayOfWeek.Equals(date.DayOfWeek.ToString(), StringComparison.InvariantCultureIgnoreCase));
+
+            return StartOfDay2(date, match);
+        }
+
+        public static DateTime GetEndOfDay2(DateTime date, List<OpeningHoursDto> openingHours)
+        {
+            var match = openingHours.Find(x => x.DayOfWeek.Equals(date.DayOfWeek.ToString(), StringComparison.InvariantCultureIgnoreCase));
+            return EndOfDay2(date, match);
+        }
+
     }
 }
