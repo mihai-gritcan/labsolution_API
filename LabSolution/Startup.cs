@@ -42,7 +42,9 @@ namespace LabSolution
             services.Configure<AppEmailNotificationConfig>(options => Configuration.GetSection(nameof(AppEmailNotificationConfig)).Bind(options));
             services.Configure<GovSyncConfiguration>(options => Configuration.GetSection(nameof(GovSyncConfiguration)).Bind(options));
 
-            services.AddControllers();
+            services.AddControllers()
+            .AddJsonOptions(options =>
+                options.JsonSerializerOptions.Converters.Add(new TimeSpanConverter()));
 
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IOrderService, OrderService>();

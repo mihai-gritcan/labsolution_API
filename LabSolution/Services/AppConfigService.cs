@@ -7,6 +7,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System;
+using LabSolution.Utils;
 
 namespace LabSolution.Services
 {
@@ -17,6 +19,10 @@ namespace LabSolution.Services
         Task<LabConfigOpeningHours> GetLabConfigOpeningHours();
         Task DeleteConfig(int id);
         Task<IEnumerable<AppConfigDto>> SaveConfigs(List<AppConfigDto> appConfigs);
+
+        Task<List<OpeningHoursDto>> GetOpeningHours();
+        Task<IEnumerable<OpeningHoursDto>> SaveOpeningHours(List<OpeningHoursDto> openingHours);
+        Task DeleteOpeningHours(int id);
     }
 
     public class AppConfigService : IAppConfigService
@@ -116,11 +122,83 @@ namespace LabSolution.Services
             }
 
             _context.AppConfigs.AddRange(configsToAdd);
-            _context.UpdateRange(configsToUpdate);
 
             await _context.SaveChangesAsync();
 
             return configsToAdd.Union(configsToUpdate).Select(x => new AppConfigDto { Id = x.Id, Key = x.Key, Value = x.Value });
+        }
+
+        public async Task<IEnumerable<OpeningHoursDto>> SaveOpeningHours(List<OpeningHoursDto> openingHours)
+        {
+            var defaultApplicableFrom = new DateTime(2022, 1, 1);
+            var defaultApplicableTo = new DateTime(3000, 12, 31);
+
+            var daysNames = openingHours.Select(x => x.DayOfWeek).ToHashSet();
+
+            var existingRecords = await _context.OpeningHours.Where(x => daysNames.Contains(x.DayOfWeek)).ToListAsync();
+
+            var openingHoursToAdd = new List<OpeningHours>();
+            var openingHoursToUpdate = new List<OpeningHours>();
+
+            foreach (var item in openingHours)
+            {
+                var match = existingRecords.Find(x => x.DayOfWeek.Equals(item.DayOfWeek, StringComparison.InvariantCultureIgnoreCase));
+
+                if (match is null) {
+                    openingHoursToAdd.Add(new OpeningHours
+                    {
+                        DayOfWeek = item.DayOfWeek,
+                        OpenTime = item.OpenTime,
+                        CloseTime = item.CloseTime,
+                        ApplicableFrom = item.ApplicableFrom ?? defaultApplicableFrom,
+                        ApplicableTo = item.ApplicableTo ?? defaultApplicableTo
+                    });
+                }
+                else
+                {
+                    match.OpenTime = item.OpenTime;
+                    match.CloseTime = item.CloseTime;
+                    openingHoursToUpdate.Add(match);
+                }
+            }
+
+            _context.OpeningHours.AddRange(openingHoursToAdd);
+
+            await _context.SaveChangesAsync();
+
+            return openingHoursToAdd.Union(openingHoursToUpdate).Select(x => new OpeningHoursDto
+            {
+                Id = x.Id,
+                DayOfWeek = x.DayOfWeek,
+                OpenTime = x.OpenTime,
+                CloseTime = x.CloseTime,
+                ApplicableFrom = x.ApplicableFrom,
+                ApplicableTo = x.ApplicableTo
+            });
+        }
+
+        public async Task DeleteOpeningHours(int id)
+        {
+            var entity = await _context.OpeningHours.FindAsync(id);
+
+            if (entity == null)
+                throw new ResourceNotFoundException();
+
+            _context.OpeningHours.Remove(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public Task<List<OpeningHoursDto>> GetOpeningHours()
+        {
+            return _context.OpeningHours.Select(x => new OpeningHoursDto
+            {
+                Id = x.Id,
+                DayOfWeek = x.DayOfWeek,
+                OpenTime = x.OpenTime,
+                CloseTime = x.CloseTime,
+                ApplicableFrom = x.ApplicableFrom,
+                ApplicableTo = x.ApplicableTo
+            }).ToListAsync();
         }
     }
 }
