@@ -7,7 +7,7 @@ namespace LabSolution.Models
 {
     [Table(nameof(CustomerOrder))]
     [Index(nameof(CustomerId), Name = "IX_CustomerOrder_CustomerId")]
-    public partial class CustomerOrder
+    public class CustomerOrder
     {
         [Key]
         public int Id { get; set; }

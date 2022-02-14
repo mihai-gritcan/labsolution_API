@@ -20,6 +20,7 @@ namespace LabSolution.Models
         public virtual DbSet<AppConfig> AppConfigs { get; set; }
         public virtual DbSet<ProcessedOrderPdf> ProcessedOrderPdfs { get; set; }
         public virtual DbSet<OrderSyncToGov> OrdersSyncToGov { get; set; }
+        public virtual DbSet<OpeningHours> OpeningHours { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
